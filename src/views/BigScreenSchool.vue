@@ -73,7 +73,7 @@ export default class BigScreenSchool extends Vue {
   schoolCode: string = '02';
   baseUrl: string = 'http://crm.test.pxjy.com';
 
-  computedPostParams () {
+  computedPostParams (): Object {
     return {
       DayAreaRank: {
         url: this.baseUrl + '/Api_DataV/getSchoolRealData',

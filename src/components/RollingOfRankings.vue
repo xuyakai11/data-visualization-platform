@@ -22,7 +22,7 @@ export default class RollingOfRankings extends Vue {
   @Prop()private datas!: any;
 
   rankList: Array<any> = [];
-  circleColor:any = {
+  circleColor: any = {
     0: 'bg-orange',
     1: 'bg-light-orange',
     2: 'bg-yellow',
