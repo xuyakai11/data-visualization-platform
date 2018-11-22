@@ -3,12 +3,33 @@
     <h3>{{datas.title}}</h3>
     <div class="list-title">
       <div class="circle"></div>
-      <div v-for="item in datas.field" class="ellipsis" :key="item">{{item}}</div>
+      <div
+        class="ellipsis"
+        v-for="item in datas.field"
+        :key="item"
+      >
+        {{item}}
+      </div>
     </div>
     <div class="roll-wrap">
-      <div v-for="(v,i) in rankList" class="list" :key="i*2">
-        <div class="circle" :class="circleColor[i>2 ? 'other' : i]">{{i+1}}</div>
-        <div v-for="item in datas.field" class="ellipsis" :key="item">{{v[item]}}</div>
+      <div
+        class="list"
+        v-for="(v,i) in rankList"
+        :key="i*2"
+      >
+        <div
+          class="circle"
+          :class="circleColor[i>2 ? 'other' : i]"
+        >
+          {{i+1}}
+        </div>
+        <div
+          class="ellipsis"
+          v-for="item in datas.field"
+          :key="item"
+        >
+          {{v[item]}}
+        </div>
       </div>
     </div>
   </div>
@@ -68,6 +89,7 @@ export default class RollingOfRankings extends Vue {
     align-items: center;
     &>div{
       flex-grow: 1;
+      flex-basis: 25%;
       font-size: 16px;
       line-height: 35px;
       text-align: left;
@@ -87,13 +109,13 @@ export default class RollingOfRankings extends Vue {
     opacity: 0;
   }
   .bg-orange{
-    background-color: #ff6029;
+    background-color: rgb(255, 96, 41);
   }
   .bg-light-orange{
-    background-color: #ff872a;
+    background-color: rgb(255, 135, 42);
   }
   .bg-yellow {
-    background-color: #f0ab38;
+    background-color: rgb(240, 171, 56);
   }
   .bg-cyan {
     background-color: rgb(68, 211, 228);
