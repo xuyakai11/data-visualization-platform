@@ -9,27 +9,31 @@ import axios from 'axios'
 const echarts = require('echarts/lib/echarts') // 引入ECharts主模块
 require('echarts/lib/chart/line')
 // 引入提示框和标题组件
-require('echarts/lib/component/tooltip')
+// require('echarts/lib/component/tooltip')
 require('echarts/lib/component/title')
 
 @Component
 export default class AreaBasic extends Vue {
-  @Prop()private datas!: any;
+  @Prop()private datas!: any
 
-  rankList: Array<any> = [];
-
-  created () {
+  mounted () {
     axios.get(this.datas.url, { params: this.datas.data }).then((r:any) => {
       r = r.data
+
       if (Object.prototype.toString.call(r).slice(8, -1) === 'Array') {
-        console.log(r)
+        let xAxisData: Array<number> = []
+        let seriesData: Array<number> = []
+
+        r.forEach((v: any) => {
+          xAxisData.push(v.x)
+          seriesData.push(v.y)
+        })
+        this.drawChartAreaBasic(xAxisData, seriesData)
       }
     })
   }
-  mounted () {
-    this.drawChartAreaBasic()
-  }
-  drawChartAreaBasic () {
+  drawChartAreaBasic (xAxisData: Array<number>, seriesData: Array<number>) {
+    console.log(xAxisData, seriesData)
     const myChart = echarts.init(document.getElementById('areaBasic'))
     myChart.setOption({
       // tooltip: {
@@ -68,7 +72,7 @@ export default class AreaBasic extends Vue {
             color: 'rgba(255, 255, 255, 0.6)'
           }
         },
-        data: [1, 2, 3]
+        data: xAxisData
       }],
       yAxis: {
         type: 'value',
@@ -95,33 +99,31 @@ export default class AreaBasic extends Vue {
           name: '',
           type: 'line',
           itemStyle: {
-            normal: {
-              lineStyle: {
-                color: '#2187be',
-                width: 1
-              },
-              areaStyle: {
-                color: {
-                  type: 'linear',
-                  x: 0,
-                  y: 0,
-                  x2: 0,
-                  y2: 1,
-                  colorStops: [{
-                    offset: 0, color: 'rgba(2,161,222,.9)' // 0% 处的颜色
-                  }, {
-                    offset: 1, color: 'rgba(255,255,255,0)' // 100% 处的颜色
-                  }],
-                  globalCoord: false // 缺省为 false
-                }
-              },
-              borderColor: '#2187be',
-              borderWidth: 6
-            }
+            color: '#2187be'
           },
           symbol: 'circle',
+          symbolSize: 8,
+          lineStyle: {
+            color: '#2187be',
+            width: 1
+          },
+          areaStyle: {
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [{
+                offset: 0, color: 'rgba(2,161,222,.9)' // 0% 处的颜色
+              }, {
+                offset: 1, color: 'rgba(255,255,255,0)' // 100% 处的颜色
+              }],
+              globalCoord: false // 缺省为 false
+            }
+          },
           z: 1,
-          data: [1, 2, 4]
+          data: seriesData
         }
       ]
     })
