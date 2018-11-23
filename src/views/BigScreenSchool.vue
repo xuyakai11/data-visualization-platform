@@ -32,20 +32,8 @@
       <AreaBasic :datas=computedPostParams().DayHourMoneyNew />
     </div>
     <div class="main-right">
-      <div class="rank-wrap">
-        <h3 id="headContinueRankArea"></h3>
-        <div class="list-title" id="titleContinueRankArea">
-        </div>
-        <div class="roll-wrap" id="continueRankArea">
-        </div>
-      </div>
-      <div class="rank-wrap">
-        <h3 id="headContinueRankClass"></h3>
-        <div class="list-title" id="titleContinueRankClass">
-        </div>
-        <div class="roll-wrap" id="continueRankClass">
-        </div>
-      </div>
+      <RollingOfRankings :datas=computedPostParams().AreaRepayRank />
+      <RollingOfRankings :datas=computedPostParams().ClassRepayRank />
       <div class="rank-wrap">
         <h3 id="headContinueRankClass"></h3>
         <div class="list-title" id="titleContinueRankGrade">
@@ -80,6 +68,18 @@ export default class BigScreenSchool extends Vue {
         data: { func: 'DayAreaRank', schoolCode: this.schoolCode },
         title: '校区收入排行',
         field: '校区-金额-人次'.split('-')
+      },
+      ClassRepayRank: {
+        url: this.baseUrl + '/Api_DataV/getSchoolRealData',
+        data: { func: 'ClassRepayRank', schoolCode: this.schoolCode },
+        title: '班级续班Top10',
+        field: '班级-教师-续班率'.split('-')
+      },
+      AreaRepayRank: {
+        url: this.baseUrl + '/Api_DataV/getSchoolRealData',
+        data: { func: 'AreaRepayRank', schoolCode: this.schoolCode },
+        title: '校区续班Top10',
+        field: '校区-人次-续班率'.split('-')
       },
       DayHourMoneyNew: {
         url: this.baseUrl + '/Api_DataV/getSchoolRealData',

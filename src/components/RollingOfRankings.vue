@@ -11,11 +11,13 @@
         {{item}}
       </div>
     </div>
-    <div class="roll-wrap">
+    <div class="roll-wrap" ref="roll">
       <div
         class="list"
         v-for="(v,i) in rankList"
         :key="i*2"
+        :style="{transform: 'translate(0, '+(175+i*35)+'px)'}"
+        :data-index="i"
       >
         <div
           class="circle"
@@ -43,6 +45,7 @@ export default class RollingOfRankings extends Vue {
   @Prop()private datas!: any;
 
   rankList: Array<any> = [];
+  timer: number = 0;
   circleColor: any = {
     0: 'bg-orange',
     1: 'bg-light-orange',
@@ -55,7 +58,48 @@ export default class RollingOfRankings extends Vue {
       if (Object.prototype.toString.call(r).slice(8, -1) === 'Array') {
         this.rankList = r
       }
+      this.$nextTick(() => {
+        this.roll(this.$refs.roll)
+      })
     })
+  }
+  
+  roll (el: any): void {
+    let child: Array<any> = el.children || [];
+    const len: number = child.length;
+    const cycle: number = Math.ceil(len/5); // 循环周期
+    let current: number = 0; // 当前循环(有且仅有一次0，初始化时)
+    let loopCurrent: number = 0; // 当前循环动画队列执行索引
+
+    const transform = function rollDom (): void {
+      [].slice.call(child).forEach((v: any, i: number) => {
+        const preY = parseInt(v.style.transform.split(',')[1], 10);
+        v.style.cssText += ';transition-duration: 1s;transform:translate(0, '+ (preY-175) +'px)';
+      })
+    }
+    const eventTransitionend = () => {
+      if (cycle < 2) return
+      if (++loopCurrent !== len) return
+      // 动画队列执行完毕
+      loopCurrent = 0;
+      if (current) {
+        // 实现无限衔接滚动，每次把滚动到上部视区之外的元素移到队列最后
+        const lenEach = current !== cycle ? 5 : len%5 === 0 ? 5 : len%5
+        for (let i = 0; i < lenEach; i++) {
+          let childR = el.removeChild(child[0]);
+          const index = +childR.getAttribute('data-index')%5;
+          childR.style.transform = 'translate(0, '+ (35*index+175*(cycle-1)) +'px)';
+          el.appendChild(childR)
+        }
+      }
+      this.timer = setTimeout(() => {
+        current = current === cycle ? 1 : ++current;
+        transform()
+      }, 5000);
+    }
+    el.addEventListener('transitionend', eventTransitionend(), false)
+
+    transform()
   }
 }
 </script>
@@ -67,26 +111,28 @@ export default class RollingOfRankings extends Vue {
     margin-bottom: 15px;
     width: 100%;
     height: 294px;
-    text-align: center;
     color:#fff;
     border-style: solid;
     border-width: 14px 20px;
     border-image-source: url('../assets/img/rank-border.png');
     border-image-slice: 14 20;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
   .rank-wrap h3 {
     font-size: 24px;
     line-height: 1.5;
-    text-align: left;
     font-weight: normal;
     color: rgb(248, 188, 56);
   }
-  .list-title,.list{
+  .roll-wrap{
+    position: relative;
+    overflow: hidden;
+    height: 175px;
+  }
+  .list-title{
     overflow: hidden;
     display: flex;
     align-items: center;
+
     &>div{
       flex-grow: 1;
       flex-basis: 25%;
@@ -103,10 +149,17 @@ export default class RollingOfRankings extends Vue {
       text-align: center;
       font-size: 14px;
       border-radius: 50%;
+      opacity: 0
     }
   }
-  .list-title .circle{
-    opacity: 0;
+  .list{
+    @extend .list-title;
+    position: absolute;
+    width: 100%;
+    transition: transform 1s cubic-bezier(0, .3, .58, 1); 
+    .circle{
+      opacity: 1
+    }
   }
   .bg-orange{
     background-color: rgb(255, 96, 41);
