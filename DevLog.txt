@@ -32,13 +32,15 @@
       缺点：滚动效果不太好，执行占用大量内存
     (3) 设置两个父元素parent，在parent层级实现无缝滚动
       优点：简单，不必考虑子元素个数
-      缺点：需要生产大量多余dom
+      缺点：生成大量多余dom
   当前使用方法
     子元素list transform+定位(多个同级元素使用transform距离是以相邻元素为起点，通过定位实现父元素为起点)
-    每次把队列前滚动到视区之外的元素移到队列最后
+    每次把队列前滚动到视区之外的子元素移到队列最后
     优点:
       (2) + transform使用硬件加速，相对不占cpu内存。动画比较连贯
     缺点：
       需要操作dom
 
-5.
+5.组件绑定动态props时无法给方法传参
+  例：
+    <RollingOfRankings :datas=computedPostParams('DayAreaRank')/> // 报错unexpected-character-in-unquoted-attribute-value
