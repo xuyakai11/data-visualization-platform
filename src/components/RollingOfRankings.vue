@@ -65,11 +65,7 @@ export default class RollingOfRankings extends Vue {
   }
   
   roll (el: any): void {
-    let child: Array<any> = el.children || [];
-    const len: number = child.length;
-    const cycle: number = Math.ceil(len/5); // 循环周期
-    let current: number = 0; // 当前循环(有且仅有一次0，初始化时)
-    let loopCurrent: number = 0; // 当前循环动画队列执行索引
+    let child: Array<any> = el.children || [];  
 
     const transform = function rollDom (): void {
       [].slice.call(child).forEach((v: any, i: number) => {
@@ -78,6 +74,11 @@ export default class RollingOfRankings extends Vue {
       })
     }
     const eventTransitionend = () => {
+      const len: number = child.length;
+      const cycle: number = Math.ceil(len/5); // 循环周期
+      let current: number = 0; // 当前循环(有且仅有一次0，初始化时)
+      let loopCurrent: number = 0; // 当前循环动画队列执行索引
+
       if (cycle < 2) return
       if (++loopCurrent !== len) return
       // 动画队列执行完毕
@@ -97,8 +98,7 @@ export default class RollingOfRankings extends Vue {
         transform()
       }, 5000);
     }
-    el.addEventListener('transitionend', eventTransitionend(), false)
-
+    el.addEventListener('transitionend', eventTransitionend, false)
     transform()
   }
 }
