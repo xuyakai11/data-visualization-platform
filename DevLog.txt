@@ -37,10 +37,25 @@
     子元素list transform+定位(多个同级元素使用transform距离是以相邻元素为起点，通过定位实现父元素为起点)
     每次把队列前滚动到视区之外的子元素移到队列最后
     优点:
-      (2) + transform使用硬件加速，相对不占cpu内存。动画比较连贯
+      去掉(2)中top滚动的方式改用transform，使用硬件加速(GPU绘制动画)，相对不占cpu内存。动画比较连贯
     缺点：
       需要操作dom
 
 5.组件绑定动态props时无法给方法传参
   例：
     <RollingOfRankings :datas=computedPostParams('DayAreaRank')/> // 报错unexpected-character-in-unquoted-attribute-value
+
+6.eslint中不太利于使用的校验
+  1.eslint 不允许在语句后存在多余的空格，不方便vue绑定多属性
+    例：
+      <div
+        class="list"
+        v-for="(v,i) in rankList"
+        :key="i*2"
+        :style="{transform: 'translate(0, '+(175+i*35)+'px)'}"
+        :data-index="i"
+      >
+    在eslintrc.js中配置'no-trailing-spaces': 'off', 关闭此校验
+    
+  2.语句不以分号结尾
+    在eslintrc.js中配置'semi': 'off'，关闭此校验
