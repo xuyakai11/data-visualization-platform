@@ -11,11 +11,11 @@
         {{item}}
       </div>
     </div>
-    <div class="roll-wrap" ref="roll">
+    <div class="roll-wrap" ref="rollElement">
       <div
         class="list"
         v-for="(v,i) in rankList"
-        :key="i*2"
+        :key="v.id"
         :style="{transform: 'translate(0, '+(175+i*35)+'px)'}"
         :data-index="i"
       >
@@ -45,7 +45,9 @@ export default class RollingOfRankings extends Vue {
   @Prop()private datas!: any;
 
   rankList: Array<any> = [];
-  timer: number = 0;
+  timer: number = 0; // 定时器
+  timerDuration: number = 10000; // 定时器持续时长(s)
+  timerDurationNumber: number = 60000; // 每间隔n秒更新数据
   circleColor: any = {
     0: 'bg-orange',
     1: 'bg-light-orange',
@@ -53,39 +55,41 @@ export default class RollingOfRankings extends Vue {
     other: 'bg-cyan'
   }
   created () {
+    this.getData();
+    setInterval(() => {
+      clearTimeout(this.timer);
+      this.getData()
+    }, this.timerDurationNumber)
+  }
+  getData (): void {
     axios.get(this.datas.url, { params: this.datas.data }).then((r:any) => {
       r = r.data
       if (Object.prototype.toString.call(r).slice(8, -1) === 'Array') {
-        this.rankList = r
+        r.forEach((v: any, i: number) => {
+          v.id = Date.now() + '' + i;
+        });
+
+        this.rankList = r;
+        this.$nextTick(() => {
+          this.initRoll('init')
+        })
       }
-      this.$nextTick(() => {
-        this.roll(this.$refs.roll)
-      })
     })
   }
-  
-  roll (el: any): void {
-    let child: Array<any> = el.children || [];  
-
-    const transform = function rollDom (): void {
-      [].slice.call(child).forEach((v: any, i: number) => {
-        const preY = parseInt(v.style.transform.split(',')[1], 10);
-        v.style.cssText += ';transition-duration: 1s;transform:translate(0, '+ (preY-175) +'px)';
-      })
-    }
+  initRoll (flag: string): void {
+    let el: any = this.$refs.rollElement;
+    let child: Array<any> = el.children || [];
+    const len: number = child.length;
+    const cycle: number = Math.ceil(len/5); // 循环周期
+    el.loopCurrent = 0; // 当前循环动画队列执行索引
+    el.current = 0;// 当前循环(有且仅有一次0，初始化时)
     const eventTransitionend = () => {
-      const len: number = child.length;
-      const cycle: number = Math.ceil(len/5); // 循环周期
-      let current: number = 0; // 当前循环(有且仅有一次0，初始化时)
-      let loopCurrent: number = 0; // 当前循环动画队列执行索引
-
-      if (cycle < 2) return
-      if (++loopCurrent !== len) return
+      if (++el.loopCurrent !== len) return
       // 动画队列执行完毕
-      loopCurrent = 0;
-      if (current) {
+      el.loopCurrent = 0;
+      if (el.current) {
         // 实现无限衔接滚动，每次把滚动到上部视区之外的元素移到队列最后
-        const lenEach = current !== cycle ? 5 : len%5 === 0 ? 5 : len%5
+        const lenEach = el.current !== cycle ? 5 : len%5 === 0 ? 5 : len%5
         for (let i = 0; i < lenEach; i++) {
           let childR = el.removeChild(child[0]);
           const index = +childR.getAttribute('data-index')%5;
@@ -94,12 +98,20 @@ export default class RollingOfRankings extends Vue {
         }
       }
       this.timer = setTimeout(() => {
-        current = current === cycle ? 1 : ++current;
-        transform()
-      }, 5000);
+        el.current = el.current === cycle ? 1 : ++el.current;
+        this.doTransform(child)
+      }, this.timerDuration)
     }
-    el.addEventListener('transitionend', eventTransitionend, false)
-    transform()
+    if (cycle > 1 && !this.timer) {
+      el.addEventListener('transitionend', eventTransitionend, false)
+    }
+    this.doTransform(child)
+  }
+  doTransform (child: any): void {
+    [].slice.call(child).forEach((v: any, i: number) => {
+      const preY = parseInt(v.style.transform.split(',')[1], 10);
+      v.style.cssText += ';transition-duration: 1s;transform:translate(0, '+ (preY-175) +'px)';
+    })
   }
 }
 </script>

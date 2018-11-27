@@ -40,12 +40,26 @@
       去掉(2)中top滚动的方式改用transform，使用硬件加速(GPU绘制动画)，相对不占cpu内存。动画比较连贯
     缺点：
       需要操作dom
+5.无缝滚动60秒刷新数据时动画出现问题
+  问题1：dom不更新(因为数据是一样的，所以用普通的id标识不行)
+  解决： 
+    获取到json之后，循环给数组中的每个对象添加id：Date.now() + '' + i;
 
-5.组件绑定动态props时无法给方法传参
+  问题2：重新请求数据之后,会多次绑定事件(transitionend)， removeEventListener无法解除绑定transitionend事件
+  解决： 
+    添加事件锁，第一次绑定事件时后锁上绑定事件的方法
+
+  问题3！！！(弄了一下午)：在问题2的基础上，因为只绑定了一次事件，重新请求数据之后，事件方法中的变量是用的是之前的，并不是用的外部重新声明的，导致动画出现问题
+  解决：
+    把事件方法中的变量绑定在元素上，例:
+    el.addEventListener('transitionend', eventTransitionend, false)
+    el.current = 0;
+  
+6.组件绑定动态props时无法给方法传参
   例：
     <RollingOfRankings :datas=computedPostParams('DayAreaRank')/> // 报错unexpected-character-in-unquoted-attribute-value
 
-6.eslint中不太利于使用的校验
+7.eslint中不太利于使用的校验
   1.eslint 不允许在语句后存在多余的空格，不方便vue绑定多属性
     例：
       <div
@@ -56,6 +70,7 @@
         :data-index="i"
       >
     在eslintrc.js中配置'no-trailing-spaces': 'off', 关闭此校验
-    
+
   2.语句不以分号结尾
     在eslintrc.js中配置'semi': 'off'，关闭此校验
+
