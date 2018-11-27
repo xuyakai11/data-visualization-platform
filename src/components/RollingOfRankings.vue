@@ -38,7 +38,6 @@
 </template>
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import axios from 'axios'
 
 @Component
 export default class RollingOfRankings extends Vue {
@@ -62,8 +61,7 @@ export default class RollingOfRankings extends Vue {
     }, this.timerDurationNumber)
   }
   getData (): void {
-    axios.get(this.datas.url, { params: this.datas.data }).then((r:any) => {
-      r = r.data
+    (this as any).$get(this.datas.url, this.datas.data).then((r:any) => {
       if (Object.prototype.toString.call(r).slice(8, -1) === 'Array') {
         r.forEach((v: any, i: number) => {
           v.id = Date.now() + '' + i;

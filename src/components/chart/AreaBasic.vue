@@ -4,9 +4,8 @@
 </template>
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import axios from 'axios'
+import echarts from 'echarts'
 
-const echarts = require('echarts/lib/echarts') // 引入ECharts主模块
 require('echarts/lib/chart/line')
 // 引入提示框和标题组件
 // require('echarts/lib/component/tooltip')
@@ -17,9 +16,7 @@ export default class AreaBasic extends Vue {
   @Prop()private datas!: any
 
   mounted () {
-    axios.get(this.datas.url, { params: this.datas.data }).then((r:any) => {
-      r = r.data
-
+    (this as any).$get(this.datas.url, this.datas.data).then((r:any) => {
       if (Object.prototype.toString.call(r).slice(8, -1) === 'Array') {
         let xAxisData: Array<number> = []
         let seriesData: Array<number> = []
