@@ -10,6 +10,9 @@
     datas: Object = {a:1}
     在方法中使用获取a：
     this.datas.a // 报错
+
+  后发现：this.datas['a']这样调用不会报错，个人还是觉着声明any类型比较好
+
   解决：
     使用any类型替换
     datas: any = {a:1}
@@ -74,3 +77,15 @@
   2.语句不以分号结尾
     在eslintrc.js中配置'semi': 'off'，关闭此校验
 
+8. import引入插件，报找不到声明模块错误：Could not find a declaration file for module
+  解决：
+    在shims-vue.d.ts 中声明引入的模块名称，例axios：
+    declare module 'axios' {
+      const axios: any;
+      export default axios;
+    }
+9. this调用隐式属性报属性未初始化类型
+  例：
+    this.get // 报错：property get does not exist on value of type
+  解决：
+   使用<this as any>.get 方式调用
