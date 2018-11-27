@@ -2,10 +2,11 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import './axios.tool' // 导入封装好的axios
 import './registerServiceWorker'
 import './assets/common.css'
 
-Vue.config.productionTip = false
+Vue.config.productionTip = true
 
 new Vue({
   router,
