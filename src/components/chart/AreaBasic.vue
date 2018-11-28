@@ -1,5 +1,5 @@
 <template>
-  <div id="areaBasic" style="width:700px;height: 500px">
+  <div ref="echart" style="width:700px;height: 500px">
   </div>
 </template>
 <script lang="ts">
@@ -31,7 +31,7 @@ export default class AreaBasic extends Vue {
   }
   drawChartAreaBasic (xAxisData: Array<number>, seriesData: Array<number>) {
     console.log(xAxisData, seriesData)
-    const myChart = echarts.init(document.getElementById('areaBasic'))
+    const myChart = echarts.init(this.$refs.echart as HTMLDivElement)
     myChart.setOption({
       // tooltip: {
       //   show: false,

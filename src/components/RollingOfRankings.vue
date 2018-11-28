@@ -75,7 +75,7 @@ export default class RollingOfRankings extends Vue {
     })
   }
   initRoll (flag: string): void {
-    let el: any = this.$refs.rollElement;
+    let el: any = this.$refs.rollElement as HTMLDivElement;
     let child: Array<any> = el.children || [];
     const len: number = child.length;
     const cycle: number = Math.ceil(len/5); // 循环周期
