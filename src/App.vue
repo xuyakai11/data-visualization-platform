@@ -12,6 +12,7 @@
 }
 #nav {
   padding: 30px;
+  text-align: right;
   a {
     font-weight: bold;
     color: #2c3e50;

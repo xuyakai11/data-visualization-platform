@@ -111,6 +111,10 @@ export default class RollingOfRankings extends Vue {
       v.style.cssText += ';transition-duration: 1s;transform:translate(0, '+ (preY-175) +'px)';
     })
   }
+
+  beforeDestroy (): void {
+    clearTimeout(this.timer)
+  }
 }
 </script>
 <style lang="scss" scoped>

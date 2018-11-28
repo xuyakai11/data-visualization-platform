@@ -88,4 +88,8 @@
   例：
     this.get // 报错：property get does not exist on value of type
   解决：
-   使用<this as any>.get 方式调用
+    使用<this as any>.get 方式调用
+    或者声明变量替换
+    that: any = this;
+    that.get
+10.
