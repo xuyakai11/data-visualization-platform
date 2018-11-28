@@ -12,6 +12,7 @@
       <div class="rank-wrap">
         <h3>班课科目分布</h3>
         <div class="pie-picture" id="classSubject"></div>
+        <!-- <MapCity /> -->
       </div>
     </div>
     <div class="main-middle">
@@ -48,12 +49,11 @@
 import { Component, Vue } from 'vue-property-decorator'
 import RollingOfRankings from '@/components/RollingOfRankings.vue'
 import AreaBasic from '@/components/chart/AreaBasic.vue'
-import axios from 'axios'
 
 @Component({
   components: {
   RollingOfRankings,
-  AreaBasic
+  AreaBasic,
   }
   })
 export default class BigScreenSchool extends Vue {
