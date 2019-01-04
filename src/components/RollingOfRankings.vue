@@ -11,13 +11,11 @@
         {{item}}
       </div>
     </div>
-    <div class="roll-wrap" ref="rollElement">
+    <div class="roll-wrap">
       <div
         class="list"
         v-for="(v,i) in rankList"
-        :key="v.id"
-        :style="{transform: 'translate(0, '+(175+i*35)+'px)'}"
-        :data-index="i"
+        :key="i*2"
       >
         <div
           class="circle"
@@ -38,15 +36,13 @@
 </template>
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import axios from 'axios'
 
 @Component
 export default class RollingOfRankings extends Vue {
   @Prop()private datas!: any;
 
   rankList: Array<any> = [];
-  timer: number = 0; // 定时器
-  timerDuration: number = 10000; // 定时器持续时长(s)
-  timerDurationNumber: number = 60000; // 每间隔n秒更新数据
   circleColor: any = {
     0: 'bg-orange',
     1: 'bg-light-orange',
@@ -54,66 +50,12 @@ export default class RollingOfRankings extends Vue {
     other: 'bg-cyan'
   }
   created () {
-    this.getData();
-    setInterval(() => {
-      clearTimeout(this.timer);
-      this.getData()
-    }, this.timerDurationNumber)
-  }
-  getData (): void {
-    (this as any).$get(this.datas.url, this.datas.data).then((r:any) => {
+    axios.get(this.datas.url, { params: this.datas.data }).then((r:any) => {
+      r = r.data
       if (Object.prototype.toString.call(r).slice(8, -1) === 'Array') {
-        r.forEach((v: any, i: number) => {
-          v.id = Date.now() + '' + i;
-        });
-
-        this.rankList = r;
-        this.$nextTick(() => {
-          this.initRoll('init')
-        })
+        this.rankList = r
       }
     })
-  }
-  initRoll (flag: string): void {
-    let el: any = this.$refs.rollElement as HTMLDivElement;
-    let child: Array<any> = el.children || [];
-    const len: number = child.length;
-    const cycle: number = Math.ceil(len/5); // 循环周期
-    el.loopCurrent = 0; // 当前循环动画队列执行索引
-    el.current = 0;// 当前循环(有且仅有一次0，初始化时)
-    const eventTransitionend = () => {
-      if (++el.loopCurrent !== len) return
-      // 动画队列执行完毕
-      el.loopCurrent = 0;
-      if (el.current) {
-        // 实现无限衔接滚动，每次把滚动到上部视区之外的元素移到队列最后
-        const lenEach = el.current !== cycle ? 5 : len%5 === 0 ? 5 : len%5
-        for (let i = 0; i < lenEach; i++) {
-          let childR = el.removeChild(child[0]);
-          const index = +childR.getAttribute('data-index')%5;
-          childR.style.transform = 'translate(0, '+ (35*index+175*(cycle-1)) +'px)';
-          el.appendChild(childR)
-        }
-      }
-      this.timer = setTimeout(() => {
-        el.current = el.current === cycle ? 1 : ++el.current;
-        this.doTransform(child)
-      }, this.timerDuration)
-    }
-    if (cycle > 1 && !this.timer) {
-      el.addEventListener('transitionend', eventTransitionend, false)
-    }
-    this.doTransform(child)
-  }
-  doTransform (child: any): void {
-    [].slice.call(child).forEach((v: any, i: number) => {
-      const preY = parseInt(v.style.transform.split(',')[1], 10);
-      v.style.cssText += ';transition-duration: 1s;transform:translate(0, '+ (preY-175) +'px)';
-    })
-  }
-
-  beforeDestroy (): void {
-    clearTimeout(this.timer)
   }
 }
 </script>
@@ -125,28 +67,26 @@ export default class RollingOfRankings extends Vue {
     margin-bottom: 15px;
     width: 100%;
     height: 294px;
+    text-align: center;
     color:#fff;
     border-style: solid;
     border-width: 14px 20px;
     border-image-source: url('../assets/img/rank-border.png');
     border-image-slice: 14 20;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .rank-wrap h3 {
     font-size: 24px;
     line-height: 1.5;
+    text-align: left;
     font-weight: normal;
     color: rgb(248, 188, 56);
   }
-  .roll-wrap{
-    position: relative;
-    overflow: hidden;
-    height: 175px;
-  }
-  .list-title{
+  .list-title,.list{
     overflow: hidden;
     display: flex;
     align-items: center;
-
     &>div{
       flex-grow: 1;
       flex-basis: 25%;
@@ -163,17 +103,10 @@ export default class RollingOfRankings extends Vue {
       text-align: center;
       font-size: 14px;
       border-radius: 50%;
-      opacity: 0
     }
   }
-  .list{
-    @extend .list-title;
-    position: absolute;
-    width: 100%;
-    transition: transform 1s cubic-bezier(0, .3, .58, 1); 
-    .circle{
-      opacity: 1
-    }
+  .list-title .circle{
+    opacity: 0;
   }
   .bg-orange{
     background-color: rgb(255, 96, 41);

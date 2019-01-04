@@ -17,12 +17,12 @@ export default new Router({
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "BigScreenSchool" */ './views/BigScreenSchool.vue')
-    },
-    {
-      path: '/APIList',
-      name: 'APIList',
-      component: () => import('./views/APIList.vue')
+      component: () => import('./views/BigScreenSchool.vue')
     }
+    /* {
+      path: '/layoutContent',
+      name: 'layoutContent',
+      component: () => import('./components/layoutContent.vue')
+    } */
   ]
 })
