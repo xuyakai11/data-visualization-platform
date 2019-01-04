@@ -8,8 +8,7 @@ import echarts from 'echarts'
 import 'echarts/lib/chart/map';
 import 'echarts/map/js/china.js';
 import 'echarts/lib/component/title';
-// 引入提示框和标题组件
-// require('echarts/lib/component/tooltip')
+import 'echarts/lib/component/tooltip'
 
 @Component
 export default class MapCity extends Vue {
@@ -20,7 +19,6 @@ export default class MapCity extends Vue {
 	@Watch('datas', {deep: true})
 	watchDatas (): void {
 		if (!this.datas) return;
-		console.log(this.datas);
 		(this as any).$get(this.baseUrl+'json/'+this.datas.name+'.json').then((r: any) => {
 			this.drawChartAreaBasic(r)
 		})
@@ -30,6 +28,10 @@ export default class MapCity extends Vue {
 		myChart.resize()
     echarts.registerMap('henan', geoJson);
     myChart.setOption({
+			tooltip: {
+				trigger: 'item',
+				formatter: '{b}<br/>{c} (p / km2)'
+			},
 			visualMap: {
 				min: 800,
 				max: 50000,

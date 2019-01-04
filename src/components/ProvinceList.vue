@@ -16,7 +16,6 @@
       高(px)：<input type="text" v-model="h">
       <button class="btn" @click="makeUpMap">预览</button>
     </div>
-    <router-view/>
   </div>
 </template>
 <script lang="ts">
@@ -34,6 +33,7 @@ export default class ProvinceList extends Vue {
   option: any = false;
   list: Array<string> = ['河南/郑州市', '北京/北京']
   current: number = 0
+  
   makeUpMap (): void {
     const nowV: any = {
       w: this.w + 'px',
