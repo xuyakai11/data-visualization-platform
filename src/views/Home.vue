@@ -1,22 +1,27 @@
 <template>
   <div class="home">
-    <div id="nav">
-        <router-link to="/">Home</router-link> |
-        <router-link to="/BigScreenSchool">BigScreenSchool</router-link> |
-        <router-link to="/APIList">APIList</router-link>
-    </div>
-    <ProvinceList />
+    <!-- <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/> -->
+    <v-header></v-header>
+    
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import ProvinceList from '@/components/ProvinceList.vue' // @ is an alias to /src
+import HelloWorld from '@/components/HelloWorld.vue' // @ is an alias to /src
+import header from '@/components/header.vue'
+import layoutContent from '@/components/layoutContent.vue'
 
 @Component({
   components: {
-  ProvinceList,
-  },
-  })
+    HelloWorld,
+    'v-header': header,
+    layoutContent
+  }
+})
+
 export default class Home extends Vue {}
 </script>
+<style lang="scss" scoped>
+
+</style>

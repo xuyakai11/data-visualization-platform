@@ -1,11 +1,12 @@
 <template>
-  <div ref="echart" style="width:700px;height: 500px">
+  <div id="areaBasic" style="width:700px;height: 500px">
   </div>
 </template>
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import echarts from 'echarts'
+import axios from 'axios'
 
+const echarts = require('echarts/lib/echarts') // 引入ECharts主模块
 require('echarts/lib/chart/line')
 // 引入提示框和标题组件
 // require('echarts/lib/component/tooltip')
@@ -16,7 +17,9 @@ export default class AreaBasic extends Vue {
   @Prop()private datas!: any
 
   mounted () {
-    (this as any).$get(this.datas.url, this.datas.data).then((r:any) => {
+    axios.get(this.datas.url, { params: this.datas.data }).then((r:any) => {
+      r = r.data
+
       if (Object.prototype.toString.call(r).slice(8, -1) === 'Array') {
         let xAxisData: Array<number> = []
         let seriesData: Array<number> = []
@@ -31,7 +34,7 @@ export default class AreaBasic extends Vue {
   }
   drawChartAreaBasic (xAxisData: Array<number>, seriesData: Array<number>) {
     console.log(xAxisData, seriesData)
-    const myChart = echarts.init(this.$refs.echart as HTMLDivElement)
+    const myChart = echarts.init(document.getElementById('areaBasic'))
     myChart.setOption({
       // tooltip: {
       //   show: false,

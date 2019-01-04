@@ -2,11 +2,12 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import './axios.tool' // 导入封装好的axios
+import axios from 'axios'
 import './registerServiceWorker'
 import './assets/common.css'
 
-Vue.config.productionTip = true
+Vue.config.productionTip = false
+Vue.prototype.$axios = axios
 
 new Vue({
   router,
