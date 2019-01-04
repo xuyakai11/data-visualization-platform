@@ -10,6 +10,8 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "ant-design-vue": "^1.2.4",
+    "babel-plugin-import": "^1.11.0",
     "echarts": "^4.2.0-rc.2",
     "register-service-worker": "^1.0.0",
     "vue": "^2.5.17",
