@@ -1,18 +1,18 @@
 import Vue from 'vue'
-import Antd from 'ant-design-vue'
 import App from './App.vue'
+import Antd from 'ant-design-vue/es'
 import router from './router'
 import store from './store'
 import 'ant-design-vue/dist/antd.css' // 引入antd样式
 // import 'ant-design-vue/lib/button' // 按需引入按钮样式
-import './axios.tool' // 导入封装好的axios
+import './services/axios.tool' // 导入封装好的axios
 import './registerServiceWorker'
 import './assets/common.css'
 
-Vue.config.productionTip = true
-
 Vue.use(Antd)
+Vue.config.productionTip = false // 设置为 false 以阻止 vue 在启动时生成生产提示
 
+// Vue.component(Button.name, Button)
 new Vue({
   router,
   store,

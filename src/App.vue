@@ -5,12 +5,17 @@
 </template>
 
 <style lang="scss">
+body {
+  background: #f0f2f5;
+}
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  height: 100%;
 }
-#nav {
+/* #nav {
   padding: 30px;
   text-align: right;
   a {
@@ -20,5 +25,5 @@
       color: #42b983;
     }
   }
-}
+} */
 </style>

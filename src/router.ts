@@ -5,9 +5,23 @@ import Home from './views/Home.vue'
 Vue.use(Router)
 
 export default new Router({
+  mode: 'history',
   routes: [
     {
       path: '/',
+      redirect: '/login' // 从定向到login页
+    },
+    {
+      path: '/login',
+      name: 'login',
+      meta: { // 设置页面title，和是否隐藏menu标识
+        title: 'Login - 登录',
+        hideInMenu: true
+      },
+      component: () => import('./components/login/login.vue')
+    },
+    {
+      path: '/home',
       name: 'home',
       component: Home
     },
