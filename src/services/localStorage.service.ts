@@ -1,22 +1,22 @@
-export default {
-  get (key: any) {
+
+  function get (key: any): void {
     let result: any = localStorage.getItem(key)
     try {
       result = JSON.parse(result)
     } catch (e) {}
     return result
-  },
-  set (key: any, value: any) {
+  }
+  function set (key: any, value: any): void {
     let toString: any = Object.prototype.toString
     if (toString.call(value) === '[object Array]' || toString.call(value) === '[object Object]') {
       value = JSON.stringify(value)
     }
     return localStorage.setItem(key, value)
-  },
-  remove (key: any) {
+  }
+  function remove (key: any): void {
     return localStorage.removeItem(key)
-  },
-  clear () {
+  }
+  function clear (): void {
     return localStorage.clear()
   }
-}
+  export { get, set, remove, clear }

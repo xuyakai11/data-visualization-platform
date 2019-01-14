@@ -1,7 +1,7 @@
 <template>
   <a-form ref="loginForm" :form="form" id="login-form" @submit="handleSubmit" class="login-form">
     <a-form-item>
-      <a-input placeholder="用户名"
+      <a-input placeholder="用户名" type="userName"
         v-decorator="['userName', {rules: [{required: true, message: '请输入用户名'}]}]"
       >
         <a-icon slot="prefix" type="user" />
@@ -22,35 +22,35 @@
 </template>
 
 <script lang='ts'>
- import { Component, Prop, Vue } from 'vue-property-decorator'
+  import { Component, Prop, Vue } from 'vue-property-decorator'
+  import { get, set, remove } from '@/services/localStorage.service'
+  
+  interface user {
+    userName: string,
+    password: string
+  }
 
- @Component({})
- export default class loginForm extends Vue {
-   /* interface form {
-     user: string,
-     password: string
-   }  */
+  @Component({})
+  export default class loginForm extends Vue {
   /*   @Prop() private msg!: string; */
-
+    /* form: any = {}
+    $form: any = {} */
     beforeCreate () {
-       this.form = this.$form.createForm(this)
-       console.log(this.form)
+       (this as any).form = (this as any).$form.createForm(this) // ant 自带的
     }
-    created () {
-
-    }
+    created () {}
     // 方法
-    handleSubmit (e: any): void {
-      e.preventDefault()
-      this.form.validateFields((err: any, values) => { // 校验
-        console.log(values)
+    handleSubmit (e: any):void {
+      e.preventDefault();
+      (this as any).form.validateFields((err: any, values: user) => { // 校验
         if (!err) {
-          alert('fuck')
+          console.log(values)
+          set("token", values);
+          (this as any).$router.push({ path: '/home' })
         }
       })
     }
     // 计算属性get
-    
  }
 </script>
 
