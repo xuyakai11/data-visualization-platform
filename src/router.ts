@@ -3,13 +3,48 @@ import Router from 'vue-router'
 import Home from './views/Home.vue'
 
 Vue.use(Router)
-
+interface user {
+  key?: string,
+  icon?: string
+}
 export default new Router({
+  mode: 'history',
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: Home
+      redirect: '/dataOriginManagement' // 从定向到login页
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('./components/login/login.vue')
+    },
+    {
+      path: '/home',
+      name: '首页',
+      component: Home,
+      children: [
+        {
+          path: '/dataOriginManagement',
+          name: '数据源管理',
+          component: () => import('./views/dataOriginManagement.vue')
+        },
+        {
+          path: '/instrumentPanelMake',
+          name: '仪表盘制作',
+          component: () => import('./views/instrumentPanelMake.vue')
+        },
+        {
+          path: '/statementManagement',
+          name: '报表管理',
+          component: () => import('./views/statementManagement.vue')
+        },
+        {
+          path: '/statementMake',
+          name: '报表制作',
+          component: () => import('./views/statementMake.vue')
+        }
+      ]
     },
     {
       path: '/BigScreenSchool',

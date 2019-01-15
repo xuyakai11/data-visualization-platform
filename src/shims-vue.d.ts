@@ -14,3 +14,7 @@ declare module 'echarts' {
   const echarts: any;
   export default echarts;
 }
+declare module 'ant-design-vue' {
+  const antDesignVue: any;
+  export default antDesignVue;
+}
