@@ -43,6 +43,21 @@ export default new Router({
           path: '/statementMake',
           name: '报表制作',
           component: () => import('./views/statementMake.vue')
+        },
+        {
+          path: '/APIList',
+          name: '测试回选菜单',
+          component: () => import('./views/APIList.vue')
+        },
+        {
+          path: '/modelManagement',
+          name: '模型管理',
+          component: () => import('./views/modelManagement.vue')
+        },
+        {
+          path: '/fieldManagement',
+          name: '字段管理',
+          component: () => import('./views/fieldManagement.vue')
         }
       ]
     },
