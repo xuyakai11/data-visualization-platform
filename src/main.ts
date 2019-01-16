@@ -7,18 +7,16 @@ import store from './store'
 import './services/axios.tool' // 导入封装好的axios
 import './registerServiceWorker'
 import './assets/common.css'
-import axios from 'axios'
 import { get, set, remove } from '@/services/localStorage.service'
 
 Vue.use(Antd)
-Vue.prototype.$axios = axios
 Vue.config.productionTip = false // 设置为 false 以阻止 vue 在启动时生成生产提示
 
 router.beforeEach((to: any, from: any, next: any) => { // 用路由跳转来验证是不可取的，应该在请求接口的时候将token带上，后台验证登录状态，返回信息前段验证做出提示
-  if (to.path != '/login') {
-    const loginToken: any = get("token")
+  if (to.path !== '/login') {
+    const loginToken: any = get('token')
     if (!loginToken) {
-      router.push({path: '/'})
+      router.push({ path: '/' })
     }
     next()
   } else {

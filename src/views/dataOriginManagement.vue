@@ -1,10 +1,7 @@
 <template>
+<div>
+  <a-card title="数据源管理" :bordered="false"></a-card>
   <div class="dataOrigin" id="components-form-demo-advanced-search">
-    <!-- <a-card :bordered="false" :loading="loading">
-      <a-form layout='inline' @submit="handleSubmit" :form="form">
-        <a-form-item></a-form-item>
-      </a-form>
-    </a-card> -->
     <a-form class="ant-advanced-search-from" @submit="handleSearch" :form="form">
       <a-row :gutter="24">
         <a-col :span="6">
@@ -18,16 +15,16 @@
           <a-button type="primary" htmlType="submit">搜索</a-button>
         </a-col>
       </a-row>
+    </a-form>
+    <div class="operation">
       <a-row>
         <a-col :span="24" :style="{ textAling: 'right'}">
-          <a-button type="primary" htmlType="button" @click="showModal">新增</a-button>
+          <a-button type="primary" htmlType="button" @click="showModel">新增</a-button>
         </a-col>
       </a-row>
-    </a-form>
+    </div>
     <div class="search-result-list">
-      <!-- <data-table :datas="dataSource" :columnsData="columns"></data-table> -->
       <a-table :columns="columns" :dataSource="data" bordered>
-      <!-- <a slot="tags" slot-scope="text" href="javascript:void(0);">action</a> -->
         <span slot="action" slot-scope="text, record">
           <a-button type="primary" size="small" :data-type="record.key" @click="editFun($event)">编辑</a-button>
           <a-divider type="vertical" />
@@ -82,35 +79,16 @@
           <a-form-item :wrapperCol="{span: 12, offset: 8}">
             <a-button type="primary" @click="testLinkFun">测试链接</a-button>
           </a-form-item>
-          <!-- <a-form-item label='Description'>
-            <a-input
-              type='textarea'
-              v-decorator="['description']"
-            />
-          </a-form-item>
-          <a-form-item class='collection-create-form_last-form-item'>
-            <a-radio-group
-              v-decorator="[
-                'modifier',
-                {
-                  initialValue: 'private',
-                }
-              ]"
-            >
-                <a-radio value='public'>Public</a-radio>
-                <a-radio value='private'>Private</a-radio>
-              </a-radio-group>
-          </a-form-item> -->
         </a-form>
       </a-modal>
   </div>
-  
+</div>
 </template>
 
 <script lang='ts'>
   import { Component, Prop, Vue } from 'vue-property-decorator'
-  import axios from 'axios';
   import { interfaces } from 'mocha';
+  import { State, Mutation } from 'vuex-class'
 
   interface axiosDatas {
     linkName: string,
@@ -133,6 +111,8 @@
  })
  export default class dataOrinig extends Vue {
   @Prop() private msg!: string;
+  @Mutation changeOpenKeys: any
+
   loading: boolean = true
   visible:boolean = false // 控制模态框
   modelCol: object = {
@@ -161,7 +141,7 @@
       }
     })
   }
-  showModal () { // 模态框
+  showModel () { // 模态框
     this.visible = true
   }
   handleCancel () {
@@ -183,27 +163,16 @@
     let linkName: string = (this as any).$refs.linkName.value;
     let address: string = (this as any).$refs.dataAdress.value;
     console.log(linkName, address);
-    axios.post('/user', {
-      firstName: linkName,
-      lastName: address
-    })
-    .then((res: any) => {
-      console.log(res);
-    })
-    .catch((res: any) => {
-      console.log(res);
-      (this as any).$message.success('链接成功！', ['3'], () => {console.log(1)}); // text, 自动关闭时间， 回调
-      (this as any).$message.error('链接成功！');
-      (this as any).$message.warning('链接成功！');
-    });
   }
   editFun (event: any): void { // 编辑方法
-    console.log(event.target.getAttribute('data-type'))
+    console.log(event.target.getAttribute('data-type'));
+    this.showModel(); // 将模态框
     let type: string = event.target.getAttribute('data-type');
   }
   go (e: any): void {
     e.preventDefault();
-    window.open(window.location.origin + '/statementMake', '_target');
+    // (this as any).changeOpenKeys({ openKeys: '2' }); // 设置要打开的key，如果是子节点则取其父key
+    window.open(window.location.origin + '/statementManagement'); // _target 表示只打开一个，重复点击会回到第一个打开的窗口
     // (this as any).$router.push({ path: '/statementManagement' })
   }
  }
@@ -217,13 +186,16 @@
   .ant-advanced-search-from {
     padding: 16px;
     background: #fbfbfb;
-    border: 1px solid #d9d9d9;
-    border-radius: 6px;
+    /* border: 1px solid #d9d9d9; */
+    border-radius: 6px 6px 0 0;
+  }
+  .operation {
+    padding: 10px 10px;
   }
   .search-result-list {
-    margin-top: 16px;
-    border: 1px dashed #e9e9e9;
-    border-radius: 6px;
+    /* margin-top: 16px;
+    border: 1px dashed #e9e9e9; */
+    border-radius: 0 0 6px 6px;
     background-color: #fafafa;
     min-height: 200px;
     padding: 10px;
