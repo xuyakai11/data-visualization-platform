@@ -1,13 +1,17 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { login, logout } from '@/api/user'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
     pageTitle: '', // 页面标题
-    openKeys: '' //
+    openKeys: '', //
+    domain: 'http://test.report.pxjy.com',
+    menu: JSON.parse((localStorage as any).getItem('menu'))
+  },
+  getters: {
+
   },
   mutations: {
     changeOpenKeys (state, data) {
@@ -16,7 +20,17 @@ export default new Vuex.Store({
       } else { 
         state.openKeys = sessionStorage.getItem('openKeys') || '';
       }
+    },
+    menuList (state, data) {
+      if (data) {
+        state.menu = data;
+        localStorage.setItem('menu', JSON.stringify(data) || '')
+      }
     }
   },
-  actions: {}
+  actions: {
+    /* menuList ({ commit }, menu) {
+      commit('MENULIST', menu)
+    } */
+  }
 })

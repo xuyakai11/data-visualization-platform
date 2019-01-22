@@ -44,8 +44,7 @@
       e.preventDefault();
       (this as any).form.validateFields((err: any, values: user) => { // 校验
         if (!err) {
-          console.log(values)
-          set("token", values);
+          // set("token", values);
           (this as any).$router.push({ path: '/home' })
         }
       })

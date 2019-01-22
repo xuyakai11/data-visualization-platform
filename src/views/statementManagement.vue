@@ -70,6 +70,7 @@
     label: {span: 8},
     wrapper: {span: 12}
   }
+
   columns: Array<object> = [
     {title: '链接名', dataIndex: 'address', key: 'address', width: '15%'}, // fixed: 'left' 设置是否固定
     {title: '数据库地址', dataIndex: 'age', key: 'age', width: '25%'},
@@ -82,7 +83,6 @@
     (this as any).form = (this as any).$form.createForm(this); // 定义搜索form
     (this as any).modalForm = (this as any).$form.createForm(this); // 定义modalform
   }
-  created () {}
 
   handleSearch (e: any):void { // 搜索方法
     e.preventDefault();

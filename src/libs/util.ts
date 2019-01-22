@@ -11,3 +11,14 @@ export const getParams = (url: any) => {
   })
   return paramObj
 }
+
+// 获取url后面的参数
+export function getQueryString (name:String) {
+  let reg:any = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+  let r:any = window.location.search.substr(1).match(reg)
+  if (r != null) {
+      return (r[2])
+  } else {
+      return null
+  }
+}
