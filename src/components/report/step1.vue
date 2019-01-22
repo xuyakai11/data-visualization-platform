@@ -26,7 +26,7 @@
         <a-button type="primary" @click="showModel"> + </a-button>
       </a-form-item>
       <a-form-item :wrapperCol="{span: 15, offset: 5}">
-        <a-tag v-for="item in aTagDatas" closable color="blue">{{item.name}}</a-tag>
+        <a-tag v-for="(item, i) in aTagDatas" :key="i" closable color="blue">{{item.name}}</a-tag>
       </a-form-item>
       <a-form-item :wrapperCol="{span: 15, offset: 5}">
         <a-button type="primary" @click="nextStep">下一步</a-button>

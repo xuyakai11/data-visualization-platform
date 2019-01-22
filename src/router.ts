@@ -3,16 +3,12 @@ import Router from 'vue-router'
 import Home from './views/Home.vue'
 
 Vue.use(Router)
-interface user {
-  key?: string,
-  icon?: string
-}
 export default new Router({
   mode: 'history',
   routes: [
     {
       path: '/',
-      redirect: '/dataOriginManagement' // 从定向到login页
+      redirect: '/dataOriginManagement' // 从定向
     },
     {
       path: '/login',
@@ -45,11 +41,6 @@ export default new Router({
           component: () => import('./views/statementMake.vue')
         },
         {
-          path: '/APIList',
-          name: '测试回选菜单',
-          component: () => import('./views/APIList.vue')
-        },
-        {
           path: '/modelManagement',
           name: '模型管理',
           component: () => import('./views/modelManagement.vue')
@@ -60,19 +51,16 @@ export default new Router({
           component: () => import('./views/fieldManagement.vue')
         }
       ]
-    },
-    {
+    }
+  ]
+})
+   /*  {
       path: '/BigScreenSchool',
       name: 'BigScreenSchool',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "BigScreenSchool" */ './views/BigScreenSchool.vue')
+      component: () => import('./views/BigScreenSchool.vue')
     },
     {
       path: '/APIList',
       name: 'APIList',
       component: () => import('./views/APIList.vue')
-    }
-  ]
-})
+    } */
