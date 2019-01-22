@@ -24,9 +24,7 @@ export default new Vuex.Store({
     menuList (state, data) {
       if (data) {
         state.menu = data;
-        localStorage.setItem('menu', JSON.stringify(data))
-      } else {
-
+        localStorage.setItem('menu', JSON.stringify(data) || '')
       }
     }
   },
