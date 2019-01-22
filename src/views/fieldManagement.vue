@@ -5,9 +5,7 @@
     <div class="operation">
       <a-row>
         <a-col :span="24" :style="{ textAling: 'right'}">
-          <a-button type="primary" htmlType="button">启用</a-button>
-          <a-button type="primary" htmlType="button">禁用</a-button>
-          <a-button type="primary" htmlType="button">生成</a-button>
+          <a-button type="primary" htmlType="button">新增</a-button>
         </a-col>
       </a-row>
     </div>
@@ -50,7 +48,6 @@
  })
  export default class dataOrinig extends Vue {
   @Prop() private msg!: string;
-  @Mutation changeOpenKeys: any
 
   loading:boolean = true
   visible:boolean = false // 控制模态框

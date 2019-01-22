@@ -2,13 +2,14 @@ import Vue from 'vue';
 import router from '../router';
 import axios from 'axios';
 import qs from 'qs';
+import store from '../store'
 
 // 设置默认请求头
 // axios.defaults.headers = {
 //   'X-Requested-With': 'XMLHttpRequest',
 //   'Content-Type': 'application/x-www-form-urlencoded',
 // }
-axios.defaults.baseURL = '';
+axios.defaults.baseURL = store.state.domain;
 // 请求超时的时间限制
 axios.defaults.timeout = 20000;
 
