@@ -11,11 +11,6 @@ export default new Router({
       redirect: '/dataOriginManagement' // 从定向
     },
     {
-      path: '/login',
-      name: 'login',
-      component: () => import('./components/login/login.vue')
-    },
-    {
       path: '/home',
       name: '首页',
       component: Home,

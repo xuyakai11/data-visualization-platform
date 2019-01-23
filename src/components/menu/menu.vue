@@ -40,7 +40,7 @@ export default class menuList extends Vue {
   created () {
     // 请求菜单
     console.log(this.menuData);
-    if (!Object.keys(this.menuData).length || this.menuData == null) {
+    // if (!this.menuData) {
       (this as any).$post('custom/GlobalApi/getMenu').then((res: any) => {
         if (res.state === 2000) {
           this.menuList(res.data);
@@ -49,10 +49,10 @@ export default class menuList extends Vue {
           (this as any).$message.error(res.message, 3);
         }
       });
-    }
+    // }
   }
   mounted () {
-    this.selectKeys = [this.$route.path];
+    this.selectKeys = [(this as any).$route.path];
   }
   selectMenu (e: any):void { // 将点击选中的实时替换
     this.selectKeys = [e.key];
