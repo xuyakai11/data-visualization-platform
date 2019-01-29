@@ -3,21 +3,15 @@
   <a-card title="数据源管理" :bordered="false"></a-card>
   <div class="dataOrigin" id="components-form-demo-advanced-search">
     <a-form layout='inline' class="ant-advanced-search-from" :form="form">
-      <a-row :gutter="24">
-        <a-col :span="5">
-          <a-form-item >
-            <a-input
-              ref="searchLinkName"
-              v-decorator="['searchLinkName']"
-              placeholder="搜索条件" />
-          </a-form-item>
-        </a-col>
-        <a-col :span="6" :style="{ textAling: 'right'}">
-          <a-form-item>
-            <a-button type="primary" @click="handleSearch" :loading="searchLoading">搜索</a-button>
-          </a-form-item>
-        </a-col>
-      </a-row>
+      <a-form-item>
+        <a-input
+          ref="searchLinkName"
+          v-decorator="['searchLinkName']"
+          placeholder="搜索条件" />
+      </a-form-item>
+      <a-form-item>
+        <a-button type="primary" @click="handleSearch" :loading="searchLoading">搜索</a-button>
+      </a-form-item>
     </a-form>
     <div class="operation">
       <a-row>
@@ -27,12 +21,12 @@
       </a-row>
     </div>
     <div class="search-result-list">
-      <a-table :columns="columns" :dataSource="data" bordered :loading="loading">
+      <a-table :columns="columns" :dataSource="data" bordered :pagination="pagination" @change="onChange" :loading="loading">
         <span slot="action" slot-scope="text, record">
           <a-button type="primary" size="small" :loading="tabload" @click="editFun($event, record)">编辑</a-button>
           <a-divider type="vertical" />
-          <a-button type="primary" size="small" @click="go($event, record, '1')">抽取规则</a-button>
-          <a-divider type="vertical" />
+          <!-- <a-button type="primary" size="small" @click="go($event, record, '1')">抽取规则</a-button>
+          <a-divider type="vertical" /> -->
           <a-button type="primary" size="small" @click="go($event, record, '2')">报表管理</a-button>
           <a-divider type="vertical" />
           <a-button type="primary" size="small" @click="go($event, record, '3')">模型管理</a-button>
@@ -106,18 +100,11 @@
   import { interfaces } from 'mocha';
   import { State, Mutation } from 'vuex-class'
 
-  interface axiosDatas {
-    linkName: string,
-    adress: string
+  interface pagination {
+    current:number,
+    pageSize:number,
+    total:number
   }
-  /* interface modelFormDatas {
-    db_host: string,
-    db_password: string,
-    db_port: number,
-    db_user: string,
-    link_name: string,
-    report_source_id: number
-  } */
  @Component({
    components: {}
  })
@@ -134,15 +121,21 @@
     wrapper: {span: 12}
   }
   columns: Array<object> = [ // 定义表格表头
-    {title: '链接名', dataIndex: 'link_name', key: 'address', width: '15%'}, // fixed: 'left' 设置是否固定
-    {title: '数据库地址', dataIndex: 'db_host', key: 'age', width: '25%'},
-    {title: '账号名', dataIndex: 'db_user', key: 'name', width: '20%'},
+    {title: '链接名', dataIndex: 'link_name', key: ''}, // fixed: 'left' 设置是否固定
+    {title: '数据库地址', dataIndex: 'db_host', key: ''},
+    {title: '账号名', dataIndex: 'db_user', key: ''},
+    {title: '数据库名', dataIndex: 'db_name', key: ''},
     {title: '操作', dataIndex: '', key: '', width: '40%', scopedSlots: { customRender: 'action'}} // scopedSlots配置操作列
   ]
   data: Array<object> = [] // 定义表格内容
   modelTitle: string = '新增数据源'
-  modelFormDatas: Array<object> = []
-  editBtnReportId: string = ''
+  modelFormDatas: object = {}
+  editBtnReportId: string = '' // 判断是否新增
+  pagination:pagination = { // 定义分页数据
+    current: 1,
+    pageSize: 10,
+    total: 1
+  }
 
   beforeCreate () { // 挂载前创建ant form
     (this as any).form = (this as any).$form.createForm(this); // 定义搜索form
@@ -159,23 +152,34 @@
     }); */
   }
   mounted () {
-    this.initDataFun(); // 请求表格数据
-  }
-  initDataFun ():void {
     let searchLinkName:string = (this as any).$refs.searchLinkName.value || '';
-    (this as any).$post('/custom/Datasmanage/getDataSourceList', { linkName: searchLinkName }).then((res: any) => { // 请求表格数据
+    let params:any = { linkName: searchLinkName, pageSize: 10, nowpage: 1 }
+    this.initDataFun(params); // 请求表格数据
+  }
+  initDataFun (params:any):void {
+    (this as any).$post('/custom/Datasmanage/getDataSourceList', params).then((res: any) => { // 请求表格数据
       if (res.state === 2000) {
-        this.data = res.data;
+        const pagination = { ...this.pagination }
         this.loading = false // 关闭加载动画
+        pagination.total = res.data.count;
+        this.data = res.data.data;
+        this.pagination = pagination
       } else {
         this.loading = false;
         (this as any).$message.error(res.message, 3); // 弹出错误message
       }
+    }).catch((err: any) => {
+      console.log(err)
+      this.loading = false;
+      this.data = [];
+      (this as any).$message.error('请求失败', 3); // 弹出错误message
     });
   }
   handleSearch (e: any):void { // 搜索方法
     e.preventDefault();
-    this.initDataFun();
+    let searchLinkName:string = (this as any).$refs.searchLinkName.value || '';
+    let params:any = { linkName: searchLinkName, pageSize: 10, nowpage: 1 }
+    this.initDataFun(params);
   }
   showModel ():void { // 新增显示模态框
     this.modelTitle = '新增数据源'
@@ -185,7 +189,7 @@
     this.visible = false;
     this.modalBtn = true;
     this.editBtnReportId = '' // 每次关闭模态框都将其id重置为空
-    this.modelFormDatas = [];
+    this.modelFormDatas = {};
     (this as any).modelForm.resetFields(); // 重置输入控件的值
   }
   handleCreate (e: any):void { // 点击模态框确认方法
@@ -194,9 +198,11 @@
       if (!err) {
         let testConnectDatas:any = (this as any).modelForm.getFieldsValue(); // 获取表单中数据
         if (!this.editBtnReportId) { // 为空是新增
+          testConnectDatas.type = 'add'
           this.addEditFun(testConnectDatas);
         } else {
           testConnectDatas.reportId = this.editBtnReportId;
+          testConnectDatas.type = 'update'
           this.addEditFun(testConnectDatas);
         }
       }
@@ -220,36 +226,18 @@
   }
   editFun (event: any, record: any): void { // 编辑方法
     this.tabload = true;
-    console.log(record);
+    console.log(record)
     this.modelTitle = '编辑数据源'
     this.visible = true; // 将模态框显示
     this.modelFormDatas = record;
     this.editBtnReportId = record.report_source_id;
     this.tabload = false;
-    /* (this as any).$get('custom/Datasmanage/getDatasInfo', { 'reportId': record.report_source_id }).then((res: any) => {
-      if (res.state === 2000) {
-        this.tabload = false;
-        this.modelTitle = '编辑数据源'
-        this.visible = true; // 将模态框显示
-        this.modelFormDatas = res.data;
-        this.editBtnReportId = res.data.report_source_id;
-      } else {
-        this.tabload = false;
-       (this as any).$message.error(res.message, 3); // 弹出错误message
-      }
-    }).catch((err: any) => {
-      this.tabload = false;
-      console.log(err);
-      (this as any).$message.error('请求失败', 3); // 弹出错误message
-    }); */
   }
   go (e: any, record: any, num: string): void {
     e.preventDefault();
     let reportId: string = record.report_source_id;
-    if (num === '1') { // 抽取规则
-
-    } else if (num === '2') { // 报表管理
-      window.open(window.location.origin + '/statementManagement?reportId=' + reportId); // _target 表示只打开一个，重复点击会回到第一个打开的窗口
+    if (num === '2') { // 报表管理
+      window.open(window.location.origin + '/statementManagement?reportResourceId=' + reportId); // _target 表示只打开一个，重复点击会回到第一个打开的窗口
     } else { // 模型管理
       window.open(window.location.origin + '/modelManagement?reportId=' + reportId); // _target 表示只打开一个，重复点击会回到第一个打开的窗口
     }
@@ -257,14 +245,27 @@
   addEditFun (testConnectDatas: object): void { // 新增/编辑方法
     (this as any).$post('custom/Datasmanage/subDataSource', testConnectDatas).then((res: any) => {
       if (res.state === 2000) {
+        this.editBtnReportId = '' // 将判断id重置为空
+        this.modelFormDatas = {}; // 回显信息置空
+        (this as any).modelForm.resetFields(); // 清空表单
         this.visible = !this.visible; // 隐藏模态框
         (this as any).$message.success(res.message, 3);
-        this.initDataFun();
+        let searchLinkName:string = (this as any).$refs.searchLinkName.value || '';
+        let params:any = { linkName: searchLinkName, nowpage: this.pagination.current, pageSize: this.pagination.pageSize }
+        this.initDataFun(params);
       } else {
         (this as any).$message.error(res.message, 3);
       }
     });
   }
+  onChange (pagination: any) {
+      const pager:any = { ...this.pagination };
+      pager.current = pagination.current;
+      this.pagination = pager
+      let searchLinkName:string = (this as any).$refs.searchLinkName.value || '';
+      let params: object = { linkName: searchLinkName, nowpage: pagination.current, pageSize: pagination.pageSize }
+      this.initDataFun(params);
+    }
  }
 </script>
 <style lang='scss' scoped>
