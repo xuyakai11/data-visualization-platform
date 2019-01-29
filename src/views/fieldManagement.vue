@@ -69,8 +69,7 @@
   import { Component, Prop, Vue } from 'vue-property-decorator'
   import { interfaces } from 'mocha';
   import { State, Mutation } from 'vuex-class'
-import sterp1 from '@/components/report/step1.vue';
-
+  
   interface pagination {
     current:number,
     pageSize:number,
@@ -174,7 +173,6 @@ import sterp1 from '@/components/report/step1.vue';
     e.preventDefault();
     (this as any).modelForm.validateFields((err: any, values: any) => {
       if (!err) {
-        console.log(values);
         let params: any = values;
         params.model_id = this.model_id // 传模型id
         const url:string = '/custom/Attribute/updateField';
@@ -188,7 +186,6 @@ import sterp1 from '@/components/report/step1.vue';
     })
   }
   editFun (event: any, record: any): void { // 点击编辑方法
-    console.log(record);
     this.visible = true // 将模态框
     this.modelTitle = '编辑字段'
     this.filedlId = record.id // 字段id
@@ -213,7 +210,6 @@ import sterp1 from '@/components/report/step1.vue';
     });
   }
   onSelectChange (selectedRowKeys: any):void {
-    console.log(selectedRowKeys)
     this.selectedRowKeys = selectedRowKeys
   }
   onChange (pagination:any):void {

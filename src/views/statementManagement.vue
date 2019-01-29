@@ -2,19 +2,22 @@
 <div>
   <a-card title="报表管理" :bordered="false"></a-card>
   <div class="dataOrigin" id="components-form-demo-advanced-search">
-    <a-form class="ant-advanced-search-from" @submit="handleSearch" :form="form">
-      <a-row :gutter="24">
-        <a-col :span="6">
-          <a-form-item >
-            <a-input
-              v-decorator="['linkName']"
-              placeholder="搜索条件" />
-          </a-form-item>
-        </a-col>
-        <a-col :span="6" :style="{ textAling: 'right'}">
-          <a-button type="primary" htmlType="submit">搜索</a-button>
-        </a-col>
-      </a-row>
+    <a-form layout='inline' class="ant-advanced-search-from" :form="form">
+      <a-form-item :span="24">
+        <a-input
+          ref="sourceName"
+          v-decorator="['sourceName']"
+          placeholder="连接名" />
+      </a-form-item>
+      <a-form-item :span="24">
+        <a-input
+          ref="reportName"
+          v-decorator="['reportName']"
+          placeholder="报表名称" />
+      </a-form-item>
+      <a-form-item>
+        <a-button type="primary" @click="handleSearch" :loading="searchLoading">搜索</a-button>
+      </a-form-item>
     </a-form>
     <div class="operation">
       <a-row>
@@ -24,11 +27,13 @@
       </a-row>
     </div>
     <div class="search-result-list">
-      <a-table :columns="columns" :dataSource="data" bordered>
+      <a-table :columns="columns" :dataSource="data" bordered :pagination="pagination" @change="onChange" :loading="loading">
         <span slot="action" slot-scope="text, record">
-          <a-button type="primary" size="small" :data-type="record.key" @click="editFun($event)">编辑</a-button>
+          <a-button type="primary" size="small" @click="go($event, record)">编辑</a-button>
           <a-divider type="vertical" />
-          <a-button type="primary" size="small">添加入菜单</a-button>
+          <!-- <a-button type="primary" size="small" @click="go($event, record, '1')">抽取规则</a-button>
+          <a-divider type="vertical" /> -->
+          <a-button type="primary" size="small">添加到菜单</a-button>
         </span>
       </a-table>
     </div>
@@ -38,70 +43,101 @@
 
 <script lang='ts'>
   import { Component, Prop, Vue } from 'vue-property-decorator'
-  import axios from 'axios';
   import { interfaces } from 'mocha';
   import { State, Mutation } from 'vuex-class'
+  import { getQueryString } from '@/libs/util'
 
-  interface axiosDatas {
-    linkName: string,
-    adress: string
+  interface pagination {
+    current:number,
+    pageSize:number,
+    total:number
   }
-
-  const dataSource: Array<object> = [{ key: 'gg', name: 'sadf', address: 'asdfbbbb', age: 'awwwww' }]
-  for (let i = 0; i < 46; i++) {
-    dataSource.push({
-      key: i,
-      name: `名字${i}`,
-      address: `链接地址¥${i}`,
-      age: `ggg${i}`,
-      text: `<span>asdf</span>`
-    })
-  }
-
  @Component({
    components: {}
  })
- export default class dataOrinig extends Vue {
+ export default class statementManagement extends Vue {
   @Prop() private msg!: string;
-  @Mutation changeOpenKeys: any
 
-  loading: boolean = true
-  modelCol: object = {
+  searchLoading:boolean = false // 搜索按钮加载效果
+  loading:boolean = true // 初始化显示loading加载动画
+  visible:boolean = false // 控制模态框
+  modalBtn:boolean = true // 控制新增编辑时确认按钮
+  modelCol:object = { // 设置栅格比例
     label: {span: 8},
     wrapper: {span: 12}
   }
-
-  columns: Array<object> = [
-    {title: '链接名', dataIndex: 'address', key: 'address', width: '15%'}, // fixed: 'left' 设置是否固定
-    {title: '数据库地址', dataIndex: 'age', key: 'age', width: '25%'},
-    {title: '账号名', dataIndex: 'name', key: 'name', width: '20%'},
+  columns: Array<object> = [ // 定义表格表头
+    {title: '报表名称', dataIndex: 'report_name', key: ''}, // fixed: 'left' 设置是否固定
+    {title: '报表数据源名称', dataIndex: 'report_resource_name', key: ''},
+    {title: '报表主表名称', dataIndex: 'main_table_name', key: ''},
     {title: '操作', dataIndex: '', key: '', width: '40%', scopedSlots: { customRender: 'action'}} // scopedSlots配置操作列
   ]
-  data: Array<object> = dataSource
+  data: Array<object> = [] // 定义表格内容
+  modelTitle: string = '新增报表'
+  modelFormDatas: object = {}
+  reportResourceId: string = '' // 数据源id
+  pagination:pagination = { // 定义分页数据
+    current: 1,
+    pageSize: 10,
+    total: 1
+  }
 
   beforeCreate () { // 挂载前创建ant form
     (this as any).form = (this as any).$form.createForm(this); // 定义搜索form
-    (this as any).modalForm = (this as any).$form.createForm(this); // 定义modalform
+    (this as any).modelForm = (this as any).$form.createForm(this); // 定义modelform
   }
-
+  mounted () {
+    /* let testConnectDatas:any = (this as any).form.getFieldsValue();
+    console.log(testConnectDatas) */
+    this.reportResourceId = getQueryString('reportResourceId') || ''; // 获取url中的数据源id，用来区分是否是由数据源管理中跳转过来
+    let sourceName:string = (this as any).$refs.sourceName.value || ''; // 连接名
+    let reportName:string = (this as any).$refs.reportName.value || ''; // 报表名
+    let params:any = { reportResourceId: this.reportResourceId, reportName: reportName, sourceName: sourceName, pageSize: 10, nowpage: 1 }
+    this.initDataFun(params); // 请求表格数据
+  }
+  initDataFun (params:any):void { // 初始化查询数据表方法
+    (this as any).$post('custom/ReportManage/getReportList', params).then((res: any) => { // 请求表格数据
+      if (res.state === 2000) {
+        const pagination = { ...this.pagination }
+        this.loading = false // 关闭加载动画
+        pagination.total = res.data.count;
+        this.data = res.data.data;
+        this.pagination = pagination
+      } else {
+        this.loading = false;
+        (this as any).$message.error(res.message, 3); // 弹出错误message
+      }
+    }).catch((err: any) => {
+      console.log(err)
+      this.loading = false;
+      this.data = [];
+      (this as any).$message.error('请求失败', 3); // 弹出错误message
+    });
+  }
   handleSearch (e: any):void { // 搜索方法
     e.preventDefault();
-    (this as any).form.validateFields((err: any, values: any) => {
-      if (!err) {
-        console.log('values', values)
-      }
-    })
+    let sourceName:string = (this as any).$refs.sourceName.value || ''; // 连接名
+    let reportName:string = (this as any).$refs.reportName.value || ''; // 报表名
+    let params:any = { reportResourceId: this.reportResourceId, reportName: reportName, sourceName: sourceName, pageSize: 10, nowpage: 1 }
+    this.initDataFun(params); // 请求表格数据
   }
-  go (e: any):void { // 打开报表制作页
-    // window.open(window.location.origin + '/statementMake'); // statementManagement _target 表示只打开一个，重复点击会回到第一个打开的窗口
-    (this as any).$router.push({ 'path': '/statementMake' });
-  }
-  testLinkFun (e: any):void { // 测试链接方法
+  
+  go (e: any, record: any): void {
     e.preventDefault();
+    console.log(record);
+    let reportId = record ? record.report_id : '' // 报表id
+    // 打开报表制作
+    window.open(window.location.origin + '/statementMake?reportId=' + reportId); // _target 表示只打开一个，重复点击会回到第一个打开的窗口
   }
-  editFun (event: any): void { // 编辑方法
-    let type: string = event.target.getAttribute('data-type');
-  }
+  onChange (pagination: any) {
+      const pager:any = { ...this.pagination };
+      pager.current = pagination.current;
+      this.pagination = pager
+      let sourceName:string = (this as any).$refs.sourceName.value || ''; // 连接名
+      let reportName:string = (this as any).$refs.reportName.value || ''; // 报表名
+      let params:any = { reportResourceId: this.reportResourceId, reportName: reportName, sourceName: sourceName, nowpage: pagination.current, pageSize: pagination.pageSize }
+      this.initDataFun(params); // 请求表格数据
+    }
  }
 </script>
 <style lang='scss' scoped>
@@ -113,36 +149,16 @@
   .ant-advanced-search-from {
     padding: 16px;
     background: #fbfbfb;
-    /* border: 1px solid #d9d9d9; */
     border-radius: 6px 6px 0 0;
   }
   .operation {
     padding: 10px 10px;
   }
   .search-result-list {
-    /* margin-top: 16px;
-    border: 1px dashed #e9e9e9; */
     border-radius: 0 0 6px 6px;
     background-color: #fafafa;
     min-height: 200px;
     padding: 10px;
-  }
-}
-/* 模态框样式 */
-.ant-form-item-label {
-  text-align: right;
-  vertical-align: middle;
-  line-height: 39.999px;
-  display: inline-block;
-  overflow: hidden;
-  white-space: nowrap;
-}
-.ant-form-item-label {
-  label :after {
-    content: ':';
-    margin: 0 8px 0 2px;
-    position: relative;
-    top: -.5px;
   }
 }
 </style>

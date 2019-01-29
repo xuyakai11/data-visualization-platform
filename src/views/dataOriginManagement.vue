@@ -3,21 +3,15 @@
   <a-card title="数据源管理" :bordered="false"></a-card>
   <div class="dataOrigin" id="components-form-demo-advanced-search">
     <a-form layout='inline' class="ant-advanced-search-from" :form="form">
-      <a-row :gutter="24">
-        <a-col :span="6">
-          <a-form-item>
-            <a-input
-              ref="searchLinkName"
-              v-decorator="['searchLinkName']"
-              placeholder="搜索条件" />
-          </a-form-item>
-        </a-col>
-        <a-col :span="6" :style="{ textAling: 'right'}">
-          <a-form-item>
-            <a-button type="primary" @click="handleSearch" :loading="searchLoading">搜索</a-button>
-          </a-form-item>
-        </a-col>
-      </a-row>
+      <a-form-item>
+        <a-input
+          ref="searchLinkName"
+          v-decorator="['searchLinkName']"
+          placeholder="搜索条件" />
+      </a-form-item>
+      <a-form-item>
+        <a-button type="primary" @click="handleSearch" :loading="searchLoading">搜索</a-button>
+      </a-form-item>
     </a-form>
     <div class="operation">
       <a-row>
@@ -106,10 +100,6 @@
   import { interfaces } from 'mocha';
   import { State, Mutation } from 'vuex-class'
 
-  interface axiosDatas {
-    linkName: string,
-    adress: string
-  }
   interface pagination {
     current:number,
     pageSize:number,
@@ -246,10 +236,8 @@
   go (e: any, record: any, num: string): void {
     e.preventDefault();
     let reportId: string = record.report_source_id;
-    if (num === '1') { // 抽取规则
-
-    } else if (num === '2') { // 报表管理
-      window.open(window.location.origin + '/statementManagement?reportId=' + reportId); // _target 表示只打开一个，重复点击会回到第一个打开的窗口
+    if (num === '2') { // 报表管理
+      window.open(window.location.origin + '/statementManagement?reportResourceId=' + reportId); // _target 表示只打开一个，重复点击会回到第一个打开的窗口
     } else { // 模型管理
       window.open(window.location.origin + '/modelManagement?reportId=' + reportId); // _target 表示只打开一个，重复点击会回到第一个打开的窗口
     }

@@ -39,7 +39,6 @@ export default class menuList extends Vue {
 
   created () {
     // 请求菜单
-    console.log(this.menuData);
     // if (!this.menuData) {
       (this as any).$post('custom/GlobalApi/getMenu').then((res: any) => {
         if (res.state === 2000) {

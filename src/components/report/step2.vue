@@ -1,5 +1,6 @@
 <template>
   <div>
+    <left-menu></left-menu>
     <a-form>
       <a-form-item :wrapperCol="{span: 19, offset: 5}">
         <a-button :loading="loading" type="primary" @click="nextStep">提交</a-button>
@@ -10,11 +11,19 @@
 </template>
 
 <script lang='ts'>
- import { Component, Prop, Vue } from 'vue-property-decorator'
+  import { Component, Prop, Vue } from 'vue-property-decorator'
+  import leftMenu from '@/components/report/step2LeftMenu.vue'
 
- @Component
+ @Component({
+   components: { leftMenu }
+ })
  export default class sterp2 extends Vue {
+   @Prop() reportId: any // 从父组件接收reportId
    loading: boolean = false
+
+  created () {
+    
+  }
 
   nextStep ():void {
     let _this = this
