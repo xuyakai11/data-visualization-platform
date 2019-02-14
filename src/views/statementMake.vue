@@ -42,6 +42,7 @@
   }
   reportIdEmit (val:any):void { // step1 传过来的reportid
     console.log(val);
+    this.reportId = val; // 接收子组件传过来的参数，用于第二步请求
     /* (this as any).$post('custom/ReportManageDetail/getAllFields', { reportId: '108' }).then((res: any) => { // 请求报表所有字段
       if (res.state === 2000) {
         
@@ -90,6 +91,9 @@
   .padding0 {
     .ant-card-body {
       padding: 0!important;
+     /*  height: calc(90vh - 130px);
+      height: -webkit-calc(90vh - 130px); //chrome
+      height: -moz-calc(90vh - 130px); //firefox */
     }
     .steps {
       max-width: 750px;

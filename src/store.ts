@@ -5,8 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    pageTitle: '', // 页面标题
-    openKeys: '', //
+    openKeys: '',
     domain: 'http://test.report.pxjy.com',
     menu: JSON.parse((localStorage as any).getItem('menu'))
   },
