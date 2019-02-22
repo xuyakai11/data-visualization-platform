@@ -34,6 +34,8 @@
           <!-- <a-button type="primary" size="small" @click="go($event, record, '1')">抽取规则</a-button>
           <a-divider type="vertical" /> -->
           <a-button type="primary" size="small">添加到菜单</a-button>
+          <a-divider type="vertical" />
+          <a-button type="primary" size="small" :loading="delBtnLoading" @click="deleteFun($event, record)">删除</a-button>
         </span>
       </a-table>
     </div>
@@ -81,6 +83,7 @@
     pageSize: 10,
     total: 1
   }
+  delBtnLoading:boolean = false // 删除按钮加载
 
   beforeCreate () { // 挂载前创建ant form
     (this as any).form = (this as any).$form.createForm(this); // 定义搜索form
@@ -130,14 +133,54 @@
     window.open(window.location.origin + '/statementMake?reportId=' + reportId); // _target 表示只打开一个，重复点击会回到第一个打开的窗口
   }
   onChange (pagination: any) {
-      const pager:any = { ...this.pagination };
-      pager.current = pagination.current;
-      this.pagination = pager
-      let sourceName:string = (this as any).$refs.sourceName.value || ''; // 连接名
-      let reportName:string = (this as any).$refs.reportName.value || ''; // 报表名
-      let params:any = { reportResourceId: this.reportResourceId, reportName: reportName, sourceName: sourceName, nowpage: pagination.current, pageSize: pagination.pageSize }
-      this.initDataFun(params); // 请求表格数据
-    }
+    const pager:any = { ...this.pagination };
+    pager.current = pagination.current;
+    this.pagination = pager
+    let sourceName:string = (this as any).$refs.sourceName.value || ''; // 连接名
+    let reportName:string = (this as any).$refs.reportName.value || ''; // 报表名
+    let params:any = { reportResourceId: this.reportResourceId, reportName: reportName, sourceName: sourceName, nowpage: pagination.current, pageSize: pagination.pageSize }
+    this.initDataFun(params); // 请求表格数据
+  }
+  deleteFun (e:any, record:any):void {
+    e.preventDefault();
+    this.delBtnLoading = !this.delBtnLoading
+    let params: object = { reportId: record.report_id };
+    this.showConfirm('提示', '确认要删除该报表么？', params)
+  }
+  showConfirm (title: string, content: string, params: any) { // 弹出确认对话框
+    let _this:any = this;
+    (this as any).$confirm({
+      title: title,
+      content: content,
+      okType: 'danger',
+      okText: '确认',
+      cancelText: '取消',
+      onOk () {
+        _this.delFieldFun(params)
+      },
+      onCancel () {
+        _this.delBtnLoading = !_this.delBtnLoading; 
+      }
+    })
+  }
+  delFieldFun (params:any):void {
+    (this as any).$post('custom/ReportManage/delReport', params).then((res: any) => { // 请求表格数据
+      if (res.state === 2000) {
+        let sourceName:string = (this as any).$refs.sourceName.value || ''; // 连接名
+        let reportName:string = (this as any).$refs.reportName.value || ''; // 报表名
+        let params:any = { reportResourceId: this.reportResourceId, reportName: reportName, sourceName: sourceName, pageSize: 10, nowpage: 1 }
+        this.initDataFun(params); // 请求表格数据
+        (this as any).$message.success(res.message, 3);
+        this.delBtnLoading = !this.delBtnLoading;
+      } else {
+        this.delBtnLoading = !this.delBtnLoading;
+        (this as any).$message.error(res.message, 3); // 弹出错误message
+      }
+    }).catch(() => {
+      this.delBtnLoading = !this.delBtnLoading;
+      (this as any).$message.error('删除失败', 3);
+    });
+  }
  }
 </script>
 <style lang='scss' scoped>

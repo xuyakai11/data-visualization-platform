@@ -9,7 +9,7 @@
     </a-steps>
     <div class="content">
       <keep-alive>  
-        <step1 v-if="current === 0" @reportId="reportIdEmit($event)" :dataSourceList="dataSourceList" @nextStep="nextStep()"></step1>
+        <step1 v-if="current === 0" @reportId="reportIdEmit" :dataSourceList="dataSourceList" @nextStep="nextStep()"></step1>
         <step2 v-if="current === 1" :reportId="reportId" @prevStep="prevStep"></step2>
       </keep-alive>
       <!-- <step3 v-if="current === 2" @prevStep="prevStep" @finish="finish"></step3> -->
@@ -41,7 +41,7 @@
     this.initDataFun();
   }
   reportIdEmit (val:any):void { // step1 传过来的reportid
-    console.log(val);
+    console.log('父组件接收到的reportId' + val);
     this.reportId = val; // 接收子组件传过来的参数，用于第二步请求
     /* (this as any).$post('custom/ReportManageDetail/getAllFields', { reportId: '108' }).then((res: any) => { // 请求报表所有字段
       if (res.state === 2000) {

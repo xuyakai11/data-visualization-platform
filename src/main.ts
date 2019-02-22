@@ -7,6 +7,10 @@ import store from './store'
 import './services/axios.tool' // 导入封装好的axios
 import './assets/common.css'
 
+import moment from 'moment' // 时间组件汉化
+import 'moment/locale/zh-cn'
+moment.locale('zh-ch')
+
 Vue.use(Antd)
 Vue.config.productionTip = false // 设置为 false 以阻止 vue 在启动时生成生产提示
 

@@ -103,7 +103,7 @@
 
  @Component
  export default class sterp1 extends Vue {
-    @Prop() dataSourceList: any // 从父组件接收数据源
+    @Prop({}) dataSourceList!:any // 从父组件接收数据源
 
     modelCol: object = {
       label: {span: 5},
@@ -122,7 +122,7 @@
     mainTableIdModel:Array<object> = [] // 存放带入到弹窗数据主表中回显的内容
     joinMainFieldIds:Array<object> = [] // 存放关联字段、主表字段
     reportId:string = ''
-    @Emit('reportId')
+    @Emit('reportId') send (reportId:string) {} // 子传父方法
 
     beforeCreate () { // 挂载前创建ant form
       (this as any).form = (this as any).$form.createForm(this); // 定义搜索form
@@ -186,7 +186,8 @@
           (this as any).$post('custom/ReportManage/saveStepOne', values).then((res: any) => { // 请求表格数据
             if (res.state === 2000) {
               this.reportId = res.data.reportId
-              this.$emit('reportId', this.reportId)
+              // this.$emit('reportId', this.reportId)
+              this.send(this.reportId) // 子传父方法
               this.$emit('nextStep')
             } else {
               (this as any).$message.error(res.message, 3); // 弹出错误message

@@ -2,7 +2,7 @@
   <div>
     <div class="lpc-step2-content">
       <!-- leftTree -->
-      <left-menu></left-menu>
+      <left-menu @treeDblData="treeMsg"></left-menu>
       <!-- middletab -->
       <div class="lpc-centerTab">
         <a-tabs defaultActiveKey="1">
@@ -101,7 +101,7 @@
                         <a href="javascript:void(0)">添加存储器列</a>
                       </a-menu-item> -->
                       <a-menu-item key="1" :disabled="!aTagDatasH.length"> <!-- 当组行为空时不能选 -->
-                        <a href="javascript:void(0)" >添加汇总公式</a>
+                        <a href="javascript:void(0)" @click="showFormulaModel">添加汇总公式</a>
                       </a-menu-item>
                       <a-menu-divider />
                       <a-menu-item key="3">删除所有列</a-menu-item>
@@ -176,14 +176,73 @@
               <div class="screening-content">
                 <a-popover arrowPointAtCenter placement="right" title="编辑筛选器" trigger="click" :visible="item.visible" @click="popoverVisibleFun($event, item)" v-model="item.popover" v-for="(item, i) in aTagDatasF" :key="i">
                   <div slot="content">
-                    <div v-if="item.type == 'time'">这是时间类型</div>
-                    <div v-if="item.type == 'number'">这是数字</div>
-                    <div v-if="item.type == 'string'">这是字符串类型</div>
-                    <div v-if="item.type == 'select'">这是复选框</div>
+                    <div v-if="item.type == 'time'">
+                      <a-form :form="timeForm">
+                        <a-form-item label="时间范围">
+                          <a-range-picker size="small" format="YYYY-MM-DD" @change="timeOnChange" v-decorator="['range-picker', rangeConfig]"/>
+                        </a-form-item>
+                      </a-form>
+                    </div>
+                    <div v-if="item.type == 'number'">
+                      <a-form :form="numberForm">
+                        <a-form-item label="运算符">
+                          <a-select v-decorator="['numberSelect', {initialValue: '0', rules: [{ required: false }]}]">
+                            <a-select-option value="0">大于等于</a-select-option>
+                            <a-select-option value="1">大于</a-select-option>
+                            <a-select-option value="2">小于等于</a-select-option>
+                            <a-select-option value="3">小于</a-select-option>
+                          </a-select>
+                        </a-form-item>
+                        <a-form-item >
+                          <a-input name="numberInput" v-decorator="['numberInput', {rules: [{ required: true, message: '请输入数字！' }]}]"/>
+                        </a-form-item>
+                      </a-form>
+                    </div>
+                    <div v-if="item.type == 'string'">
+                      <a-form :form="stringForm">
+                        <a-form-item label="运算符">
+                          <a-select v-decorator="['stringSelect', {initialValue: '0', rules: [{ required: false }]}]">
+                            <a-select-option value="0">等于</a-select-option>
+                            <a-select-option value="1">不等于</a-select-option>
+                          </a-select>
+                        </a-form-item>
+                        <a-form-item >
+                          <a-input name="stringInput" v-decorator="['numberInput', {rules: [{ required: true, message: '请输入字符串！' }]}]"/>
+                        </a-form-item>
+                      </a-form>
+                    </div>
+                    <div v-if="item.type == 'select'">
+                      <a-form :form="selectForm">
+                        <a-form-item label="运算符">
+                          <a-select style="width: 250px" v-decorator="['selectSelect', {initialValue: '0', rules: [{ required: false }]}]">
+                            <a-select-option value="0">等于</a-select-option>
+                            <a-select-option value="1">不等于</a-select-option>
+                            <a-select-option value="2">小于</a-select-option>
+                            <a-select-option value="3">大于</a-select-option>
+                            <a-select-option value="4">小于或等于</a-select-option>
+                            <a-select-option value="5">大于或等于</a-select-option>
+                            <a-select-option value="6">包含</a-select-option>
+                            <a-select-option value="7">不包含</a-select-option>
+                            <a-select-option value="8">起始字符</a-select-option>
+                          </a-select>
+                        </a-form-item>
+                        <a-form-item label="值">
+                          <a-select mode="multiple" v-decorator="['selectMultiple', { rules: [{ required: true, message: '请选择值！' }]}]"
+                            showSearch
+                            allowClear
+                            style="width: 250px"
+                            :filterOption="filterOption">
+                            <a-select-option v-for="(item, index) in selectMultiple" :key="index" :value="item.value">
+                              {{item.title}}
+                            </a-select-option>
+                          </a-select>
+                        </a-form-item>
+                      </a-form>
+                    </div>
                     <div v-if="item.type == 'list'">这是列表类型</div>
                     <div class="content-footer">
                       <a-button size="small" @click="hidePopover(item)">取消</a-button>
-                      <a-button size="small" type="primary" @click="hidePopover(item)">应用</a-button>
+                      <a-button size="small" type="primary" @click="enterPopover(item)">应用</a-button>
                     </div>
                   </div>
                   <div class="screening-item">
@@ -222,14 +281,72 @@
               <div class="According-content">
                 <a-popover arrowPointAtCenter placement="right" id="ant-popover" title="编辑筛选器" trigger="click" :visible="item.visible" @click="popoverVisibleFun($event, item)" v-model="item.popover" v-for="(item, i) in aTagDatasX" :key="i">
                   <div slot="content">
-                    <div v-if="item.type == 'time'">这是时间类型</div>
-                    <div v-if="item.type == 'number'">这是数字</div>
-                    <div v-if="item.type == 'string'">这是字符串类型</div>
-                    <div v-if="item.type == 'select'">这是复选框</div>
+                    <div v-if="item.type == 'time'">
+                      <a-form :form="timeForm">
+                        <a-form-item label="时间范围">
+                          <a-range-picker size="small" format="YYYY-MM-DD" @change="timeOnChange" v-decorator="['range-picker', rangeConfig]"/>
+                        </a-form-item>
+                      </a-form>
+                    </div>
+                    <div v-if="item.type == 'number'">
+                      <a-form :form="numberForm">
+                        <a-form-item label="运算符">
+                          <a-select v-decorator="['numberSelect', {initialValue: '0', rules: [{ required: false }]}]">
+                            <a-select-option value="0">大于等于</a-select-option>
+                            <a-select-option value="1">大于</a-select-option>
+                            <a-select-option value="2">小于等于</a-select-option>
+                            <a-select-option value="3">小于</a-select-option>
+                          </a-select>
+                        </a-form-item>
+                        <a-form-item >
+                          <a-input name="numberInput" v-decorator="['numberInput', {rules: [{ required: true, message: '请输入数字！' }]}]"/>
+                        </a-form-item>
+                      </a-form>
+                    </div>
+                    <div v-if="item.type == 'string'">
+                      <a-form :form="stringForm">
+                        <a-form-item label="运算符">
+                          <a-select v-decorator="['stringSelect', {initialValue: '0', rules: [{ required: false }]}]">
+                            <a-select-option value="0">等于</a-select-option>
+                            <a-select-option value="1">不等于</a-select-option>
+                          </a-select>
+                        </a-form-item>
+                        <a-form-item >
+                          <a-input name="stringInput" v-decorator="['numberInput', {rules: [{ required: true, message: '请输入字符串！' }]}]"/>
+                        </a-form-item>
+                      </a-form>
+                    </div>
+                    <div v-if="item.type == 'select'">
+                      <a-form :form="selectForm">
+                        <a-form-item label="运算符">
+                          <a-select v-decorator="['selectSelect', {initialValue: '0', rules: [{ required: false }]}]">
+                            <a-select-option value="0">等于</a-select-option>
+                            <a-select-option value="1">不等于</a-select-option>
+                            <a-select-option value="2">小于</a-select-option>
+                            <a-select-option value="3">大于</a-select-option>
+                            <a-select-option value="4">小于或等于</a-select-option>
+                            <a-select-option value="5">大于或等于</a-select-option>
+                            <a-select-option value="6">包含</a-select-option>
+                            <a-select-option value="7">不包含</a-select-option>
+                            <a-select-option value="8">起始字符</a-select-option>
+                          </a-select>
+                        </a-form-item>
+                        <a-form-item label="值">
+                          <a-select mode="multiple" v-decorator="['selectMultiple', { rules: [{ required: true, message: '请选择值！' }]}]"
+                            showSearch
+                            allowClear
+                            :filterOption="filterOption">
+                            <a-select-option v-for="(item, index) in selectMultiple" :key="index" :value="item.value">
+                              {{item.title}}
+                            </a-select-option>
+                          </a-select>
+                        </a-form-item>
+                      </a-form>
+                    </div>
                     <div v-if="item.type == 'list'">这是列表类型</div>
                     <div class="content-footer">
                       <a-button size="small" @click="hidePopover(item)">取消</a-button>
-                      <a-button size="small" type="primary" @click="hidePopover(item)">应用</a-button>
+                      <a-button size="small" type="primary" @click="enterPopover(item)">应用</a-button>
                     </div>
                   </div>
                   <div class="According-item">
@@ -269,8 +386,9 @@
             <a-button type="primary" class="runBtn" :loading="runLoading" @click="runFun">运行</a-button>
           </div>
         </div>
-        <div class="table-content">
-          <div class="ant-table-body">
+        <div class="table-content" ref="tableContent">
+          <a-table :columns="columns" :dataSource="data" bordered :scroll="screenWidth"></a-table>
+          <!-- <div class="ant-table-body">
             <table>
               <thead>
                 <tr>
@@ -279,16 +397,158 @@
               </thead>
               <tbody></tbody>
             </table>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
-    <a-form>
+    <a-form class="lpc-form-footer">
       <a-form-item>
         <a-button :loading="loading" type="primary" @click="nextStep">提交</a-button>
         <a-button style="margin-left: 8px" @click="prevStep">上一步</a-button>
       </a-form-item>
     </a-form>
+    <!-- 弹窗层 -->
+    <a-modal
+        :visible="showFormulaFlag"
+        :title="showFormulaTitle"
+        okText='确认'
+        cancelText='取消'
+        @cancel="formulaCancel"
+        @ok="formulaCreate"
+        class="formulaModal"
+      >
+        <div class="modalContent">
+          <div class="modalLeftTab">
+            <a-tabs defaultActiveKey="1">
+              <a-tab-pane tab="字段" key="1">
+                <div class="leftMenu">
+                  <div class="lpc-full">
+                    <div class="header">
+                      <a-input-search placeholder="搜索字段" @change="onChangeField" />
+                    </div>
+                    <div class="treeContent">
+                      <a-tree
+                        @expand="onExpandField"
+                        :expandedKeys="expandedKeysField"
+                        :autoExpandParent="autoExpandParentField"
+                        :treeData="dataSource"
+                        @select="onselectTreeField"
+                        ><!-- @select="selectTreeFun($event)" -->
+                        <template slot="title" slot-scope="{title}">
+                          <span v-if="title.indexOf(searchValueField) > -1">
+                            {{title.substr(0, title.indexOf(searchValueField))}}
+                            <span style="color: #f50">{{searchValueField}}</span>
+                            {{title.substr(title.indexOf(searchValueField) + searchValueField.length)}}
+                          </span>
+                          <span v-else>{{title}}</span>
+                        </template>
+                      </a-tree>
+                    </div>
+                    <div class="footer">
+                      <div>
+                        <a-select defaultValue="SUM" style="width: 170px" v-model="fieldCalculate">
+                          <a-select-option value="SUM">总和</a-select-option>
+                          <a-select-option value="AVG">平均</a-select-option>
+                          <a-select-option value="MIN">最小值</a-select-option>
+                          <a-select-option value="MAX">最大值</a-select-option>
+                        </a-select>
+                        <a-button type="primary" :disabled="insertField" @click="insertFieldFun">插入 > </a-button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </a-tab-pane>
+              <a-tab-pane tab="函数" key="2">
+                <div class="leftMenu">
+                  <div class="lpc-full">
+                    <div class="header">
+                      <a-input-search placeholder="搜索函数" @change="onChangeFun" />
+                    </div>
+                    <div class="treeContent">
+                      <a-tree
+                        @expand="onExpandFun"
+                        :expandedKeys="expandedKeysFun"
+                        :autoExpandParent="autoExpandParentFun"
+                        :treeData="dataSource"
+                        @select="onSelectTreeFun"
+                        ><!-- @select="selectTreeFun($event)" -->
+                        <template slot="title" slot-scope="{title}">
+                          <span v-if="title.indexOf(searchValueFun) > -1">
+                            {{title.substr(0, title.indexOf(searchValueFun))}}
+                            <span style="color: #f50">{{searchValueFun}}</span>
+                            {{title.substr(title.indexOf(searchValueFun) + searchValueFun.length)}}
+                          </span>
+                          <span v-else>{{title}}</span>
+                        </template>
+                      </a-tree>
+                    </div>
+                    <div class="footer">
+                      <div>
+                        <a-button type="primary" style="margin-left: 191px" :disabled="insertFun" @click="insertFunFun">插入 > </a-button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </a-tab-pane>
+            </a-tabs>
+          </div>
+          <div class="modalRightTab">
+            <a-tabs defaultActiveKey="1">
+              <a-tab-pane tab="一般信息" key="1">
+                <div class="message">
+                  <a-form layout="vertical" :form="messageForm">
+                    <a-form-item class="twoCol" label="列名称" :wrapper-col="{ span: 24 }">
+                      <a-input name="colName" v-decorator="['colName', {rules: [{ required: true, message: '请输入列名称！' }]}]"/>
+                    </a-form-item>
+                    <a-form-item class="twoCol" label="描述" :wrapper-col="{ span: 24 }" style="margin-left: 20px">
+                      <a-input name="describe" v-decorator="['describe', {rules: [{ required: false }]}]"/>
+                    </a-form-item>
+                    <a-form-item label="公式">
+                      <a-textarea ref="formulaTextarea" value="" placeholder="请在此键入公式。" :rows="10" name="formula" v-decorator="['formula', { rules: [{ required: true, message: '请键入公式' }]}]"/>
+                    </a-form-item>
+                    <a-form-item style="margin-bottom: 0">
+                      <a-button @click="checkGrammar">检查语法</a-button>
+                    </a-form-item>
+                  </a-form>
+                </div>
+              </a-tab-pane>
+              <a-tab-pane tab="格式" key="2">
+                <div class="message">
+                  <a-form layout="vertical" :form="formatForm">
+                    <a-form-item class="twoCol" label="格式" :wrapper-col="{ span: 24 }">
+                      <a-select name="format" v-decorator="['format', {initialValue: 'num', rules: [{ required: false }]}]">
+                        <a-select-option value="num">数字</a-select-option>
+                        <a-select-option value="percentage">百分比</a-select-option>
+                        <a-select-option value="currency">币种</a-select-option>
+                      </a-select>
+                    </a-form-item>
+                    <a-form-item class="twoCol" label="小数点" :wrapper-col="{ span: 24 }" style="margin-left: 20px">
+                      <a-select name="decimalPoint" v-decorator="['decimalPoint', {initialValue: '0', rules: [{ required: false }]}]">
+                        <a-select-option :key="i" v-for="(list, i) in 19" :value="i">{{i}}</a-select-option>
+                      </a-select>
+                    </a-form-item>
+                    <a-form-item class="twoCol" label="此公式将在哪里应用?">
+                      <a-radio-group v-model="radioValue">
+                        <a-radio :value="0">所有汇总级别</a-radio>
+                        <a-radio :value="1">仅限总合计</a-radio>
+                        <a-radio :value="2">特定组</a-radio>
+                      </a-radio-group>
+                      <span v-if="radioValue === 2" style="margin-left: 20px">
+                            <a-select name="specific" v-decorator="['specific', {initialValue: '0', rules: [{ required: false }]}]">
+                              <a-select-option value="0">客户所有人</a-select-option>
+                            </a-select>
+                          </span>
+                    </a-form-item>
+                  </a-form>
+                </div>
+              </a-tab-pane>
+            </a-tabs>
+            <!-- <a-form :form="modalForm">
+          
+            </a-form> -->
+          </div>
+        </div>
+    </a-modal>
   </div>
 </template>
 
@@ -297,60 +557,32 @@
   import leftMenu from '@/components/report/step2LeftMenu.vue'
   // import middenTab from '@/components/report/step2MiddenTab.vue'
   import Draggable from 'vuedraggable'
+  import formulaModal from '@/components/report/formulaModal.vue';
   /* import leftMenu2 from '@/components/report/leftMenu.vue' */
- @Component({
-   components: { leftMenu, Draggable }
- })
- export default class sterp2 extends Vue {
+  import { getTextareaCursor, setTextareaCursor, addTextareaCursor } from '@/libs/util'
+  @Component({
+    components: { leftMenu, Draggable }
+  })
+  export default class sterp2 extends Vue {
     @Prop() reportId: any // 从父组件接收reportId
     loading: boolean = false
-    dataSource:Array<object> = [{
-      title: '话题',
-      key: '122',
-      scopedSlots: {title: 'title'},
-      children: [{
-        title: 'AntDesign',
-        scopedSlots: {title: 'title'},
-        key: '10000',
-      }, {
-        title: 'AntDesign UI',
-        scopedSlots: {title: 'title'},
-        key: '10600',
-      }]
-    }, {
-      title: '问题',
-      scopedSlots: {title: 'title'},
-      key: '1',
-      children: [{
-        title: 'AntDesign UI 有多好',
-        scopedSlots: {title: 'title'},
-        key: '60100'
-      }, {
-        title: 'AntDesign 是啥',
-        scopedSlots: {title: 'title'},
-        key: '30010'
-      }]
-    }, {
-      title: '文章',
-      scopedSlots: {title: 'title'},
-      key: '123',
-      children: [{
-        title: 'AntDesign 是一个设计语言',
-        scopedSlots: {title: 'title'},
-        key: '100000',
-      }]
-    }]
+    selectMultiple:Array<any> = [ // 筛选器中复选框
+      { value: 0, title: '同步中' },
+      { value: 1, title: '不同' },
+      { value: 2, title: '已审核' },
+      { value: 3, title: '未找到' },
+      { value: 4, title: '未启用' },
+      { value: 5, title: '未比较' },
+      { value: '', title: '无选择' }
+    ]
+    selectMultipleData: Array<string> = [] // 筛选器中复选框 选中的选项数据 
     aTagDatasH:Array<any> = [] // 组行
     aTagDatasL:Array<any> = []
     aTagDatasS:Array<any> = [] // 列数
     // 状态type time时间，number数字，string字符串，list列表， select复选框
-    aTagDatasF:Array<any> = [{title: '订单日期', text: '111', type: 'time', popover: false, visible: false}, {title: '数字类型', text: '222', type: 'number', popover: false, visible: false }] // 固定筛选
-    aTagDatasX:Array<any> = [{title: '字符串', text: '333', popover: false, type: 'string', visible: false}, {title: '复选框类型', text: '333', popover: false, type: 'select', visible: false }, {title: '订单列表', text: '333', popover: false, type: 'list', visible: false }] // 显示筛选
-    @Watch('aTagDatasH')
-    private aTagDatasChange (val:any, oldVal:any) {
-     console.log(val)
-     console.log(oldVal)
-    }
+    aTagDatasF:Array<any> = [{title: '订单日期', text: '111', type: 'time', popover: false, visible: false}, {title: '数字类型', text: '222', type: 'number', popover: false, visible: false }, {title: '复选框类型', text: '333', popover: false, type: 'select', visible: false }] // 固定筛选
+    aTagDatasX:Array<any> = [{title: '字符串', text: '333', popover: false, type: 'string', visible: false}, {title: '复选框类型', text: '333', popover: false, type: 'select', visible: false }] // 显示筛选
+   
     dragOptions: object = { // 拖拽组件相关配置
       sort: true, // 定义是否拖拽
       group: 'task', // string or array分组用的，同一组的不同的list可以相互拖拽
@@ -368,19 +600,131 @@
     runLoading:boolean = false
     columns:Array<object> = [{
         title: '移动后的序号',
-        dataIndex: 'name'
+        dataIndex: 'name',
+        key: 1,
+        width: 150
       }, {
         title: 'Ag移动后的序号e',
-        dataIndex: 'age'
+        dataIndex: 'age',
+        key: 2,
+        width: 150
       }, {
         title: '移动后的序号',
         dataIndex: 'address',
+        key: 3,
+        width: 150
+      }, {
+        title: '移动后的序号',
+        dataIndex: 'name',
+        key: 4,
+        width: 150
+      }, {
+        title: 'Ag移动后的序号e',
+        dataIndex: 'age',
+        key: 5,
+        width: 150
       }]
-    data:Array<object> = []
-    mounted () {
-      
+    data:Array<object> = [
+      { key: 0, name: '嗯哼', age: '123', address: '啥玩意儿'},
+      { key: 1, name: '嗯哼', age: '123', address: 'hhhh'},
+      { key: 2, name: '嗯哼', age: '123', address: '啥玩意儿'},
+      { key: 3, name: '嗯哼', age: '123', address: '啥玩意儿'},
+      { key: 4, name: '嗯哼', age: '123', address: '啥玩意儿'}
+    ]
+    screenWidth: object = {x: 1000, y: 400}
+    // tableWidth:number = 10
+    // screenWidth:any = document.body.clientWidth
+    rangeConfig:object = { // 筛选器时间组件规则
+      rules: [{ type: 'array', required: true, message: '请选择时间！' }]
+    }
+    showFormulaFlag:boolean = false // 控制添加公式列模态框
+    showFormulaTitle:string = '编辑公式列'
+
+    expandedKeysField:Array<any> = []
+    searchValueField:string = ''
+    autoExpandParentField:boolean = true
+    dataListField:Array<object> = []
+    dataSource:Array<object> = [
+      {
+        title: '话题',
+        key: '122',
+        scopedSlots: {title: 'title'},
+        selectable: false, // 配置节点是否可选
+        children: [{
+          title: 'AntDesign',
+          scopedSlots: {title: 'title'},
+          key: '10000',
+        }, {
+          title: 'AntDesign UI',
+          scopedSlots: {title: 'title'},
+          key: '10600',
+        }]
+      }, {
+        title: '问题',
+        scopedSlots: {title: 'title'},
+        key: '1',
+        selectable: false, // 配置节点是否可选
+        children: [{
+          title: 'AntDesign UI 有多好',
+          scopedSlots: {title: 'title'},
+          key: '60100'
+        }, {
+          title: 'AntDesign 是啥',
+          scopedSlots: {title: 'title'},
+          key: '30010'
+        }]
+      }, {
+        title: '文章',
+        scopedSlots: {title: 'title'},
+        key: '123',
+        selectable: false, // 配置节点是否可选
+        children: [{
+          title: 'AntDesign 是一个设计语言',
+          scopedSlots: {title: 'title'},
+          key: '100000',
+        }]
+    }];
+    expandedKeysFun:Array<any> = []
+    searchValueFun:string = ''
+    autoExpandParentFun:boolean = true
+    dataListFun:Array<object> = []
+    isActive:boolean = false
+    insertFun:boolean = true // 函数插入按钮
+    insertField:boolean = true // 字段插入按钮
+    fieldData:any = '' // 存放字段选中
+    funData:any = '' // 存放函数选中
+    wrapperCol:any = { span: 4}
+    fieldCalculate:string = 'SUM' // 存放字段求值字段
+    radioValue:number = 0 // 编辑公式列弹框 格式单选model
+    formulaTextarea:string = '' // 编辑列公式弹框 公式内容
+
+    treeMsg (e:object):void { // 接收子组件的值 的方法
+      console.log('父组件' + e)
+      if (this.aTagDatasS.indexOf(e) === -1) {
+        this.aTagDatasS.push(e); // 将接收到的子组件传过来的值push到列数中
+      }
     }
 
+    beforeCreate () { // 挂载前创建ant form
+      (this as any).timeForm = (this as any).$form.createForm(this); // 定义timeForm
+      (this as any).numberForm = (this as any).$form.createForm(this); // 定义numberForm
+      (this as any).stringForm = (this as any).$form.createForm(this); // 定义stringForm
+      (this as any).selectForm = (this as any).$form.createForm(this); // 定义selectForm
+      (this as any).modalForm = (this as any).$form.createForm(this); // 定义添加公式 弹窗modalForm
+      (this as any).messageForm = (this as any).$form.createForm(this); // 定义添加公式 messageForm
+      (this as any).formatForm = (this as any).$form.createForm(this); // 定义添加公式 formatForm
+    }
+    mounted () {
+      const that:any = this;
+      window.onresize = () => {
+        return (() => {
+          const elHeightValue: any = that.$refs.tableContent.offsetHeight - 64
+          // that.tableWidth = {x: 1000, y: elHeightValue}
+          // console.log(elWidthValue)
+          console.log(that.screenWidth)
+        })()
+      }
+    }
     nextStep ():void {
       let _this = this
       _this.loading = true
@@ -398,26 +742,41 @@
     }
     handleChangeH (value:any):void { // 报表设置栏 组行 搜索框下拉选择方法
       if (value) {
-        this.aTagDatasH.push({ text: value })
+        let obj:object = { text: value }
+        if (this.aTagDatasH.indexOf(obj) === -1) {
+          this.aTagDatasH.push(obj)
+        }
       }
     }
     handleChangeS (value:any):void { // 报表设置栏 列数
       if (value) {
-       this.aTagDatasS.push({ text: value }) 
+        let obj:object = { text: value }
+        if (this.aTagDatasS.indexOf(obj) === -1) {
+          this.aTagDatasS.push(obj)
+          console.log(this.aTagDatasS)
+        }
       }
     }
     handleChangeF (value:any):void { // 固定筛选
       if (value) {
-        console.log(value)
-       this.aTagDatasF.push({ title: value, text: '111', type: 'string', popover: true, visible: true }) 
+        let obj:object = { title: value, text: '111', type: 'string', popover: true, visible: true }
+        console.log(this.aTagDatasF)
+        console.log(this.aTagDatasF.indexOf(obj))
+        if (this.aTagDatasF.indexOf(obj) === -1) {
+          this.aTagDatasF.push(obj)
+        }
       }
     }
     handleChangeX (value:any):void { // 显示筛选
       if (value) {
-       this.aTagDatasX.push({ title: value, text: '111', type: 'time', popover: true, visible: true }) 
+        // this.aTagDatasX.push({ title: value, text: '111', type: 'time', popover: true, visible: true })
+        let obj:object = { title: value, text: '111', type: 'time', popover: true, visible: true }
+        if (this.aTagDatasX.indexOf(obj) === -1) {
+          this.aTagDatasX.push(obj)
+        }
       }
     }
-    filterOption (input:any, option:any):boolean {
+    filterOption (input:any, option:any):boolean { // 搜索框输入搜索 过滤方法
       return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
     }
     handleBlur ():void {
@@ -455,7 +814,6 @@
 
     popoverVisibleFun (e:any, item:any) { // 筛选器点击 是否显示气泡框事件
       console.log(item.type)
-      console.log(e)
     }
 
     handleClickChange (v:any):void {
@@ -464,6 +822,61 @@
     hidePopover (e:any):void { // 取消关闭气泡框
       console.log(e)
       e.popover = false
+    }
+    enterPopover (e:any):void { // 确认应用关闭气泡框
+      console.log(e);
+      const that = this;
+      if (e.type === 'time') {
+        (this as any).timeForm.validateFields((err: any, values: any) => {
+          if (!err) {
+            const rangeValue:any = values['range-picker']
+            const subData:any = {
+              ...values,
+              'range-picker': [rangeValue[0].format('YYYY-MM-DD'), rangeValue[1].format('YYYY-MM-DD')]
+            }
+            // console.log(subData)
+            e.text = rangeValue[0].format('YYYY-MM-DD') + ' - ' + rangeValue[1].format('YYYY-MM-DD')
+            console.log(e);
+            e.popover = false;
+            (this as any).timeForm.resetFields(); // 重置输入控件的值
+          }
+        })
+      } else if (e.type === 'number') {
+        (this as any).numberForm.validateFields((err: any, values: any) => {
+          if (!err) {
+            console.log(values)
+            e.text = values.numberSelect + '  ' + values.numberInput
+            e.popover = false;
+            (this as any).numberForm.resetFields(); // 重置输入控件
+          }
+        })
+      } else if (e.type === 'string') {
+        (this as any).stringForm.validateFields((err:any, values: any) => {
+          if (!err) {
+            console.log(values)
+            e.text = values.stringSelect + '  ' + values.stringInput
+            e.popover = false;
+            (this as any).numberForm.resetFields(); // 重置输入控件
+          }
+        })
+      } else if (e.type === 'select') {
+        (this as any).selectForm.validateFields((err:any, values:any) => {
+          if (!err) {
+            that.selectMultiple.map((v:any, i:number) => { // 遍历所有
+              values.selectMultiple.map((val:any, ind: number) => { // 遍历选中
+                if (val === v.value) { // 比较
+                  that.selectMultipleData.push(v.title)
+                }
+              })
+            })
+            console.log(that.selectMultipleData)
+            e.text = values.selectSelect + '  ' + that.selectMultipleData.join(',')
+          }
+        })
+      }
+    }
+    selectMultipleFun (v:any):void { // 筛选器弹框中 复选框change方法
+      console.log(v)
     }
     titleNameEditFun (e:string) { // 报表名称修改方法
       this.titleName = e // 将输入的赋值给其名称
@@ -492,6 +905,118 @@
       setTimeout(() => {
         _this.runLoading = false
       }, 2000)
+    }
+
+    timeOnChange (date:any, dateString:any):void { // 时间筛选器变化
+
+    }
+    showFormulaModel ():void { // 添加汇总公式弹窗方法
+      this.generateList(this.dataSource) // 先处理数据
+      this.showFormulaFlag = true
+    }
+    formulaCreate ():void { // 模态框确认方法
+
+    }
+    formulaCancel ():void { // 模态框取消关闭方法
+      this.showFormulaFlag = !this.showFormulaFlag
+    }
+
+    /* 模态框搜索树处理方法 start */
+    generateList (data:any):void { // 将数据处理成只有一个层级
+      for (let i = 0; i < data.length; i++) {
+        const node = data[i]
+        this.dataListField.push({ count: node.count, title: node.title, key: node.key }) // 字段
+        this.dataListFun.push({ count: node.count, title: node.title, key: node.key }) // 函数
+        if (node.children) {
+          (this as any).generateList(node.children, node.key)
+        }
+      }
+    }
+    getParentKey (key:string, tree:any):void {
+      let parentKey
+      for (let i = 0; i < tree.length; i++) {
+        const node = tree[i]
+        if (node.children) {
+          if (node.children.some((item:any) => item.key === key)) {
+            parentKey = node.key
+          } else if ((this as any).getParentKey(key, node.children)) {
+            parentKey = (this as any).getParentKey(key, node.children)
+          }
+        }
+      }
+      return parentKey
+    }
+    onExpandField (expandedKeys:any):void {
+      this.expandedKeysField = expandedKeys
+      this.autoExpandParentField = false
+    }
+    onChangeField (e:any):void {
+      const value = e.target.value
+      const expandedKeysField = this.dataListField.map((item:any) => { // 遍历 查询所有的节点
+        if (item.title.indexOf(value) > -1) {
+          return (this as any).getParentKey(item.key, this.dataSource)
+        }
+        return null
+      }).filter((item, i, self) => item && self.indexOf(item) === i) // 过滤出要打开的节点
+      Object.assign(this, {
+        expandedKeysField,
+        searchValueField: value,
+        autoExpandParentField: true
+      })
+    }
+
+    onExpandFun (expandedKeys:any):void {
+      this.expandedKeysFun = expandedKeys
+      this.autoExpandParentFun = false
+    }
+    onChangeFun (e:any):void {
+      const value = e.target.value
+      const expandedKeysFun = this.dataListFun.map((item:any) => { // 遍历 查询所有的节点
+        if (item.title.indexOf(value) > -1) {
+          return (this as any).getParentKey(item.key, this.dataSource)
+        }
+        return null
+      }).filter((item, i, self) => item && self.indexOf(item) === i) // 过滤出要打开的节点
+      Object.assign(this, {
+        expandedKeysFun,
+        searchValueFun: value,
+        autoExpandParentFun: true
+      })
+    }
+    onselectTreeField (selectedKeys:any, info:any):void { // 字段选中
+      console.log('selectedKeys' + selectedKeys)
+      console.log(info)
+      this.fieldData = info.node.dataRef // 将选中的字段保存到fieldData中
+      this.insertField = false
+    }
+    onSelectTreeFun (selectedKeys:any, info:any):void { // 函数选中
+      this.funData = info.node.dataRef // 将选中的函数保存到funData中
+      this.insertFun = false
+    }
+    /* end */
+    insertFieldFun ():void { // 字段插入方法
+      debugger
+      // console.log((this as any).$refs.fieldCalculate)
+      // console.log(this.$refs.fieldCalculate as HTMLDivElement)
+      // console.log(this.fieldCalculate)
+      // console.log(this.fieldData)
+      let textarea:any = (this as any).$refs.formulaTextarea.$el // 获取文本域元素
+      let cursor:any = getTextareaCursor(textarea) // 先调用获取位置方法
+      let text: string = this.fieldData.title + ': ' + this.fieldCalculate + ' '
+      addTextareaCursor(textarea, cursor, text) // 调用插入文本方法
+      // this.formulaTextarea += ' ' + this.fieldData.title + ': ' + this.fieldCalculate
+      console.log(this.formulaTextarea)
+    }
+    insertFunFun ():void { // 函数插入方法
+      let textarea:any = (this as any).$refs.formulaTextarea.$el // 获取文本域元素
+      let cursor:any = getTextareaCursor(textarea) // 先调用获取位置方法
+      let text: string = this.funData.title + ' '
+      addTextareaCursor(textarea, cursor, text) // 调用插入文本方法
+      // this.formulaTextarea += ' ' + this.fieldData.title + ': ' + this.fieldCalculate
+      console.log(this.funData)
+    }
+    checkGrammar ():void { // 模态框 检查语法方法
+
     }
  }
 </script>
@@ -677,8 +1202,8 @@
         }
       }
       .screening-content,.According-content {
-        
         .screening-item,.According-item {
+          background-color: #fbfbfb;
           padding: 0 7px;
           border-radius: 4px;
           border: 1px solid #d9d9d9;
@@ -756,7 +1281,8 @@
       }
     }
     .table-content {
-      width: 100%;
+      height: calc(80vh - 43px);
+      /* width: 100%;
       overflow-x: scroll;
       table tr th {
         padding: 12px 8px;
@@ -767,12 +1293,126 @@
         font-weight: 500;
         border-bottom: 1px solid #e8e8e8;
         white-space: nowrap;
+      } */
+      .ant-table-header {
+        /* min-width: 1000px;
+        thead tr th {
+          white-space: nowrap;
+        }  */
+      }
+      table tr {
+        th {
+          text-align: center;
+        }
       }
     }
   }
 }
-.ant-form-item {
-  display: block;
+.lpc-form-footer { // 底部按钮样式
   text-align: center;
+  .ant-form-item {
+    margin: 12px 0;
+  }
+}
+.ant-popover { // 筛选器弹框样式
+  .ant-popover-inner-content {
+    .ant-form-item {
+      margin-bottom: 12px;
+      .ant-form-item-control {
+        width: 250px;
+      }
+    }
+    .content-footer {
+      text-align: right;
+      .ant-btn-primary {
+        margin-left: 10px;
+      }
+    }
+  }
+}
+.formulaModal { // 编辑公式列模态框样式
+  width: 950px!important;
+  .ant-modal-body {
+    padding: 0!important;
+    .modalContent {
+      display: flex;
+      .modalLeftTab {
+        display: inline-block;
+        width: 300px;
+        flex: 0 0 300px;
+        background-color: #f9f9fa;
+        padding: 0 1rem;
+        border-right: 1px solid #d9dbdd;
+        .ant-tabs-nav-wrap {
+          border-bottom: 1px solid #e8e8e8;
+          height: 45px;
+          margin-bottom: 0;
+          .ant-tabs-tab-active {
+            color: rgb(8, 7, 7);
+          }
+        }
+        .ant-tabs-tabpane {
+          padding: 0 5px;
+        }
+      }
+      .modalRightTab {
+        display: inline-block;
+        flex: 1;
+        padding: 0 1rem;
+        .ant-tabs-nav-wrap {
+          border-bottom: 1px solid #e8e8e8;
+          height: 45px;
+          margin-bottom: 0;
+          .ant-tabs-tab-active {
+            color: rgb(8, 7, 7);
+          }
+        }
+        .ant-tabs-tabpane {
+          padding: 0 5px;
+        }
+        .message {
+          .ant-form-vertical {
+            .twoCol {
+              display: inline-block;
+              width: 48%;
+              .ant-radio-wrapper {
+                height: 30px;
+                line-height: 30px;
+                display: block;
+                textarea {
+                  height: 265px;
+                  resize: none;
+                }
+              }
+            }
+          }
+        }
+      }
+      .leftMenu {
+        .header {
+          .ant-input-search {
+            width: 265px;
+          }
+        }
+        .treeContent { // 模态框中tree内容样式
+          // height: calc(80vh - 22.6875rem);
+          height: 360px;
+          width: 265px;
+          overflow: scroll;
+          background-color: #fff;
+          border: 1px solid #d9dbdd;
+          border-radius: .25rem;
+          margin: .625rem 0 .75rem;
+          padding: 0 .5rem;
+        }
+        .footer {
+          margin: 10px 0;
+          button {
+            margin-left: 21px;
+          }
+        }
+      }
+    }
+  }
 }
 </style>

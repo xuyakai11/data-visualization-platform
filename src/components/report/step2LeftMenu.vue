@@ -11,14 +11,14 @@
           :expandedKeys="expandedKeys"
           :autoExpandParent="autoExpandParent"
           :treeData="dataSource"
-        >
+        ><!-- @select="selectTreeFun($event)" -->
         <template slot="title" slot-scope="{title}">
-          <span v-if="title.indexOf(searchValue) > -1">
+          <span v-if="title.indexOf(searchValue) > -1" @dblclick="getInfo(title)">
             {{title.substr(0, title.indexOf(searchValue))}}
             <span style="color: #f50">{{searchValue}}</span>
             {{title.substr(title.indexOf(searchValue) + searchValue.length)}}
           </span>
-          <span v-else>{{title}}</span>
+          <span  @dblclick="getInfo(title)" v-else>{{title}}</span>
         </template>
       </a-tree>
     </div>
@@ -26,52 +26,57 @@
 </template>
 
 <script lang='ts'>
-  import { Component, Prop, Vue } from 'vue-property-decorator'
+  import { Component, Prop, Vue, Emit } from 'vue-property-decorator'
 
   @Component
   export default class step2LeftMenu extends Vue {
     expandedKeys:Array<any> = []
     searchValue:string = ''
     autoExpandParent:boolean = true
-    dataSource:Array<object> = [{
-      title: '话题',
-      key: '122',
-      scopedSlots: {title: 'title'},
-      children: [{
-        title: 'AntDesign',
+    dataSource:Array<object> = [
+      {
+        title: '话题',
+        key: '122',
         scopedSlots: {title: 'title'},
-        key: '10000',
+        selectable: false, // 配置节点是否可选
+        children: [{
+          title: 'AntDesign',
+          scopedSlots: {title: 'title'},
+          key: '10000',
+        }, {
+          title: 'AntDesign UI',
+          scopedSlots: {title: 'title'},
+          key: '10600',
+        }]
       }, {
-        title: 'AntDesign UI',
+        title: '问题',
         scopedSlots: {title: 'title'},
-        key: '10600',
-      }]
-    }, {
-      title: '问题',
-      scopedSlots: {title: 'title'},
-      key: '1',
-      children: [{
-        title: 'AntDesign UI 有多好',
-        scopedSlots: {title: 'title'},
-        key: '60100'
+        key: '1',
+        selectable: false, // 配置节点是否可选
+        children: [{
+          title: 'AntDesign UI 有多好',
+          scopedSlots: {title: 'title'},
+          key: '60100'
+        }, {
+          title: 'AntDesign 是啥',
+          scopedSlots: {title: 'title'},
+          key: '30010'
+        }]
       }, {
-        title: 'AntDesign 是啥',
+        title: '文章',
         scopedSlots: {title: 'title'},
-        key: '30010'
-      }]
-    }, {
-      title: '文章',
-      scopedSlots: {title: 'title'},
-      key: '123',
-      children: [{
-        title: 'AntDesign 是一个设计语言',
-        scopedSlots: {title: 'title'},
-        key: '100000',
-      }]
+        key: '123',
+        selectable: false, // 配置节点是否可选
+        children: [{
+          title: 'AntDesign 是一个设计语言',
+          scopedSlots: {title: 'title'},
+          key: '100000',
+        }]
     }];
     dataList:Array<object> = []
     isActive:boolean = false
-    isTrigger:boolean = true // 配置 字段配置是否显示
+    isTrigger:boolean = true; // 配置 字段配置是否显示
+    @Emit('treeDblData') treeDblDataFun (e: object) {};
 
     created () {
       this.generateList(this.dataSource)
@@ -125,6 +130,15 @@
     closeSet ():void { // 点击关闭按钮
       this.isTrigger = false
       this.isActive = true
+    }
+    selectTreeFun (e:any):void { // 点击选中事件
+      console.log(e)
+    }
+    getInfo (e:string) { // 树控件双击事件
+      console.log(e)
+      console.log('getInfo')
+      let obj:object = { text: e } // 将双击选中的传递给父组件
+      this.treeDblDataFun(obj)
     }
  }
 </script>

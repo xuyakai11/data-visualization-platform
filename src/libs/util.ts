@@ -13,7 +13,7 @@ export const getParams = (url: any) => {
 }
 
 // 获取url后面的参数
-export function getQueryString (name:String) {
+const getQueryString = (name:String) => {
   let reg:any = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
   let r:any = window.location.search.substr(1).match(reg)
   if (r != null) {
@@ -22,3 +22,76 @@ export function getQueryString (name:String) {
       return null
   }
 }
+
+// 获取textarea光标位置 和 选中文本
+const getTextareaCursor = (textarea: any):void => {
+  console.log(textarea)
+  let rangeData:any = {
+    text: '',
+    start: 0,
+    end: 0
+  }
+  if (textarea.setSelectionRange) {
+    textarea.focus()
+    rangeData.start = textarea.selectionStart
+    rangeData.end = textarea.selectionEnd
+    rangeData.text = (rangeData.start !== rangeData.end) ? textarea.value.substring(rangeData.start, rangeData.end) : ''
+  } else if ((document as any).selection) { // IE
+    textarea.focus();
+    let i:number = 0
+    let oS:any = (document as any).selection.createRange()
+    let oR:any = (document as any).body.createTextRange()
+    oR.moveToElementText(textarea)
+    rangeData.text = oS.text
+    rangeData.bookmark = oS.getBookmark()
+    for (i = 0; oR.compareEndPoints('StartToStart', oS) < 0 && oS.moveStart('character', -1) !== 0; i++) {
+      if (textarea.value.charAt(i) === '/r') {
+        i++
+      }
+    }
+    rangeData.start = i
+    rangeData.end = rangeData.text.length + rangeData.start
+  }
+  return rangeData
+}
+// 设置光标回原先位置 在插入文本时调用
+const setTextareaCursor = (textarea:any, rangeData:any) => {
+  let oR, start, end
+  textarea.focus()
+  if (textarea.setSelectionRange) {
+    textarea.setSelectionRange(rangeData.start, rangeData.end)
+  } else if (textarea.createtextRange) { // IE
+    oR = textarea.createTextRange()
+    if (textarea.value.length === rangeData.start) {
+      oR.collapse(false)
+      oR.select()
+    } else {
+      oR.moveToBookmark(rangeData.bookmark)
+      oR.select()
+    }
+  }
+}
+// 在获取的光标位置插入指定文本 或 替换选定文本
+const addTextareaCursor = (textarea:any, cursor:any, text:string) => {
+  // textarea 容器； cursor：光标位置和选中内容； text：要插入的文本
+  let oValue, nValue, oR, nStart, nEnd, st
+  const sR:any = ''
+  setTextareaCursor(textarea, cursor) // 调用获取位置
+  if (textarea.setSelectionRange) {
+    oValue = textarea.value
+    nValue = oValue.substring(0, cursor.start) + text + oValue.substring(cursor.end)
+    nStart = nEnd = cursor.start + text.length
+    st = textarea.scrollTop
+    textarea.value = nValue
+    if (textarea.scrollTop !== st) {
+      textarea.scrollTop = st
+    }
+    textarea.setSelectionRange(nStart, nEnd)
+  } else if (textarea.createTextRange) { // IE
+    sR.document.selection.createRange();
+    sR.text = text
+    sR.select()
+  }
+}
+
+export { getQueryString, getTextareaCursor, setTextareaCursor, addTextareaCursor }
