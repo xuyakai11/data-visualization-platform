@@ -2,7 +2,7 @@
   <div>
     <div class="lpc-step2-content">
       <!-- leftTree -->
-      <left-menu @treeDblData="treeMsg"></left-menu>
+      <left-menu @treeDblData="treeMsg" :dataSourceTree="dataSourceTree"></left-menu>
       <!-- middletab -->
       <div class="lpc-centerTab">
         <a-tabs defaultActiveKey="1">
@@ -16,13 +16,12 @@
                     <template slot="title">
                       <span>删除所有分组</span>
                     </template>
-                    <a-icon type="delete" @click="deleteAllGroup"/>
+                    <a-icon type="delete" @click.stop="deleteAllGroup('hang')"/>
                   </a-tooltip>
                 </div>
                 <div class="tab1-top-content">
                   <h4>组行</h4>
                   <a-select
-                    showSearch
                     allowClear
                     placeholder="添加组行"
                     ref="handleChangeH"
@@ -30,62 +29,28 @@
                     @focus="handleFocus"
                     @blur="handleBlur"
                     @change="handleChangeH"
-                    :filterOption="filterOption">
-                    <a-select-opt-group v-for="(source, index) in dataSource" :key="index">
+                    optionFilterProp="children"
+                    :filterOption="filterOption"><!-- showSearch -->
+                    <!-- optionFilterProp:搜索时过滤对应的option属性，如设置为children表示对内嵌内容进行搜索 -->
+                    <a-select-opt-group v-for="(source, index) in dataSourceTree" :key="index">
                       <span slot="label"><a-icon type="user"/>{{source.title}}</span>
-                      <a-select-option v-for="(child) in source.children" :key="child.key" :value="child.title">{{child.title}}</a-select-option>
+                      <a-select-option v-for="(child, i) in source.children" :key="i" :value="child.id">{{ child.title }}</a-select-option>
                     </a-select-opt-group>
-                   <!--  <a-select-opt-group label="Engineer">
-                      <a-select-option value="Yiminghe1">yiminghe1</a-select-option>
-                    </a-select-opt-group> -->
                   </a-select>
                   <div class="task-content">
-                    <draggable :options="dragOptions" v-model="aTagDatasH" :move="onEnd">
-                      <p class="task-item" type="inner" v-for="(item, i) in aTagDatasH" :key="i">
-                        {{item.text}}
+                    <draggable :options="dragOptions" @end="onEndHang" @update="onUpdateHang" class="hang">
+                      <p class="task-item" type="inner" v-for="(item, i) in aTagDatasH" :key="i" :title="item.text">
+                        <span v-if="item.text.length > 17">{{item.text.substr(0, 17)}}...</span>
+                        <span v-else>{{item.text}}</span>
                         <a-tooltip placement="right">
                           <template slot="title">
                             <span>删除</span>
                           </template>
-                          <a-icon type="close" @click="deleteGroup"/>
+                          <a-icon type="close" @click.stop="deleteGroupH(item, i)"/>
                         </a-tooltip>
                       </p>
                     </draggable>
                   </div>
-                  <!-- <div class="tab1-top-content-bottom">
-                    <h4>组列</h4>
-                    <a-select
-                      showSearch
-                      placeholder="添加组列"
-                      optionFilterProp="children"
-                      style="width: 100%"
-                      @focus="handleFocus"
-                      @blur="handleBlur"
-                      @change="handleChange"
-                      :filterOption="filterOption">
-                      <a-select-opt-group>
-                        <span slot="label"><a-icon type="user"/>Manager</span>
-                        <a-select-option value="jack">Jack</a-select-option>
-                        <a-select-option value="lucy">Lucy</a-select-option>
-                      </a-select-opt-group>
-                      <a-select-opt-group label="Engineer">
-                        <a-select-option value="Yiminghe">yiminghe</a-select-option>
-                      </a-select-opt-group>
-                    </a-select>
-                    <div class="task-content">
-                      <draggable :options="dragOptions" :End="onEnd()" :Update="onUpdate()" v-model="aTagDatasL">
-                        <p class="task-item" type="inner" v-for="(item, i) in aTagDatasL">
-                          {{item.text}}
-                          <a-tooltip placement="right">
-                            <template slot="title">
-                              <span>删除</span>
-                            </template>
-                            <a-icon type="close" @click="deleteGroup"/>
-                          </a-tooltip>
-                        </p>
-                      </draggable>
-                    </div>
-                  </div> -->
                 </div>
               </div>
               <a-divider />
@@ -100,38 +65,36 @@
                       <!-- <a-menu-item key="0">
                         <a href="javascript:void(0)">添加存储器列</a>
                       </a-menu-item> -->
-                      <a-menu-item key="1" :disabled="!aTagDatasH.length"> <!-- 当组行为空时不能选 -->
-                        <a href="javascript:void(0)" @click="showFormulaModel">添加汇总公式</a>
+                      <a-menu-item key="1" :disabled="!aTagDatasH.length" @click="showFormulaModel"> <!-- 当组行为空时不能选 -->
+                        <a href="javascript:void(0)">添加汇总公式</a>
                       </a-menu-item>
                       <a-menu-divider />
-                      <a-menu-item key="3">删除所有列</a-menu-item>
+                      <a-menu-item key="3" @click="deleteAllGroup('lie')">删除所有列</a-menu-item>
                     </a-menu>
                   </a-dropdown>
                 </div>
                 <a-select
-                  showSearch
                   allowClear
                   placeholder="添加组列"
                   optionFilterProp="children"
                   style="width: 100%"
-                  @focus="handleFocus"
-                  @blur="handleBlur"
-                  @change="handleChangeS"
+                  @change="handleChangeL"
                   :filterOption="filterOption">
-                  <a-select-opt-group v-for="(source, index) in dataSource" :key="index">
+                  <a-select-opt-group v-for="(source, index) in dataSourceTree" :key="index">
                     <span slot="label"><a-icon type="user"/>{{source.title}}</span>
-                    <a-select-option v-for="(child) in source.children" :key="child.key" :value="child.title">{{child.title}}</a-select-option>
+                    <a-select-option v-for="(child) in source.children" :key="child.id" :value="child.id">{{child.title}}</a-select-option>
                   </a-select-opt-group>
                 </a-select>
                 <div class="task-content">
-                  <draggable :options="dragOptions" v-model="aTagDatasS" :move="onEnd">
-                    <p class="task-item" type="inner" v-for="(item, i) in aTagDatasS" :key="i">
-                      {{item.text}}
+                  <draggable :options="dragOptions" @end="onEndLie" @update="onUpdateLie" class="lie">
+                    <p class="task-item" type="inner" v-for="(item, i) in aTagDatasL" :key="i">
+                      <span v-if="item.text.length > 17">{{item.text.substr(0, 17)}}...</span>
+                      <span v-else>{{item.text}}</span>
                       <a-tooltip placement="right">
                         <template slot="title">
                           <span>删除</span>
                         </template>
-                        <a-icon type="close" @click="deleteGroup"/>
+                        <a-icon type="close" @click.stop="deleteGroupL(item, i)"/>
                       </a-tooltip>
                     </p>
                   </draggable>
@@ -159,75 +122,75 @@
                 </a-dropdown> -->
               </div>
               <a-select
-                showSearch
                 allowClear
                 placeholder="添加固有筛选"
                 optionFilterProp="children"
                 style="width: 100%"
-                @focus="handleFocus"
-                @blur="handleBlurF"
                 @change="handleChangeF"
                 :filterOption="filterOption">
-                <a-select-opt-group v-for="(source, index) in dataSource" :key="index">
+                <a-select-opt-group v-for="(source, index) in dataSourceTree" :key="index">
                   <span slot="label"><a-icon type="user"/>{{source.title}}</span>
-                  <a-select-option v-for="(child) in source.children" :key="child.key" :value="child.title">{{child.title}}</a-select-option>
+                  <a-select-option v-for="(child) in source.children" :key="child.key" :value="child.id">{{child.title}}</a-select-option>
                 </a-select-opt-group>
               </a-select>
               <div class="screening-content">
-                <a-popover arrowPointAtCenter placement="right" title="编辑筛选器" trigger="click" :visible="item.visible" @click="popoverVisibleFun($event, item)" v-model="item.popover" v-for="(item, i) in aTagDatasF" :key="i">
+                <a-popover arrowPointAtCenter placement="right" @visibleChange="visibleChangeFun" title="编辑筛选器" trigger="click" v-model="item.popover" :visible="item.popover" @click.stop="popoverVisibleFun($event, item)" v-for="(item, i) in aTagDatasF" :key="i">
                   <div slot="content">
-                    <div v-if="item.type == 'time'">
-                      <a-form :form="timeForm">
-                        <a-form-item label="时间范围">
-                          <a-range-picker size="small" format="YYYY-MM-DD" @change="timeOnChange" v-decorator="['range-picker', rangeConfig]"/>
+                    <p>{{item.title + item.field_type}}</p>
+                    <div v-if="item.field_type == 'data'">
+                      <a-form :form="dataForm">
+                        <a-form-item label="时间范围">{{'gg' + moment('2019-01-01')}}
+                          <a-range-picker size="small" format="YYYY-MM-DD" v-decorator="['search_param', { initialValue: ['2019-01-01', '2019-03-01'], rules: [{ type: 'array', required: true, message: '请选择时间！' }]}]"/>
                         </a-form-item>
                       </a-form>
                     </div>
-                    <div v-if="item.type == 'number'">
+                    <div v-if="item.field_type == 'datetime'">
+                      <a-form :form="datetimeForm">
+                        <a-form-item label="时间范围">
+                          <a-range-picker size="small" :showTime="{ format: 'HH:mm' }" format="YYYY-MM-DD HH:mm" @change="timeOnChange" v-decorator="['search_param', {rules: [{ type: 'array', required: false, message: '请选择时间！' }]}]"/>
+                        </a-form-item>
+                      </a-form>
+                    </div>
+                    <div v-if="item.field_type == 'num'">
                       <a-form :form="numberForm">
                         <a-form-item label="运算符">
-                          <a-select v-decorator="['numberSelect', {initialValue: '0', rules: [{ required: false }]}]">
-                            <a-select-option value="0">大于等于</a-select-option>
-                            <a-select-option value="1">大于</a-select-option>
-                            <a-select-option value="2">小于等于</a-select-option>
-                            <a-select-option value="3">小于</a-select-option>
+                          <a-select labelInValue v-decorator="['search_logic', {initialValue: { key: '0' }, rules: [{ required: false }]}]">
+                            <a-select-option value="eq">等于</a-select-option>
+                            <a-select-option value="neq">不等于</a-select-option>
+                            <a-select-option value="lt">小于</a-select-option>
+                            <a-select-option value="gt">大于</a-select-option>
+                            <a-select-option value="elt">小于等于</a-select-option>
+                            <a-select-option value="egt">大于等于</a-select-option>
                           </a-select>
                         </a-form-item>
                         <a-form-item >
-                          <a-input name="numberInput" v-decorator="['numberInput', {rules: [{ required: true, message: '请输入数字！' }]}]"/>
+                          <a-input v-decorator="['search_param', {rules: [{ required: false, message: '请输入数字！' }]}]"/>
                         </a-form-item>
                       </a-form>
                     </div>
-                    <div v-if="item.type == 'string'">
+                    <div v-if="item.field_type == 'string'">
                       <a-form :form="stringForm">
                         <a-form-item label="运算符">
-                          <a-select v-decorator="['stringSelect', {initialValue: '0', rules: [{ required: false }]}]">
-                            <a-select-option value="0">等于</a-select-option>
-                            <a-select-option value="1">不等于</a-select-option>
+                          <a-select labelInValue v-decorator="['search_logic', {initialValue: { key: '0' }, rules: [{ required: false }]}]">
+                            <a-select-option value="like">包含</a-select-option>
+                            <a-select-option value="not like">不包含</a-select-option>
                           </a-select>
                         </a-form-item>
                         <a-form-item >
-                          <a-input name="stringInput" v-decorator="['numberInput', {rules: [{ required: true, message: '请输入字符串！' }]}]"/>
+                          <a-input v-decorator="['search_param', {rules: [{ required: false, message: '请输入字符串！' }]}]"/>
                         </a-form-item>
                       </a-form>
                     </div>
-                    <div v-if="item.type == 'select'">
+                    <div v-if="item.field_type == 'select'"> <!-- 单选 -->
                       <a-form :form="selectForm">
                         <a-form-item label="运算符">
-                          <a-select style="width: 250px" v-decorator="['selectSelect', {initialValue: '0', rules: [{ required: false }]}]">
-                            <a-select-option value="0">等于</a-select-option>
-                            <a-select-option value="1">不等于</a-select-option>
-                            <a-select-option value="2">小于</a-select-option>
-                            <a-select-option value="3">大于</a-select-option>
-                            <a-select-option value="4">小于或等于</a-select-option>
-                            <a-select-option value="5">大于或等于</a-select-option>
-                            <a-select-option value="6">包含</a-select-option>
-                            <a-select-option value="7">不包含</a-select-option>
-                            <a-select-option value="8">起始字符</a-select-option>
+                          <a-select labelInValue style="width: 250px" v-decorator="['search_logic', {initialValue: { key: '0' }, rules: [{ required: false }]}]">
+                            <a-select-option value="eq">等于</a-select-option>
+                            <a-select-option value="neq">不等于</a-select-option>
                           </a-select>
                         </a-form-item>
                         <a-form-item label="值">
-                          <a-select mode="multiple" v-decorator="['selectMultiple', { rules: [{ required: true, message: '请选择值！' }]}]"
+                          <a-select v-decorator="['search_param', { rules: [{ required: false, message: '请选择值！' }]}]"
                             showSearch
                             allowClear
                             style="width: 250px"
@@ -239,22 +202,42 @@
                         </a-form-item>
                       </a-form>
                     </div>
-                    <div v-if="item.type == 'list'">这是列表类型</div>
+                    <div v-if="item.field_type == 'checkbox'"> <!-- 多选 -->
+                      <a-form :form="checkboxForm">
+                        <a-form-item label="运算符">
+                          <a-select labelInValue style="width: 250px" v-decorator="['search_logic', {initialValue: { key: '0' }, rules: [{ required: false }]}]">
+                            <a-select-option value="in">等于</a-select-option>
+                            <a-select-option value="not in">不等于</a-select-option>
+                          </a-select>
+                        </a-form-item>
+                        <a-form-item label="值">
+                          <a-select mode="multiple" v-decorator="['search_param', { rules: [{ required: false, message: '请选择值！' }]}]"
+                            showSearch
+                            allowClear
+                            style="width: 250px"
+                            :filterOption="filterOption">
+                            <a-select-option v-for="(item, index) in selectMultiple" :key="index" :value="item.value">
+                              {{item.title}}
+                            </a-select-option>
+                          </a-select>
+                        </a-form-item>
+                      </a-form>
+                    </div>
                     <div class="content-footer">
                       <a-button size="small" @click="hidePopover(item)">取消</a-button>
                       <a-button size="small" type="primary" @click="enterPopover(item)">应用</a-button>
                     </div>
                   </div>
-                  <div class="screening-item">
+                  <div class="screening-item" :class="{ 'active_item': item.popover }">
                     <div class="lpc-fixed-text">
                       <p class="title">{{item.title}}</p>
-                      <p class="text">{{item.text}}</p>
+                      <p class="text">{{item.extra}}</p>
                     </div>
-                    <a-tooltip placement="right" v-if="!item.type"> <!-- 判断固定项不显示删除按钮 -->
+                    <a-tooltip placement="right"> <!-- 判断固定项不显示删除按钮 -->
                       <template slot="title">
                         <span>删除</span>
                       </template>
-                      <a-icon type="close" @click="deleteFixed"/>
+                      <a-icon type="close" @click.stop="deleteFixed(item, i)"/>
                     </a-tooltip>
                   </div>
                 </a-popover>
@@ -264,77 +247,78 @@
                 <h4>显示筛选器</h4>
               </div>
               <a-select
-                showSearch
                 allowClear
                 placeholder="添加显示筛选"
                 optionFilterProp="children"
                 style="width: 100%"
-                @focus="handleFocus"
-                @blur="handleBlurX"
                 @change="handleChangeX"
                 :filterOption="filterOption">
-                <a-select-opt-group v-for="(source, index) in dataSource" :key="index">
+                <a-select-opt-group v-for="(source, index) in dataSourceTree" :key="index">
                   <span slot="label"><a-icon type="user"/>{{source.title}}</span>
-                  <a-select-option v-for="(child) in source.children" :key="child.key" :value="child.title">{{child.title}}</a-select-option>
+                  <a-select-option v-for="(child) in source.children" :key="child.key" :value="child.id">{{child.title}}</a-select-option>
                 </a-select-opt-group>
               </a-select>
               <div class="According-content">
-                <a-popover arrowPointAtCenter placement="right" id="ant-popover" title="编辑筛选器" trigger="click" :visible="item.visible" @click="popoverVisibleFun($event, item)" v-model="item.popover" v-for="(item, i) in aTagDatasX" :key="i">
+                <a-popover arrowPointAtCenter placement="right" id="ant-popover" title="编辑筛选器" trigger="click" @visibleChange="visibleChangeFun" :visible="item.visible" @click.stop="popoverVisibleFun($event, item)" v-model="item.popover" v-for="(item, i) in aTagDatasX" :key="i">
                   <div slot="content">
-                    <div v-if="item.type == 'time'">
-                      <a-form :form="timeForm">
+                    <p>{{item.title + item.field_type}}</p>
+                    <div v-if="item.field_type == 'data'">
+                      <a-form :form="dataForm">
                         <a-form-item label="时间范围">
-                          <a-range-picker size="small" format="YYYY-MM-DD" @change="timeOnChange" v-decorator="['range-picker', rangeConfig]"/>
+                          <a-range-picker size="small" format="YYYY-MM-DD" @change="timeOnChange" v-decorator="['search_param', {rules: [{ type: 'array', required: false, message: '请选择时间！' }]}]"/>
                         </a-form-item>
                       </a-form>
                     </div>
-                    <div v-if="item.type == 'number'">
+                    <div v-if="item.field_type == 'datetime'">
+                      <a-form :form="datetimeForm">
+                        <a-form-item label="时间范围">
+                          <a-range-picker size="small" format="YYYY-MM-DD HH:mm" @change="timeOnChange" v-decorator="['search_param', {rules: [{ type: 'array', required: false, message: '请选择时间！' }]}]"/>
+                        </a-form-item>
+                      </a-form>
+                    </div>
+                    <div v-if="item.field_type == 'num'">
                       <a-form :form="numberForm">
                         <a-form-item label="运算符">
-                          <a-select v-decorator="['numberSelect', {initialValue: '0', rules: [{ required: false }]}]">
-                            <a-select-option value="0">大于等于</a-select-option>
-                            <a-select-option value="1">大于</a-select-option>
-                            <a-select-option value="2">小于等于</a-select-option>
-                            <a-select-option value="3">小于</a-select-option>
+                          <a-select style="width: 250px" labelInValue v-decorator="['search_logic', {initialValue: { key: 'eq' }, rules: [{ required: false }]}]">
+                            <a-select-option value="eq">等于</a-select-option>
+                            <a-select-option value="neq">不等于</a-select-option>
+                            <a-select-option value="lt">小于</a-select-option>
+                            <a-select-option value="gt">大于</a-select-option>
+                            <a-select-option value="elt">小于等于</a-select-option>
+                            <a-select-option value="egt">大于等于</a-select-option>
                           </a-select>
                         </a-form-item>
                         <a-form-item >
-                          <a-input name="numberInput" v-decorator="['numberInput', {rules: [{ required: true, message: '请输入数字！' }]}]"/>
+                          <a-input style="width: 250px" v-decorator="['search_param', {rules: [{ required: false, message: '请输入数字！' }]}]"/>
                         </a-form-item>
                       </a-form>
                     </div>
-                    <div v-if="item.type == 'string'">
+                    <div v-if="item.field_type == 'string'">
                       <a-form :form="stringForm">
                         <a-form-item label="运算符">
-                          <a-select v-decorator="['stringSelect', {initialValue: '0', rules: [{ required: false }]}]">
-                            <a-select-option value="0">等于</a-select-option>
-                            <a-select-option value="1">不等于</a-select-option>
+                          <a-select style="width: 250px" labelInValue v-decorator="['search_logic', {initialValue: { key: 'like' }, rules: [{ required: false }]}]">
+                            <a-select-option value="like">包含</a-select-option>
+                            <a-select-option value="not like">不包含</a-select-option>
                           </a-select>
                         </a-form-item>
                         <a-form-item >
-                          <a-input name="stringInput" v-decorator="['numberInput', {rules: [{ required: true, message: '请输入字符串！' }]}]"/>
+                          <a-input style="width: 250px" v-decorator="['search_param', {rules: [{ required: false, message: '请输入字符串！' }]}]"/>
                         </a-form-item>
                       </a-form>
                     </div>
-                    <div v-if="item.type == 'select'">
+                    <div v-if="item.field_type == 'select'"> <!-- 单选 -->
                       <a-form :form="selectForm">
                         <a-form-item label="运算符">
-                          <a-select v-decorator="['selectSelect', {initialValue: '0', rules: [{ required: false }]}]">
-                            <a-select-option value="0">等于</a-select-option>
-                            <a-select-option value="1">不等于</a-select-option>
-                            <a-select-option value="2">小于</a-select-option>
-                            <a-select-option value="3">大于</a-select-option>
-                            <a-select-option value="4">小于或等于</a-select-option>
-                            <a-select-option value="5">大于或等于</a-select-option>
-                            <a-select-option value="6">包含</a-select-option>
-                            <a-select-option value="7">不包含</a-select-option>
-                            <a-select-option value="8">起始字符</a-select-option>
+                          <a-select labelInValue style="width: 250px" v-decorator="['search_logic', {initialValue: { key: '0' }, rules: [{ required: false }]}]">
+                            <a-select-option value="eq">等于</a-select-option>
+                            <a-select-option value="neq">不等于</a-select-option>
                           </a-select>
                         </a-form-item>
                         <a-form-item label="值">
-                          <a-select mode="multiple" v-decorator="['selectMultiple', { rules: [{ required: true, message: '请选择值！' }]}]"
+                          <a-select v-decorator="['search_param', { rules: [{ required: false, message: '请选择值！' }]}]"
                             showSearch
                             allowClear
+                            style="width: 250px"
                             :filterOption="filterOption">
                             <a-select-option v-for="(item, index) in selectMultiple" :key="index" :value="item.value">
                               {{item.title}}
@@ -343,22 +327,42 @@
                         </a-form-item>
                       </a-form>
                     </div>
-                    <div v-if="item.type == 'list'">这是列表类型</div>
+                    <div v-if="item.field_type == 'checkbox'"> <!-- 多选 -->
+                      <a-form :form="checkboxForm">
+                        <a-form-item label="运算符">
+                          <a-select labelInValue style="width: 250px" v-decorator="['search_logic', {initialValue: { key: '0' }, rules: [{ required: false }]}]">
+                            <a-select-option value="in">等于</a-select-option>
+                            <a-select-option value="not in">不等于</a-select-option>
+                          </a-select>
+                        </a-form-item>
+                        <a-form-item label="值">
+                          <a-select mode="multiple" v-decorator="['search_param', { rules: [{ required: false, message: '请选择值！' }]}]"
+                            showSearch
+                            allowClear
+                            style="width: 250px"
+                            :filterOption="filterOption">
+                            <a-select-option v-for="(item, index) in selectMultiple" :key="index" :value="item.value">
+                              {{item.title}}
+                            </a-select-option>
+                          </a-select>
+                        </a-form-item>
+                      </a-form>
+                    </div>
                     <div class="content-footer">
                       <a-button size="small" @click="hidePopover(item)">取消</a-button>
                       <a-button size="small" type="primary" @click="enterPopover(item)">应用</a-button>
                     </div>
                   </div>
-                  <div class="According-item">
+                  <div class="According-item" :class="{ 'active_item': item.popover }">
                     <div class="lpc-fixed-text">
                       <p class="title">{{item.title}}</p>
-                      <p class="text">{{item.text}}</p>
+                      <p class="text">{{item.extra}}</p>
                     </div>
-                    <a-tooltip placement="right" v-if="!item.type"> <!-- 判断固定项不显示删除按钮 -->
+                    <a-tooltip placement="right"> <!-- 判断固定项不显示删除按钮  v-if="!item.type"-->
                       <template slot="title">
                         <span>删除</span>
                       </template>
-                      <a-icon type="close" @click="deleteFixed"/>
+                      <a-icon type="close" @click.stop="deleteAccording(item, i)"/>
                     </a-tooltip>
                   </div>
                 </a-popover>
@@ -387,7 +391,14 @@
           </div>
         </div>
         <div class="table-content" ref="tableContent">
-          <a-table :columns="columns" :dataSource="data" bordered :scroll="screenWidth"></a-table>
+          <a-table v-if="columns.length > 0" :columns="columns" :dataSource="data" bordered :scroll="screenWidth"></a-table>
+          <div v-else class="noneIcon">
+            <div>
+              <a-icon type="table"/>
+              <p>暂无数据</p>
+            </div>
+          </div>
+          
           <!-- <div class="ant-table-body">
             <table>
               <thead>
@@ -518,8 +529,8 @@
                     <a-form-item class="twoCol" label="格式" :wrapper-col="{ span: 24 }">
                       <a-select name="format" v-decorator="['format', {initialValue: 'num', rules: [{ required: false }]}]">
                         <a-select-option value="num">数字</a-select-option>
-                        <a-select-option value="percentage">百分比</a-select-option>
-                        <a-select-option value="currency">币种</a-select-option>
+                        <a-select-option value="percent">百分比</a-select-option>
+                        <a-select-option value="common">币种</a-select-option>
                       </a-select>
                     </a-form-item>
                     <a-form-item class="twoCol" label="小数点" :wrapper-col="{ span: 24 }" style="margin-left: 20px">
@@ -527,7 +538,7 @@
                         <a-select-option :key="i" v-for="(list, i) in 19" :value="i">{{i}}</a-select-option>
                       </a-select>
                     </a-form-item>
-                    <a-form-item class="twoCol" label="此公式将在哪里应用?">
+                    <!-- <a-form-item class="twoCol" label="此公式将在哪里应用?">
                       <a-radio-group v-model="radioValue">
                         <a-radio :value="0">所有汇总级别</a-radio>
                         <a-radio :value="1">仅限总合计</a-radio>
@@ -538,7 +549,7 @@
                               <a-select-option value="0">客户所有人</a-select-option>
                             </a-select>
                           </span>
-                    </a-form-item>
+                    </a-form-item> -->
                   </a-form>
                 </div>
               </a-tab-pane>
@@ -555,34 +566,54 @@
 <script lang='ts'>
   import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
   import leftMenu from '@/components/report/step2LeftMenu.vue'
-  // import middenTab from '@/components/report/step2MiddenTab.vue'
   import Draggable from 'vuedraggable'
-  import formulaModal from '@/components/report/formulaModal.vue';
-  /* import leftMenu2 from '@/components/report/leftMenu.vue' */
+  import formulaModal from '@/components/report/formulaModal.vue'
   import { getTextareaCursor, setTextareaCursor, addTextareaCursor } from '@/libs/util'
+  /* import moment from 'moment' */
+
   @Component({
     components: { leftMenu, Draggable }
   })
   export default class sterp2 extends Vue {
     @Prop() reportId: any // 从父组件接收reportId
+    
+    dataSourceTree:Array<object> = []
     loading: boolean = false
     selectMultiple:Array<any> = [ // 筛选器中复选框
-      { value: 0, title: '同步中' },
-      { value: 1, title: '不同' },
-      { value: 2, title: '已审核' },
-      { value: 3, title: '未找到' },
-      { value: 4, title: '未启用' },
-      { value: 5, title: '未比较' },
+      { value: '0', title: '同步中' },
+      { value: '1', title: '不同' },
+      { value: '2', title: '已审核' },
+      { value: '3', title: '未找到' },
+      { value: '4', title: '未启用' },
+      { value: '5', title: '未比较' },
       { value: '', title: '无选择' }
     ]
     selectMultipleData: Array<string> = [] // 筛选器中复选框 选中的选项数据 
-    aTagDatasH:Array<any> = [] // 组行
-    aTagDatasL:Array<any> = []
-    aTagDatasS:Array<any> = [] // 列数
     // 状态type time时间，number数字，string字符串，list列表， select复选框
-    aTagDatasF:Array<any> = [{title: '订单日期', text: '111', type: 'time', popover: false, visible: false}, {title: '数字类型', text: '222', type: 'number', popover: false, visible: false }, {title: '复选框类型', text: '333', popover: false, type: 'select', visible: false }] // 固定筛选
-    aTagDatasX:Array<any> = [{title: '字符串', text: '333', popover: false, type: 'string', visible: false}, {title: '复选框类型', text: '333', popover: false, type: 'select', visible: false }] // 显示筛选
-   
+    
+      /* [{ 
+        title: '订单日期',
+        text: '111',
+        type: 'time',
+        popover: false, // 控制编辑框是否显示， default为false
+        visible: true // 控制是否是固定筛选条件， 固定为 true，否则为false
+      }, {
+        title: '数字类型',
+        text: '222',
+        type: 'number',
+        popover: false,
+        visible: true
+      }, {
+        title: '复选框类型',
+        text: '333',
+        popover: false,
+        type: 'select',
+        visible: true
+      }]  */// 固定筛选
+    
+      /* [{title: '字符串', text: '333', popover: false, type: 'string', visible: false},
+      {title: '复选框类型', text: '333', popover: false, type: 'select', visible: false }]  */// 显示筛选
+
     dragOptions: object = { // 拖拽组件相关配置
       sort: true, // 定义是否拖拽
       group: 'task', // string or array分组用的，同一组的不同的list可以相互拖拽
@@ -598,44 +629,28 @@
     cancelTitleNameFlag:string = '' // 用于取消还原修改
     saveLoading:boolean = false
     runLoading:boolean = false
-    columns:Array<object> = [{
+    columns:Array<object> = [/* { //  表头
         title: '移动后的序号',
-        dataIndex: 'name',
-        key: 1,
-        width: 150
-      }, {
-        title: 'Ag移动后的序号e',
-        dataIndex: 'age',
-        key: 2,
-        width: 150
+        dataIndex: 'name'
       }, {
         title: '移动后的序号',
-        dataIndex: 'address',
-        key: 3,
-        width: 150
+        dataIndex: 'age'
       }, {
         title: '移动后的序号',
-        dataIndex: 'name',
-        key: 4,
-        width: 150
-      }, {
-        title: 'Ag移动后的序号e',
-        dataIndex: 'age',
-        key: 5,
-        width: 150
-      }]
-    data:Array<object> = [
-      { key: 0, name: '嗯哼', age: '123', address: '啥玩意儿'},
-      { key: 1, name: '嗯哼', age: '123', address: 'hhhh'},
-      { key: 2, name: '嗯哼', age: '123', address: '啥玩意儿'},
-      { key: 3, name: '嗯哼', age: '123', address: '啥玩意儿'},
-      { key: 4, name: '嗯哼', age: '123', address: '啥玩意儿'}
+        dataIndex: 'dataIndex'
+      } */]
+    data:Array<object> = [ // 右侧tab表格内容
+      /* { key: 0, name: '嗯哼', age: '123', dataIndex: '啥玩意儿'},
+      { key: 1, name: '嗯哼', age: '123', dataIndex: 'hhhh'},
+      { key: 2, name: '嗯哼', age: '123', dataIndex: '啥玩意儿'},
+      { key: 3, name: '嗯哼', age: '123', dataIndex: '啥玩意儿'},
+      { key: 4, name: '嗯哼', age: '123', dataIndex: '啥玩意儿'} */
     ]
     screenWidth: object = {x: 1000, y: 400}
     // tableWidth:number = 10
     // screenWidth:any = document.body.clientWidth
     rangeConfig:object = { // 筛选器时间组件规则
-      rules: [{ type: 'array', required: true, message: '请选择时间！' }]
+      rules: [{ type: 'array', required: false, message: '请选择时间！' }]
     }
     showFormulaFlag:boolean = false // 控制添加公式列模态框
     showFormulaTitle:string = '编辑公式列'
@@ -698,34 +713,107 @@
     radioValue:number = 0 // 编辑公式列弹框 格式单选model
     formulaTextarea:string = '' // 编辑列公式弹框 公式内容
 
-    treeMsg (e:object):void { // 接收子组件的值 的方法
-      console.log('父组件' + e)
-      if (this.aTagDatasS.indexOf(e) === -1) {
-        this.aTagDatasS.push(e); // 将接收到的子组件传过来的值push到列数中
+    treeList:Array<any> = [] // 存放将dataSourceTree处理成一层之后的数据
+    fieldIdArrLie:Array<number> = [] // 存放选择过的fieldId（表头列字段）
+    fieldIdArrHang:Array<number> = [] // 存放选择过的fieldId（表头行字段）
+    aTagDatasH:Array<any> = [] // 组行显示文字
+    aTagDatasL:Array<any> = [] // 组列显示文字
+    colColId:Array<number> = [] // 组列新增后返回的id，删除用
+    rowGroupId:Array<number> = [] // 组行新增后返回ID，删除用
+
+    screeningFlag:boolean = true // 固定筛选为true，显示筛选为false，用于visibleChange  Popover显示隐藏判断
+    fixedScreening:Array<number> = [] // 存放固定筛选选中字段
+    aTagDatasF:Array<any> = [] // 固定筛选回显信息
+    accordScreening:Array<number> = [] // 存放显示筛选选中字段
+    aTagDatasX:Array<any> = [] // 显示筛选回显信息
+    searchId:Array<number> = [] // 存放新增后返回的筛选器id
+
+   /*  moment () {} */
+    treeMsg (e:number):void { // 接收子组件的值 的方法
+      console.log('父组件接收' + e)
+      if (this.fieldIdArrLie.indexOf(e) === -1) {
+        // this.fieldIdArrLie.push(e); // 将接收到的子组件传过来的值push到列数中
+        this.treeList.map((v:any, i:number) => {
+            if (v.id === e) {
+              this.fieldIdArrLie.push(e) // push 选中的fieldId
+              this.aTagDatasL.push({ text: v.title }) // push 选中的回显的文字
+              const url: string = 'custom/ReportManageDetail/addReportCols'
+              const type:string = 'lie'
+              this.addReportColsFun(url, e, type)
+            }
+          })
+       /*  const url: string = 'custom/ReportManageDetail/addReportCols'
+        const type: string = 'lie'
+        this.addReportColsFun(url, e, type) // 调用增加报表表头列方法 */
       }
     }
-
     beforeCreate () { // 挂载前创建ant form
-      (this as any).timeForm = (this as any).$form.createForm(this); // 定义timeForm
+      (this as any).dataForm = (this as any).$form.createForm(this); // 定义dataForm
+      (this as any).datetimeForm = (this as any).$form.createForm(this); // 定义datetimeForm
       (this as any).numberForm = (this as any).$form.createForm(this); // 定义numberForm
       (this as any).stringForm = (this as any).$form.createForm(this); // 定义stringForm
       (this as any).selectForm = (this as any).$form.createForm(this); // 定义selectForm
+      (this as any).checkboxForm = (this as any).$form.createForm(this); // 定义checkboxForm
+      
       (this as any).modalForm = (this as any).$form.createForm(this); // 定义添加公式 弹窗modalForm
       (this as any).messageForm = (this as any).$form.createForm(this); // 定义添加公式 messageForm
       (this as any).formatForm = (this as any).$form.createForm(this); // 定义添加公式 formatForm
+    }
+    get aTagDatasFcomput () { // computed计算属性， 过滤出visible为true的对象来渲染，因为当 v-if 与 v-for 一起使用时，v-for 具有比 v-if 更高的优先级，这意味着 v-if 将分别重复运行于每个 v-for 循环中
+      return this.aTagDatasF.filter(item => item.visible)
+    }
+    created () {
+      (this as any).$post('custom/ReportManageDetail/getAllFields', { reportId: this.reportId }).then((res: any) => { // 请求报表所有表的所有字段
+        if (res.state === 2000) {
+          console.log(res)
+          this.dataSourceTree = res.data
+          this.treeListFun(res.data) // 将其处理成一层数据，报表设置4个搜索下拉框会用到
+        } else {
+          (this as any).$message.error(res.message, 3); // 弹出错误message
+        }
+      }).catch((err: any) => {
+        console.log(err);
+        (this as any).$message.error('获取报表所有表的所有字段失败', 3); // 弹出错误message
+      });
     }
     mounted () {
       const that:any = this;
       window.onresize = () => {
         return (() => {
-          const elHeightValue: any = that.$refs.tableContent.offsetHeight - 64
+          // const elHeightValue: any = that.$refs.tableContent.offsetHeight - 64
           // that.tableWidth = {x: 1000, y: elHeightValue}
           // console.log(elWidthValue)
-          console.log(that.screenWidth)
+          // console.log(that.screenWidth)
         })()
       }
     }
-    nextStep ():void {
+    addReportColsFun (url:string, fieldId:number, type:string) { // 增加报表表头列方法
+      (this as any).$post(url, { reportId: this.reportId, fieldId }).then((res: any) => { // 请求新增字段
+        if (res.state === 2000) {
+          console.log(res)
+          if (type === 'lie') {
+            this.colColId.push(res.data.colId) // 存放新增后返回id
+          } else if (type === 'hang') {
+            this.rowGroupId.push(res.data.groupId) // 存放新增后返回id
+          }
+        } else {
+          (this as any).$message.error(res.message, 3); // 弹出错误message
+        }
+      }).catch((err: any) => {
+        console.log(err);
+        (this as any).$message.error('新增字段失败', 3); // 弹出错误message
+      });
+    }
+    treeListFun (data:any):void { // 将datasourceTree处理成一层
+      for (let i = 0; i < data.length; i++) {
+        const node:any = data[i]
+        this.treeList.push(node)
+        if (node.children) {
+          (this as any).treeListFun(node.children)
+        }
+      }
+    }
+    nextStep ():void { // 提交
       let _this = this
       _this.loading = true
       setTimeout(() => {
@@ -733,89 +821,149 @@
         _this.$emit('nextStep')
       }, 1000)
     }
-    prevStep ():void {
+    prevStep ():void { // 上一步
       this.$emit('prevStep')
     }
-    deleteAllGroup ():void { // 删除所有组
-      this.aTagDatasH = []; // 清空组行
-      // console.log((this as any).$refs.handleChangeH)
+    /* 报表设置 start */
+    handleFocus ():void {
     }
-    handleChangeH (value:any):void { // 报表设置栏 组行 搜索框下拉选择方法
+    handleBlur ():void {
+    }
+    handleChangeH (value:number):void { // 报表设置栏 组行 搜索框下拉选择方法
+      console.log(value)
       if (value) {
-        let obj:object = { text: value }
-        if (this.aTagDatasH.indexOf(obj) === -1) {
-          this.aTagDatasH.push(obj)
+        if (this.fieldIdArrHang.indexOf(value) === -1) {
+          this.treeList.map((v:any, i:number) => {
+            if (v.id === value) {
+              this.fieldIdArrHang.push(value) // push 选中的fieldId
+              this.aTagDatasH.push({ text: v.title }) // push 选中的回显的文字
+              const url:string = 'custom/ReportManageDetail/addGroupRow'
+              const type:string = 'hang'
+              this.addReportColsFun(url, value, type)
+            }
+          })
         }
       }
     }
-    handleChangeS (value:any):void { // 报表设置栏 列数
+    handleChangeL (value:number):void { // 报表设置栏 列数 搜索框下拉选择方法
       if (value) {
-        let obj:object = { text: value }
-        if (this.aTagDatasS.indexOf(obj) === -1) {
-          this.aTagDatasS.push(obj)
-          console.log(this.aTagDatasS)
+        if (this.fieldIdArrLie.indexOf(value) === -1) {
+          this.treeList.map((v:any, i:number) => {
+            if (v.id === value) {
+              this.fieldIdArrLie.push(value) // push 选中的fieldId
+              this.aTagDatasL.push({ text: v.title }) // push 选中的回显的文字
+              const url: string = 'custom/ReportManageDetail/addReportCols'
+              const type:string = 'lie'
+              this.addReportColsFun(url, value, type)
+            }
+          })
         }
       }
     }
-    handleChangeF (value:any):void { // 固定筛选
+    deleteGroupH (item:any, index:number):void { // 删除组行方法
+      this.aTagDatasH.splice(index, 1) // 删除回显文字
+      this.fieldIdArrHang.splice(index, 1) // 删除选中id
+      let delRow:Array<number> = this.rowGroupId.slice(index, 1) // 获取要删除的那个id
+      this.rowGroupId.splice(index, 1) // 删除新增返回id
+      const type:string = 'hang'
+      const URL: string = 'custom/ReportManageDetail/delGroupRow'
+      let param:any = { groupId: delRow.toString() }
+      this.deleteGroupFun(URL, type, param) // 调用删除组行 列 方法
+    }
+    deleteGroupL (item:any, index:number):void { // 删除列数方法
+      this.aTagDatasL.splice(index, 1) // 删除回显文字
+      this.fieldIdArrLie.splice(index, 1) // 删除选中id
+      let delCol:Array<number> = this.colColId.slice(index, 1) // 获取要删除的那个id
+      this.colColId.splice(index, 1) // 删除新增返回id
+      const type:string = 'lie'
+      const URL: string = 'custom/ReportManageDetail/delReportCols'
+      let param:any = { colId: delCol.toString() }
+      this.deleteGroupFun(URL, type, param) // 调用删除组行 列 方法
+    }
+    deleteAllGroup (type:string):void { // 删除所有组行、组列
+      let url:string
+      let param:any
+      if (type === 'hang') {
+        url = 'custom/ReportManageDetail/delGroupRow'
+        param = { colId: this.rowGroupId.toString() }
+        this.deleteGroupFun(url, type, param) // 调用删除组行 列 方法
+      } else if (type === 'lie') {
+        url = 'custom/ReportManageDetail/delReportCols'
+        param = { colId: this.colColId.toString() }
+        this.deleteGroupFun(url, type, param) // 调用删除组行 列 方法
+      }
+    }
+    deleteGroupFun (URL:string, type:string, param:any) { // 删除组行 列 方法
+      (this as any).$post(URL, param).then((res: any) => { // 请求报表所有表的所有字段
+        if (res.state === 2000) {
+          console.log(res)
+        } else {
+          (this as any).$message.error(res.message, 3); // 弹出message
+        }
+      }).catch((err: any) => {
+        console.log(err);
+        (this as any).$message.error('删除失败', 3); // 弹出错误message
+      });
+    }
+    /* 报表设置 end */
+
+    /* 筛选 start */
+    handleChangeF (value:any):void { // 固定筛选改变事件
       if (value) {
-        let obj:object = { title: value, text: '111', type: 'string', popover: true, visible: true }
-        console.log(this.aTagDatasF)
-        console.log(this.aTagDatasF.indexOf(obj))
-        if (this.aTagDatasF.indexOf(obj) === -1) {
-          this.aTagDatasF.push(obj)
+        if (this.fixedScreening.indexOf(value) === -1) {
+          this.treeList.map((v:any, i:number) => {
+            if (v.id === value) {
+              console.log(v.popover)
+              let a:any = Object.assign({}, v)
+              a.popover = true
+              a.field_type = 'data'
+              a.new = true // 用来判断是否是第一次
+              this.fixedScreening.push(value) // push 选中的fieldId
+              this.aTagDatasF.push(a) // push 选中的回显的信息
+              this.screeningFlag = true // 固定筛选为true，显示筛选为false，用于visibleChange  Popover显示隐藏判断
+              console.log(this.aTagDatasF)
+            }
+          })
         }
       }
     }
-    handleChangeX (value:any):void { // 显示筛选
+    handleChangeX (value:any):void { // 显示筛选改变事件
       if (value) {
         // this.aTagDatasX.push({ title: value, text: '111', type: 'time', popover: true, visible: true })
-        let obj:object = { title: value, text: '111', type: 'time', popover: true, visible: true }
+        /* let obj:object = { title: value, text: '111', type: 'time', popover: true, visible: true }
         if (this.aTagDatasX.indexOf(obj) === -1) {
           this.aTagDatasX.push(obj)
+        } */
+        if (this.accordScreening.indexOf(value) === -1) {
+          this.treeList.map((v:any, i:number) => {
+            if (v.id === value) {
+              console.log(v.popover)
+              let a:any = Object.assign({}, v)
+              a.popover = true
+              a.field_type = 'data'
+              a.new = true // 用来判断是否是第一次
+              this.accordScreening.push(value) // push 选中的fieldId
+              this.aTagDatasX.push(a) // push 选中的回显的信息
+              this.screeningFlag = false // 固定筛选为true，显示筛选为false，用于visibleChange  Popover显示隐藏判断
+              console.log(this.aTagDatasF)
+            }
+          })
         }
       }
     }
     filterOption (input:any, option:any):boolean { // 搜索框输入搜索 过滤方法
+      console.log(input, option)
       return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
     }
-    handleBlur ():void {
+    
+    deleteFixed (item: any, index: number):void { // 删除固定筛选项方法
+      this.fixedScreening.splice(index, 1)
+      this.aTagDatasF.splice(index, 1)
     }
-    handleFocus ():void {
+    deleteAccording (item:any, index: number):void { // 删除显示筛选器选项方法
+      this.accordScreening.splice(index, 1)
+      this.aTagDatasX.splice(index, 1)
     }
-    handleBlurF ():void { // 固定筛选器失去焦点
-      // this.aTagDatasF.pop()
-    }
-    handleBlurX ():void { // 显示筛选器失去焦点
-      // this.aTagDatasX.pop()
-    }
-    // to:移动到的列表的容器, from:来源列表容器, item:被移动的单元, clone:副本的单元, oldIndex:移动前的序号, newIndex:移动后的序号
-    onEnd (to:any, from:any, item:any, clone:any, oldIndex:any, newIndex:any):void { // 拖拽移动结束
-      console.log('移动到的列表的容器' + to)
-      console.log('来源列表容器' + from)
-      console.log('被移动的单元' + item)
-      console.log('副本的单元' + clone)
-      console.log('移动前的序号' + oldIndex)
-      console.log('移动后的序号' + newIndex)
-    }
-    onUpdate (to:any, from:any, item:any, clone:any, oldIndex:any, newIndex:any):void { // 拖拽移动排序发生变化时
-
-    }
-    deleteGroup ():void { // 删除组行，列数方法
-
-    }
-    deleteFixed ():void { // 删除固定筛选项方法
-
-    }
-    clickAccording (e:any):void { // 点击筛选器
-      const value = e.target
-      console.log(value)
-    }
-
-    popoverVisibleFun (e:any, item:any) { // 筛选器点击 是否显示气泡框事件
-      console.log(item.type)
-    }
-
     handleClickChange (v:any):void {
       console.log(v)
     }
@@ -825,59 +973,151 @@
     }
     enterPopover (e:any):void { // 确认应用关闭气泡框
       console.log(e);
+      if (e.new) { // 如果是第一次点击
+        e.new = false
+      } else {
+
+      }
       const that = this;
-      if (e.type === 'time') {
-        (this as any).timeForm.validateFields((err: any, values: any) => {
-          if (!err) {
-            const rangeValue:any = values['range-picker']
-            const subData:any = {
-              ...values,
-              'range-picker': [rangeValue[0].format('YYYY-MM-DD'), rangeValue[1].format('YYYY-MM-DD')]
+      if (e.field_type === 'data') { // 日期
+        (this as any).dataForm.validateFields((err: any, values: any) => {
+          console.log(err, values)
+          if (values['search_param']) {
+            if (!err) {
+              const rangeValue:any = values['search_param']
+              /* const subData:any = {
+                ...values,
+                'range-picker': [rangeValue[0].format('YYYY-MM-DD'), rangeValue[1].format('YYYY-MM-DD')]
+              } */
+              // console.log(subData)
+              e.extra = rangeValue[0].format('YYYY-MM-DD') + ' ～' + rangeValue[1].format('YYYY-MM-DD')
+              e.popover = false;
+              (this as any).dataForm.resetFields(); // 重置输入控件的值
             }
-            // console.log(subData)
-            e.text = rangeValue[0].format('YYYY-MM-DD') + ' - ' + rangeValue[1].format('YYYY-MM-DD')
-            console.log(e);
+          } else {
+            e.extra = '所有时间'
             e.popover = false;
-            (this as any).timeForm.resetFields(); // 重置输入控件的值
+            (this as any).dataForm.resetFields(); // 重置输入控件的值
           }
         })
-      } else if (e.type === 'number') {
+      } else if (e.field_type === 'datetime') { // 时间
+        (this as any).datetimeForm.validateFields((err: any, values: any) => {
+
+        })
+      } else if (e.field_type === 'num') { // 数字
         (this as any).numberForm.validateFields((err: any, values: any) => {
-          if (!err) {
-            console.log(values)
-            e.text = values.numberSelect + '  ' + values.numberInput
-            e.popover = false;
-            (this as any).numberForm.resetFields(); // 重置输入控件
-          }
+            if (!err) {
+              console.log(values)
+              e.text = values.numberSelect.label ? values.numberSelect.label : '大于等于' + '  '
+              e.text += values.numberInput ? values.numberInput : '  " "'
+              e.popover = false;
+              (this as any).numberForm.resetFields(); // 重置输入控件
+            }
         })
-      } else if (e.type === 'string') {
+      } else if (e.field_type === 'string') { // 字符串
         (this as any).stringForm.validateFields((err:any, values: any) => {
           if (!err) {
             console.log(values)
-            e.text = values.stringSelect + '  ' + values.stringInput
+            e.text = values.stringSelect.label ? values.stringSelect.label : '等于' + '  '
+            e.text += values.stringInput ? values.stringInput : '  " "'
             e.popover = false;
             (this as any).numberForm.resetFields(); // 重置输入控件
           }
         })
-      } else if (e.type === 'select') {
+      } else if (e.field_type === 'select') { // 单选
         (this as any).selectForm.validateFields((err:any, values:any) => {
           if (!err) {
+            that.selectMultipleData = [] // 每次都将其先清空，然后再push
             that.selectMultiple.map((v:any, i:number) => { // 遍历所有
-              values.selectMultiple.map((val:any, ind: number) => { // 遍历选中
-                if (val === v.value) { // 比较
-                  that.selectMultipleData.push(v.title)
-                }
-              })
+              if (values.selectMultiple) {
+                values.selectMultiple.map((val:any, ind: number) => { // 遍历选中
+                  if (val === v.value) { // 比较
+                    that.selectMultipleData.push(v.title)
+                  }
+                })
+              }
             })
-            console.log(that.selectMultipleData)
-            e.text = values.selectSelect + '  ' + that.selectMultipleData.join(',')
+            e.text = values.selectSelect.label ? values.selectSelect.label : '等于' + '  '
+            e.text += that.selectMultipleData.length ? that.selectMultipleData.join(',') : '  " "'
+            e.popover = false;
+            (this as any).selectForm.resetFields(); // 重置输入控件
           }
         })
+      } else if (e.field_type === 'checkbox') { // 复选框
+
       }
     }
     selectMultipleFun (v:any):void { // 筛选器弹框中 复选框change方法
       console.log(v)
     }
+    
+    timeOnChange (date:any, dateString:any):void { // 时间筛选器变化
+
+    }
+    visibleChangeFun (visible:any):void { // popover 显示隐藏的回调
+      if (this.screeningFlag) {
+        let aTagFLast:any = this.aTagDatasF[this.aTagDatasF.length -1] // 获取固定筛选数组最后一个
+        if (aTagFLast.new) { // 如果是第一次选中未点击确认按钮的情况下
+          this.fixedScreening.pop()
+          this.aTagDatasF.pop()
+        }
+      } else {
+        let aTagXLast:any = this.aTagDatasX[this.aTagDatasX.length -1] // 获取显示筛选数组最后一个
+        if (aTagXLast.new) { // 如果是第一次选中未点击确认按钮的情况下
+          this.accordScreening.pop()
+          this.aTagDatasX.pop()
+        }
+      }
+      console.log(visible)
+    }
+    
+    popoverVisibleFun (e:any, item:any) { // 筛选器点击 是否显示气泡框事件
+      console.log(item)
+      if (item.type === 'time') {
+
+      } else if (item.type === 'string') {
+
+      } else if (item.type === 'number') {
+
+      } else if (item.type === 'select') {
+
+      }
+    }
+    /* 筛选 end */
+    /* 组行、组列拖拽系列方法 start */
+      onEndHang (ev:any):void { // 组行拖拽移动
+        // console.log(this.aTagDatasH)
+        if (ev.to.className === 'lie') {
+          // console.log(ev.oldIndex)
+          // console.log(this.aTagDatasH[ev.oldIndex])
+          // this.aTagDatasL.splice(ev.newIndex, 0, this.aTagDatasH[ev.oldIndex]) // 往列中添加数据
+          // this.aTagDatasH.splice(ev.oldIndex, 1) // 删除行中的数据
+        }
+        // console.log(this.aTagDatasL)
+      }
+      // to:移动到的列表的容器, from:来源列表容器, item:被移动的单元, clone:副本的单元, oldIndex:移动前的序号(从0开始), newIndex:移动后的序号
+      onEndLie (ev:any):void { // 组列拖拽移动结束
+        // console.log(ev)
+        if (ev.to.className === 'hang') {
+          // this.aTagDatasL.splice(ev.oldIndex, 1) // 
+        }
+      }
+      // deep: 深度监听， immediate代表声明监听后立即执行方法
+      @Watch('aTagDatasH', { deep: true, immediate: true }) onAtagDatasHChangeFun (newVal:string, oldVal:string) { 
+        // console.log(newVal)
+        // console.log(oldVal)
+      }
+      onUpdateHang (ev:any):void { // 拖拽行移动排序发生变化时
+        // console.log(ev)
+        // console.log(this.aTagDatasL)
+      }
+      onUpdateLie (ev:any):void { // 拖拽列
+        // console.log(ev)
+        // console.log(this.aTagDatasL)
+      }
+     /* 拖拽end */
+
+    /* 报表名称 修改方法 start */
     titleNameEditFun (e:string) { // 报表名称修改方法
       this.titleName = e // 将输入的赋值给其名称
     }
@@ -892,6 +1132,8 @@
       this.titleNameEdit = false
       this.titleName = this.cancelTitleNameFlag // 取消时将之前的titleName还原
     }
+    /* 报表名称 修改方法 end */
+
     saveFun ():void { // 保存方法
       this.saveLoading = true
       let _this = this
@@ -905,10 +1147,6 @@
       setTimeout(() => {
         _this.runLoading = false
       }, 2000)
-    }
-
-    timeOnChange (date:any, dateString:any):void { // 时间筛选器变化
-
     }
     showFormulaModel ():void { // 添加汇总公式弹窗方法
       this.generateList(this.dataSource) // 先处理数据
@@ -995,11 +1233,6 @@
     }
     /* end */
     insertFieldFun ():void { // 字段插入方法
-      debugger
-      // console.log((this as any).$refs.fieldCalculate)
-      // console.log(this.$refs.fieldCalculate as HTMLDivElement)
-      // console.log(this.fieldCalculate)
-      // console.log(this.fieldData)
       let textarea:any = (this as any).$refs.formulaTextarea.$el // 获取文本域元素
       let cursor:any = getTextareaCursor(textarea) // 先调用获取位置方法
       let text: string = this.fieldData.title + ': ' + this.fieldCalculate + ' '
@@ -1013,10 +1246,8 @@
       let text: string = this.funData.title + ' '
       addTextareaCursor(textarea, cursor, text) // 调用插入文本方法
       // this.formulaTextarea += ' ' + this.fieldData.title + ': ' + this.fieldCalculate
-      console.log(this.funData)
     }
     checkGrammar ():void { // 模态框 检查语法方法
-
     }
  }
 </script>
@@ -1044,7 +1275,7 @@
     }
     .lpc-tab1-content {
       padding: .875rem 1rem;
-      height: calc(80vh - 43px);
+      height: calc(64vh - 43px);
       overflow-y: scroll;
       .tab1-top {
         .tab1-top-header {
@@ -1076,8 +1307,6 @@
             font-size: .6875rem;
             color: #6b6d70;
             text-transform: uppercase;
-            display: -ms-flexbox;
-            display: box;
             display: flex;
             -o-box-align: center;
             align-items: center;
@@ -1146,9 +1375,7 @@
           transition: all 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
           opacity: 1;
           white-space: nowrap;
-          :hover {
-            cursor: move;
-          }
+          cursor: move;
           .anticon-close {
             display: inline-block;
             float: right;
@@ -1163,7 +1390,7 @@
     }
     .lpc-tab2-content {
       padding: .875rem 1rem;
-      height: calc(80vh - 43px);
+      height: calc(64vh - 43px);
       overflow-y: scroll;
       .tab2-top-header {
         margin-bottom: .5rem;
@@ -1236,6 +1463,9 @@
             }
           }
         }
+        .active_item {
+          border: 1px solid #40a9ff;
+        }
       }
     }
   }
@@ -1281,7 +1511,7 @@
       }
     }
     .table-content {
-      height: calc(80vh - 43px);
+      height: calc(64vh - 43px);
       /* width: 100%;
       overflow-x: scroll;
       table tr th {
@@ -1305,6 +1535,22 @@
           text-align: center;
         }
       }
+      .noneIcon {
+        width: 100%;
+        height: 100%;
+        display:flex;
+        justify-content:center;
+        align-items:center; /* 水平垂直居中 */
+        i {
+          color: #ddd;
+          font-size: 8rem;
+        }
+        p {
+          text-align: center;
+          font-size: 15px;
+          color: #bfbfbf;
+        }
+      }
     }
   }
 }
@@ -1319,7 +1565,7 @@
     .ant-form-item {
       margin-bottom: 12px;
       .ant-form-item-control {
-        width: 250px;
+        /* width: 250px; */
       }
     }
     .content-footer {
@@ -1379,11 +1625,12 @@
                 height: 30px;
                 line-height: 30px;
                 display: block;
-                textarea {
-                  height: 265px;
-                  resize: none;
-                }
               }
+            }
+            textarea {
+              height: 265px;
+              resize: none;
+              resize: none;
             }
           }
         }
@@ -1395,7 +1642,7 @@
           }
         }
         .treeContent { // 模态框中tree内容样式
-          // height: calc(80vh - 22.6875rem);
+          // height: calc(64vh - 22.6875rem);
           height: 360px;
           width: 265px;
           overflow: scroll;

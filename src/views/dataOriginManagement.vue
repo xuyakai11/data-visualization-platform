@@ -21,7 +21,7 @@
       </a-row>
     </div>
     <div class="search-result-list">
-      <a-table :columns="columns" :dataSource="data" bordered :pagination="pagination" @change="onChange" :loading="loading">
+      <a-table :columns="columns" :dataSource="data" bordered :pagination="pagination" @change="onChange" :loading="loading" :rowKey="record => record.report_source_id">
         <span slot="action" slot-scope="text, record">
           <a-button type="primary" size="small" :loading="tabload" @click="editFun($event, record)">编辑</a-button>
           <a-divider type="vertical" />

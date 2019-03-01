@@ -10,8 +10,8 @@
     <div class="content">
       <keep-alive>  
         <step1 v-if="current === 0" @reportId="reportIdEmit" :dataSourceList="dataSourceList" @nextStep="nextStep()"></step1>
-        <step2 v-if="current === 1" :reportId="reportId" @prevStep="prevStep"></step2>
       </keep-alive>
+      <step2 v-if="current === 1" :reportId="reportId" @prevStep="prevStep"></step2>
       <!-- <step3 v-if="current === 2" @prevStep="prevStep" @finish="finish"></step3> -->
     </div>
   </a-card>

@@ -10,15 +10,15 @@
           @expand="onExpand"
           :expandedKeys="expandedKeys"
           :autoExpandParent="autoExpandParent"
-          :treeData="dataSource"
+          :treeData="dataSourceTree"
         ><!-- @select="selectTreeFun($event)" -->
-        <template slot="title" slot-scope="{title}">
-          <span v-if="title.indexOf(searchValue) > -1" @dblclick="getInfo(title)">
+        <template slot="title" slot-scope="{title, nodes}">
+          <span v-if="title.indexOf(searchValue) > -1" @dblclick.stop="getInfo(title, nodes)">
             {{title.substr(0, title.indexOf(searchValue))}}
             <span style="color: #f50">{{searchValue}}</span>
             {{title.substr(title.indexOf(searchValue) + searchValue.length)}}
           </span>
-          <span  @dblclick="getInfo(title)" v-else>{{title}}</span>
+          <span @dblclick.stop="getInfo(title, nodes)" v-else>{{title}}</span>
         </template>
       </a-tree>
     </div>
@@ -30,8 +30,11 @@
 
   @Component
   export default class step2LeftMenu extends Vue {
+    @Prop({}) dataSourceTree!:any // 从父组件接收树数据
+
     expandedKeys:Array<any> = []
     searchValue:string = ''
+    SelectedKeys:Array<any> = []
     autoExpandParent:boolean = true
     dataSource:Array<object> = [
       {
@@ -73,18 +76,19 @@
           key: '100000',
         }]
     }];
-    dataList:Array<object> = []
+    dataList:Array<object> = [] // 存放处理后的tree数据
     isActive:boolean = false
     isTrigger:boolean = true; // 配置 字段配置是否显示
-    @Emit('treeDblData') treeDblDataFun (e: object) {};
+    @Emit('treeDblData') treeDblDataFun (e: number) {};
 
-    created () {
-      this.generateList(this.dataSource)
+    mounted () {
+      this.generateList(this.dataSourceTree)
     }
     generateList (data:any):void { // 将数据处理成只有一个层级
       for (let i = 0; i < data.length; i++) {
         const node = data[i]
-        this.dataList.push({ count: node.count, title: node.title, key: node.key })
+        data[i].node = { id: node.id }
+        this.dataList.push({ id: node.id, title: node.title, key: node.key, scopedSlots: { title: 'title', nodes: node.id } })
         if (node.children) {
           (this as any).generateList(node.children, node.key)
         }
@@ -110,13 +114,13 @@
       this.autoExpandParent = false
     }
     onChange (e:any):void {
-      const value = e.target.value
+      const value:any = e.target.value
       const expandedKeys = this.dataList.map((item:any) => { // 遍历 查询所有的节点
         if (item.title.indexOf(value) > -1) {
-          return (this as any).getParentKey(item.key, this.dataSource)
+          return (this as any).getParentKey(item.key, this.dataSourceTree)
         }
         return null
-      }).filter((item, i, self) => item && self.indexOf(item) === i) // 过滤出要打开的节点
+      }).filter((item, i, self) => item && self.indexOf(item) === i); // 过滤出要打开的节点
       Object.assign(this, {
         expandedKeys,
         searchValue: value,
@@ -131,21 +135,24 @@
       this.isTrigger = false
       this.isActive = true
     }
-    selectTreeFun (e:any):void { // 点击选中事件
-      console.log(e)
+    selectTreeFun (e:any, node:any):void { // 点击选中事件
+      console.log(e, node)
+      // let obj:object = { text: e } // 将双击选中的传递给父组件
+      // this.treeDblDataFun(obj)
     }
-    getInfo (e:string) { // 树控件双击事件
-      console.log(e)
-      console.log('getInfo')
-      let obj:object = { text: e } // 将双击选中的传递给父组件
-      this.treeDblDataFun(obj)
+    getInfo (e:string, node:any) { // 树控件双击事件
+      console.log(node)
+      if (node) {
+        let fieldId:number = node.id
+        this.treeDblDataFun(fieldId)
+      }
     }
  }
 </script>
 
 <style lang='scss' scoped rel='stylesheet/scss'>
   .leftMenu {
-    height: 80vh;
+    height: 64vh;
     .lpc-hide-set {
       background-color: #f9f9fa;
       border-right: 1px solid #e9eaec;
@@ -176,6 +183,10 @@
           margin-left: 8px;
           cursor: pointer;
         }
+      }
+      ul.ant-tree {
+        height: calc(64vh - 43px);
+        overflow-y: scroll;
       }
     }
     .trigger {

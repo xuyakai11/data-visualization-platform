@@ -27,7 +27,7 @@
       </a-row>
     </div>
     <div class="search-result-list">
-      <a-table :columns="columns" :dataSource="data" bordered :pagination="pagination" @change="onChange" :loading="loading">
+      <a-table :columns="columns" :dataSource="data" bordered :pagination="pagination" @change="onChange" :loading="loading" :rowKey="record => record.report_id">
         <span slot="action" slot-scope="text, record">
           <a-button type="primary" size="small" @click="go($event, record)">编辑</a-button>
           <a-divider type="vertical" />
@@ -69,10 +69,10 @@
     wrapper: {span: 12}
   }
   columns: Array<object> = [ // 定义表格表头
-    {title: '报表名称', dataIndex: 'report_name', key: ''}, // fixed: 'left' 设置是否固定
-    {title: '报表数据源名称', dataIndex: 'report_resource_name', key: ''},
-    {title: '报表主表名称', dataIndex: 'main_table_name', key: ''},
-    {title: '操作', dataIndex: '', key: '', width: '40%', scopedSlots: { customRender: 'action'}} // scopedSlots配置操作列
+    {title: '报表名称', dataIndex: 'report_name'}, // fixed: 'left' 设置是否固定
+    {title: '报表数据源名称', dataIndex: 'report_resource_name'},
+    {title: '报表主表名称', dataIndex: 'main_table_name'},
+    {title: '操作', dataIndex: '', width: '40%', scopedSlots: { customRender: 'action'}} // scopedSlots配置操作列
   ]
   data: Array<object> = [] // 定义表格内容
   modelTitle: string = '新增报表'

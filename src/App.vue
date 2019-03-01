@@ -1,9 +1,27 @@
 <template>
-  <div id="app">
-    <router-view/>
-  </div>
+  <a-locale-provider :locale="zhCn">
+    <div id="app">
+      <router-view/>
+    </div>
+  </a-locale-provider>
 </template>
-
+<script>
+import zhCn from 'ant-design-vue/lib/locale-provider/zh_CN';
+/*  import * as moment from 'moment' */
+/*import 'moment/locale/zh-cn'
+moment.locale('zh-cn');
+ */
+export default {
+  data () {
+    return {
+      zhCn
+    }
+  },
+  created () {
+    // console.log(moment('2019-04-01', 'YYYY-MM-DD'))
+  }
+}
+</script>
 <style lang="scss">
 body {
   background: #f0f2f5;

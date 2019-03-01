@@ -7,12 +7,17 @@ import store from './store'
 import './services/axios.tool' // 导入封装好的axios
 import './assets/common.css'
 
-import moment from 'moment' // 时间组件汉化
+/* import moment from 'moment' // 时间格式转换
 import 'moment/locale/zh-cn'
-moment.locale('zh-ch')
+moment.locale('zh-cn') */
 
 Vue.use(Antd)
 Vue.config.productionTip = false // 设置为 false 以阻止 vue 在启动时生成生产提示
+
+/* Vue.filter('datafmt',function (input:any,fmtstring:any) {
+  // 使用momentjs这个日期格式化类库实现日期的格式化功能
+  return moment(input).format(fmtstring);
+}); */
 
 // Vue.component(Button.name, Button)
 new Vue({

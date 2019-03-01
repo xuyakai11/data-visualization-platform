@@ -22,10 +22,10 @@ declare module 'vuedraggable' {
   const vuedraggable: any;
   export default vuedraggable;
 }
-declare module 'moment' {
+/* declare module 'moment' {
   const moment: any;
   export default moment;
-}
+} */
 declare module 'vue/types/vue' { // 声明为 Vue 补充的东西
   interface Vue {
     $Message: any,

@@ -13,7 +13,7 @@
     <div class="search-result-list">
       <a-table :pagination="pagination" :loading="loading" @change="onChange" :columns="columns" :dataSource="data" bordered :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}">
         <span slot="action" slot-scope="text, record">
-          <a-button type="primary" size="small" :data-type="record.key" @click="editFun($event, record)">编辑</a-button>
+          <a-button type="primary" size="small" :loading="editBtnLoading" :data-type="record.key" @click="editFun($event, record)">编辑</a-button>
           <a-divider type="vertical" />
           <a-button type="primary" size="small" :loading="delBtnLoading" @click="deleteFun($event, record)">删除</a-button>
         </span>
@@ -160,6 +160,7 @@
   showModel () { // 模态框
     this.visible = !this.visible
     this.addBtnLoading = true
+    // this.editBtnLoading = true
     this.modelTitle = '新增字段'
   }
   handleCancel () { // 隐藏模态框
@@ -186,9 +187,10 @@
     })
   }
   editFun (event: any, record: any): void { // 点击编辑方法
-    this.visible = true // 将模态框
+    this.visible = true // 将模态框显示
     this.modelTitle = '编辑字段'
     this.filedlId = record.id // 字段id
+    this.editBtnLoading = true
     this.editDataEcho = record; // 将信息带过来回显
   }
   addEditModelFun (params:any, url: string):void {
