@@ -11,14 +11,18 @@
           :expandedKeys="expandedKeys"
           :autoExpandParent="autoExpandParent"
           :treeData="dataSourceTree"
+          @select="getInfo"
         ><!-- @select="selectTreeFun($event)" -->
-        <template slot="title" slot-scope="{title, nodes}">
-          <span v-if="title.indexOf(searchValue) > -1" @dblclick.stop="getInfo(title, nodes)">
+        <!-- <a-tree-node v-for="(item, index) in dataSourceTree" :title="item.title" :key="item.id">
+          <a-tree-node v-for="(list, i) in item.children" :title="list.title" :key="list.id" @dblclick="getInfo(list.id)"/>
+        </a-tree-node> -->
+        <template slot="title" slot-scope="{title}">
+          <span v-if="title.indexOf(searchValue) > -1">
             {{title.substr(0, title.indexOf(searchValue))}}
             <span style="color: #f50">{{searchValue}}</span>
             {{title.substr(title.indexOf(searchValue) + searchValue.length)}}
           </span>
-          <span @dblclick.stop="getInfo(title, nodes)" v-else>{{title}}</span>
+          <span v-else>{{title}}</span>
         </template>
       </a-tree>
     </div>
@@ -26,7 +30,7 @@
 </template>
 
 <script lang='ts'>
-  import { Component, Prop, Vue, Emit } from 'vue-property-decorator'
+  import { Component, Prop, Vue, Emit, Watch } from 'vue-property-decorator'
 
   @Component
   export default class step2LeftMenu extends Vue {
@@ -81,21 +85,29 @@
     isTrigger:boolean = true; // 配置 字段配置是否显示
     @Emit('treeDblData') treeDblDataFun (e: number) {};
 
-    mounted () {
-      this.generateList(this.dataSourceTree)
+    // deep: 深度监听， immediate代表声明监听后立即执行方法
+    // 监听dataSourceTree 是因为父组件传过来的时候有可能为空
+    @Watch('dataSourceTree', { deep: true, immediate: true }) onAtagDatasHChangeFun (newVal:string, oldVal:string) { 
+      if (newVal) {
+        this.generateList(this.dataSourceTree)
+      }
     }
+    /* mounted () { 
+      console.log(this.dataList)
+    } */
     generateList (data:any):void { // 将数据处理成只有一个层级
       for (let i = 0; i < data.length; i++) {
         const node = data[i]
-        data[i].node = { id: node.id }
-        this.dataList.push({ id: node.id, title: node.title, key: node.key, scopedSlots: { title: 'title', nodes: node.id } })
+        // data[i].node = { id: node.id }
+        this.dataList.push(node)
+        // this.dataList.push({ id: node.id, title: node.title, key: node.key, scopedSlots: { title: 'title', nodes: node.id } })
         if (node.children) {
-          (this as any).generateList(node.children, node.key)
+          (this as any).generateList(node.children)
         }
       }
     }
     getParentKey (key:string, tree:any):void {
-      let parentKey
+      let parentKey:any = '';
       for (let i = 0; i < tree.length; i++) {
         const node = tree[i]
         if (node.children) {
@@ -106,7 +118,6 @@
           }
         }
       }
-      console.log(parentKey)
       return parentKey
     }
     onExpand (expandedKeys:any):void {
@@ -140,11 +151,10 @@
       // let obj:object = { text: e } // 将双击选中的传递给父组件
       // this.treeDblDataFun(obj)
     }
-    getInfo (e:string, node:any) { // 树控件双击事件
-      console.log(node)
-      if (node) {
+    getInfo (e:any, node:any) { // 树控件双击事件
+      if (e.length) {
         let fieldId:number = node.id
-        this.treeDblDataFun(fieldId)
+        this.treeDblDataFun(+e.toString())
       }
     }
  }

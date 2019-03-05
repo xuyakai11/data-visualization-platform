@@ -1,49 +1,50 @@
 <template>
   <div>
-    <a-form style="max-width: 800px; margin: 40px auto 0;" :form="form">
-      <a-form-item label='报表名称' :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
-        <a-input
-          ref="reportName"
-          v-decorator="['reportName', { rules: [{ required: true, message: '请输入报表名称' }]}]"
-          placeholder="报表名称"
-        />
-      </a-form-item>
-      <a-form-item label="数据源" :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
-        <a-select
-          ref="reportResourceId"
-          @change="dataSourceSelectChange"
-          v-decorator="['reportResourceId', { rules: [{ required: true, message: '请选择数据源' }]}]"
-          placeholder="请选择数据源"
-        >
-          <a-select-option value="">请选择数据源</a-select-option>
-          <a-select-option v-for="(item, i) in dataSourceList" :value="item.report_source_id" :key="i">{{item.link_name}}</a-select-option>
-        </a-select>
-      </a-form-item>
-      <a-form-item label="数据主表" :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
-        <a-select
-          ref="mainTableId"
-          :disabled="selectDisabled"
-          @change="mainTableIdChange"
-          placeholder="数据主表"
-          v-decorator="['mainTableId', { initialValue: dataSourceSelect, rules: [{ required: true, message: '请选择数据主表' }]}]"
-        >
-          <a-select-option value="">请选择数据主表</a-select-option>
-          <a-select-option v-for="(item, i) in dataTab" :value="item.id" :key="i">{{item.title}}</a-select-option>
-        </a-select>
-      </a-form-item>
-      <a-form-item label="关联表" :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
-        <a-button type="primary" :disabled="joinBtnDis" @click="showModel" ref="joinArr"> + </a-button>
-      </a-form-item>
-      <a-form-item :wrapperCol="{span: 15, offset: 5}">
-        <template v-for="(item, i) in aTagDatas">
-          <a-tag :key="i" :closable="(i+1) === aTagDatas.length" :afterClose="() => aTagClose(i)" color="blue">关联表：{{item.joinTableName}}</a-tag>
-        </template>
-      </a-form-item>
-      <a-form-item :wrapperCol="{span: 15, offset: 5}">
-        <a-button type="primary" @click="nextStep">下一步</a-button>
-      </a-form-item>
-    </a-form>
-
+    <a-spin :spinning="spinning" delayTime="500">
+      <a-form style="max-width: 800px; margin: 40px auto 0;" :form="form">
+        <a-form-item label='报表名称' :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
+          <a-input
+            ref="reportName"
+            v-decorator="['reportName', { rules: [{ required: true, message: '请输入报表名称' }]}]"
+            placeholder="报表名称"
+          />
+        </a-form-item>
+        <a-form-item label="数据源" :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
+          <a-select
+            ref="reportResourceId"
+            @change="dataSourceSelectChange"
+            v-decorator="['reportResourceId', { rules: [{ required: true, message: '请选择数据源' }]}]"
+            placeholder="请选择数据源"
+          >
+            <a-select-option value="">请选择数据源</a-select-option>
+            <a-select-option v-for="(item, i) in dataSourceList" :value="item.report_source_id" :key="i">{{item.link_name}}</a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="数据主表" :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
+          <a-select
+            ref="mainTableId"
+            :disabled="selectDisabled"
+            @change="mainTableIdChange"
+            placeholder="数据主表"
+            v-decorator="['mainTableId', { initialValue: dataSourceSelect, rules: [{ required: true, message: '请选择数据主表' }]}]"
+          >
+            <a-select-option value="">请选择数据主表</a-select-option>
+            <a-select-option v-for="(item, i) in dataTab" :value="item.id" :key="i">{{item.title}}</a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="关联表" :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
+          <a-button type="primary" :disabled="joinBtnDis" @click="showModel" ref="joinArr"> + </a-button>
+        </a-form-item>
+        <a-form-item :wrapperCol="{span: 15, offset: 5}">
+          <template v-for="(item, i) in aTagDatas">
+            <a-tag :key="i" :closable="(i+1) === aTagDatas.length" :afterClose="() => aTagClose(i)" color="blue">关联表：{{item.joinTableName}}</a-tag>
+          </template>
+        </a-form-item>
+        <a-form-item :wrapperCol="{span: 15, offset: 5}">
+          <a-button type="primary" @click="nextStep">下一步</a-button>
+        </a-form-item>
+      </a-form>
+    </a-spin>
     <!-- 弹窗层 -->
     <a-modal
       :visible="visible"
@@ -106,7 +107,7 @@
   @Component
   export default class sterp1 extends Vue {
     @Prop({}) dataSourceList!:any // 从父组件接收数据源
-
+    spinning:boolean = true
     modelCol: object = {
       label: {span: 5},
       wrapper: {span: 15}
@@ -147,11 +148,14 @@
             (this as any).form.setFieldsValue({ 'reportName': res.data.reportName, 'reportResourceId': res.data.reportResourceId })
             this.aTagDatas = res.data.joinArr // 赋值关联表回显
             this.joinArr = Object.assign(this.joinArr, res.data.joinArr); // 深度拷贝
+            this.spinning = false // 关闭加载动画
           } else {
+            this.spinning = false; // 关闭加载动画
             (this as any).$message.error(res.message, 3); // 弹出错误message
           }
         }).catch((err: any) => {
           console.log(err);
+          this.spinning = false; // 关闭加载动画
           (this as any).$message.error('请求失败', 3); // 弹出错误message
         });
       }
@@ -242,7 +246,9 @@
               this.reportId = res.data.reportId
               // this.$emit('reportId', this.reportId)
               this.send(this.reportId) // 子传父方法
-              this.$emit('nextStep')
+              // setTimeout(() => {
+                this.$emit('nextStep')
+              // }, 100)
             } else {
               (this as any).$message.error(res.message, 3); // 弹出错误message
             }
@@ -294,4 +300,9 @@
 </script>
 
 <style lang='scss' scoped rel='stylesheet/scss'>
+.spin-content{
+  border: 1px solid #91d5ff;
+  background-color: #e6f7ff;
+  padding: 30px;
+}
 </style>

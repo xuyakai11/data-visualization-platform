@@ -73,15 +73,18 @@ const setTextareaCursor = (textarea:any, rangeData:any) => {
 }
 // 在获取的光标位置插入指定文本 或 替换选定文本
 const addTextareaCursor = (textarea:any, cursor:any, text:string) => {
+  debugger
   // textarea 容器； cursor：光标位置和选中内容； text：要插入的文本
   let oValue, nValue, oR, nStart, nEnd, st
   const sR:any = ''
   setTextareaCursor(textarea, cursor) // 调用获取位置
   if (textarea.setSelectionRange) {
+    debugger
     oValue = textarea.value
     nValue = oValue.substring(0, cursor.start) + text + oValue.substring(cursor.end)
     nStart = nEnd = cursor.start + text.length
     st = textarea.scrollTop
+    console.log(nValue)
     textarea.value = nValue
     if (textarea.scrollTop !== st) {
       textarea.scrollTop = st
