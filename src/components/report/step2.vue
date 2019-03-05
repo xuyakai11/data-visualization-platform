@@ -37,10 +37,10 @@
                       </a-select-opt-group>
                     </a-select>
                     <div class="task-content">
-                      <draggable :options="dragOptions" @end="onEndHang" @update="onUpdateHang" class="hang">
+                      <draggable class="hang"> <!-- :options="dragOptions" @end="onEndHang" @update="onUpdateHang" -->
                         <p class="task-item" type="inner" v-for="(item, i) in aTagDatasH" :key="i" :title="item.text">
-                          <span v-if="item.text.length > 17">{{item.text.substr(0, 17)}}...</span>
-                          <span v-else>{{item.text}}</span>
+                          <span v-if="item.title.length > 17">{{item.title.substr(0, 17)}}...</span>
+                          <span v-else>{{item.title}}</span>
                           <a-tooltip placement="right">
                             <template slot="title">
                               <span>删除</span>
@@ -85,10 +85,10 @@
                     </a-select-opt-group>
                   </a-select>
                   <div class="task-content">
-                    <draggable :options="dragOptions" @end="onEndLie" @update="onUpdateLie" class="lie">
+                    <draggable class="lie"> <!--  :options="dragOptions" @end="onEndLie" @update="onUpdateLie" -->
                       <p class="task-item" type="inner" v-for="(item, i) in aTagDatasL" :key="i">
-                        <span v-if="item.text.length > 17">{{item.text.substr(0, 17)}}...</span>
-                        <span v-else>{{item.text}}</span>
+                        <span v-if="item.title.length > 17">{{item.title.substr(0, 17)}}...</span>
+                        <span v-else>{{item.title}}</span>
                         <a-tooltip placement="right">
                           <template slot="title">
                             <span>删除</span>
@@ -233,7 +233,7 @@
                         </a-form>
                       </div>
                       <div class="content-footer">
-                        <a-button size="small" @click="hidePopover(i, 'F')">取消</a-button>
+                        <a-button size="small" @click="hidePopover(item, i, 'F')">取消</a-button>
                         <a-button size="small" type="primary" @click="enterPopover(item, 'F')">应用</a-button>
                       </div>
                     </div>
@@ -268,123 +268,16 @@
                   </a-select-opt-group>
                 </a-select>
                 <div class="According-content">
-                  <a-popover arrowPointAtCenter placement="right" id="ant-popover" title="编辑筛选器" trigger="click" @visibleChange="visibleChangeFun" :visible="item.visible" v-model="item.popover" v-for="(item, i) in aTagDatasX" :key="i">
-                    <div slot="content">
-                      <p>{{item.title}}</p>
-                      <div v-if="item.field_type == 'data'">
-                        <a-form :form="dataForm">
-                          <a-form-item label="时间范围">
-                            <a-range-picker size="small" format="YYYY-MM-DD" v-decorator="['search_param', { initialValue: item.search_param, rules: [{ type: 'array', required: true, message: '请选择时间！' }]}]"/>
-                          </a-form-item>
-                        </a-form>
-                      </div>
-                      <div v-if="item.field_type == 'datetime'">
-                        <a-form :form="datetimeForm">
-                          <a-form-item label="时间范围">
-                            <a-range-picker size="small" :showTime="{ format: 'HH:mm' }" format="YYYY-MM-DD HH:mm" v-decorator="['search_param', { initialValue: item.search_param, rules: [{ type: 'array', required: true, message: '请选择时间！' }]}]"/>
-                          </a-form-item>
-                        </a-form>
-                      </div>
-                      <div v-if="item.field_type == 'num'">
-                        <a-form :form="numberForm">
-                          <a-form-item label="运算符">
-                            <a-select labelInValue v-decorator="['search_logic', { initialValue: item.search_logic, rules: [{ required: false }]}]">
-                              <a-select-option value="eq">等于</a-select-option>
-                              <a-select-option value="neq">不等于</a-select-option>
-                              <a-select-option value="lt">小于</a-select-option>
-                              <a-select-option value="gt">大于</a-select-option>
-                              <a-select-option value="elt">小于等于</a-select-option>
-                              <a-select-option value="egt">大于等于</a-select-option>
-                            </a-select>
-                          </a-form-item>
-                          <a-form-item >
-                            <a-input v-decorator="['search_param', { initialValue: item.search_param, rules: [{ required: false, message: '请输入数字！' }]}]"/>
-                          </a-form-item>
-                        </a-form>
-                      </div>
-                      <div v-if="item.field_type == 'string'">
-                        <a-form :form="stringForm">
-                          <a-form-item label="运算符">
-                            <a-select labelInValue v-decorator="['search_logic', { initialValue: item.search_logic, rules: [{ required: false }]}]">
-                              <a-select-option value="like">包含</a-select-option>
-                              <a-select-option value="not like">不包含</a-select-option>
-                            </a-select>
-                          </a-form-item>
-                          <a-form-item >
-                            <a-input v-decorator="['search_param', { initialValue: item.search_param, rules: [{ required: false, message: '请输入字符串！' }]}]"/>
-                          </a-form-item>
-                        </a-form>
-                      </div>
-                      <div v-if="item.field_type == 'select'"> <!-- 单选 -->
-                        <a-form :form="selectForm">
-                          <a-form-item label="运算符">
-                            <a-select labelInValue style="width: 250px" v-decorator="['search_logic', { initialValue: item.search_logic, rules: [{ required: false }]}]">
-                              <a-select-option value="eq">等于</a-select-option>
-                              <a-select-option value="neq">不等于</a-select-option>
-                            </a-select>
-                          </a-form-item>
-                          <a-form-item label="值">
-                            <a-select labelInValue style="width: 250px" v-decorator="['search_param', { initialValue: item.search_param, rules: [{ required: false, message: '请选择值！' }]}]"
-                              showSearch
-                              allowClear
-                              :filterOption="filterOption">
-                              <a-select-option value="0">同步中</a-select-option>
-                              <a-select-option value="1">不同</a-select-option>
-                              <a-select-option value="2">已审核</a-select-option>
-                              <a-select-option value="3">未找到</a-select-option>
-                              <a-select-option value="4">未启用</a-select-option>
-                              <a-select-option value="5">未比较</a-select-option>
-                              <a-select-option value="">无选择</a-select-option>
-                              <!-- <a-select-option v-for="(item, index) in selectMultiple" :key="index" :value="item.value">
-                                {{item.title}}
-                              </a-select-option> -->
-                            </a-select>
-                          </a-form-item>
-                        </a-form>
-                      </div>
-                      <div v-if="item.field_type == 'checkbox'"> <!-- 多选 -->
-                        <a-form :form="checkboxForm">
-                          <a-form-item label="运算符">
-                            <a-select labelInValue style="width: 250px" v-decorator="['search_logic', {initialValue: item.search_logic, rules: [{ required: false }]}]">
-                              <a-select-option value="in">等于</a-select-option>
-                              <a-select-option value="not in">不等于</a-select-option>
-                            </a-select>
-                          </a-form-item>
-                          <a-form-item label="值">
-                            <a-select labelInValue mode="multiple" v-decorator="['search_param', {initialValue: item.search_param,  rules: [{ required: false, message: '请选择值！' }]}]"
-                              showSearch
-                              allowClear
-                              style="width: 250px"
-                              :filterOption="filterOption">
-                              <a-select-option value="0">同步中</a-select-option>
-                              <a-select-option value="1">不同</a-select-option>
-                              <a-select-option value="2">已审核</a-select-option>
-                              <a-select-option value="3">未找到</a-select-option>
-                              <a-select-option value="4">未启用</a-select-option>
-                              <a-select-option value="5">未比较</a-select-option>
-                              <!-- <a-select-option value="">无选择</a-select-option> -->
-                            </a-select>
-                          </a-form-item>
-                        </a-form>
-                      </div>
-                      <div class="content-footer">
-                        <a-button size="small" @click="hidePopover(i)">取消</a-button>
-                        <a-button size="small" type="primary" @click="enterPopover(item, 'X')">应用</a-button>
-                      </div>
-                    </div>
-                    <div class="According-item" :class="{ 'active_item': item.popover }">
-                      <div class="lpc-fixed-text">
-                        <p class="title">{{item.title}}</p>
-                        <p class="text">{{item.extra}}</p>
-                      </div>
-                      <a-tooltip placement="right"> <!-- 判断固定项不显示删除按钮  v-if="!item.type"-->
-                        <template slot="title">
-                          <span>删除</span>
-                        </template>
-                        <a-icon type="close" @click.stop="deleteSearch(i, 'X')"/>
-                      </a-tooltip>
-                    </div>
-                  </a-popover>
+                  <p class="task-item" type="inner" v-for="(item, i) in aTagDatasX" :key="i">
+                    <span v-if="item.title.length > 17">{{item.title.substr(0, 17)}}...</span>
+                    <span v-else>{{item.title}}</span>
+                    <a-tooltip placement="right">
+                      <template slot="title">
+                        <span>删除</span>
+                      </template>
+                      <a-icon type="close" @click.stop="deleteSearch(i, 'X')"/>
+                    </a-tooltip>
+                  </p>
                 </div>
               </div>
             </a-tab-pane>
@@ -748,11 +641,9 @@
         // this.fieldIdArrLie.push(e); // 将接收到的子组件传过来的值push到列数中
         this.treeList.map((v:any, i:number) => {
             if (v.id === e) {
-              this.fieldIdArrLie.push(e) // push 选中的fieldId
-              this.aTagDatasL.push({ text: v.title }) // push 选中的回显的文字
               const url: string = 'custom/ReportManageDetail/addReportCols'
               const type:string = 'lie'
-              this.addReportColsFun(url, e, type)
+              this.addReportColsFun(url, v, type)
             }
           })
       }
@@ -828,14 +719,18 @@
         (this as any).$message.error('请求表格失败', 3); // 弹出错误message
       });
     }
-    addReportColsFun (url:string, fieldId:number, type:string) { // 增加报表表头列方法
+    addReportColsFun (url:string, v:any, type:string) { // 增加报表表头列方法
       this.spinning = true;
-      (this as any).$post(url, { reportId: this.reportId, fieldId }).then((res: any) => { // 请求新增字段
+      (this as any).$post(url, { reportId: this.reportId, fieldId: v.id }).then((res: any) => { // 请求新增字段
         if (res.state === 2000) {
           console.log(res)
           if (type === 'lie') {
+            this.fieldIdArrLie.push(v.id) // push 选中的fieldId
+            this.aTagDatasL.push(v) // push 选中的回显的文字
             this.colColId.push(res.data.colId) // 存放新增后返回id
           } else if (type === 'hang') {
+            this.fieldIdArrHang.push(v.id) // push 选中的fieldId
+            this.aTagDatasH.push(v) // push 选中的回显的文字
             this.rowGroupId.push(res.data.groupId) // 存放新增后返回id
           }
           this.getReportDetail() // 请求table表格
@@ -872,18 +767,19 @@
     }
     /* 报表设置 start */
     handleChangeH (value:number):void { // 报表设置栏 组行 搜索框下拉选择方法
-      console.log(value)
-      if (value) {
-        if (this.fieldIdArrHang.indexOf(value) === -1) {
-          this.treeList.map((v:any, i:number) => {
-            if (v.id === value) {
-              this.fieldIdArrHang.push(value) // push 选中的fieldId
-              this.aTagDatasH.push({ text: v.title }) // push 选中的回显的文字
-              const url:string = 'custom/ReportManageDetail/addGroupRow'
-              const type:string = 'hang'
-              this.addReportColsFun(url, value, type)
-            }
-          })
+      if (!this.aTagDatasL.length) {
+        (this as any).$message.error('请先添加列', 3); // 弹出成功message
+      } else {
+        if (value) {
+          if (this.fieldIdArrHang.indexOf(value) === -1) {
+            this.treeList.map((v:any, i:number) => {
+              if (v.id === value) {
+                const url:string = 'custom/ReportManageDetail/addGroupRow'
+                const type:string = 'hang'
+                this.addReportColsFun(url, v, type)
+              }
+            })
+          }
         }
       }
     }
@@ -892,11 +788,9 @@
         if (this.fieldIdArrLie.indexOf(value) === -1) {
           this.treeList.map((v:any, i:number) => {
             if (v.id === value) {
-              this.fieldIdArrLie.push(value) // push 选中的fieldId
-              this.aTagDatasL.push({ text: v.title }) // push 选中的回显的文字
               const url: string = 'custom/ReportManageDetail/addReportCols'
               const type:string = 'lie'
-              this.addReportColsFun(url, value, type)
+              this.addReportColsFun(url, v, type)
             }
           })
         }
@@ -951,76 +845,103 @@
 
     /* 筛选 start */
     handleChangeF (value:any):void { // 固定筛选改变事件
-      if (value) {
-        if (this.fixedScreening.indexOf(value) === -1) {
-          this.dataSourceTree.map((val:any, ind:number) => {
-            val.children.map((v:any, i:number) => {
-              if (v.id === value) {
-                console.log(v.popover)
-                let a:any = Object.assign({}, v)
-                a.popover = true
-                a.field_type = 'datetime'
-                a.new = true // 用来判断是否是第一次
-                a.tableId = val.id
-                if (a.field_type === 'checkbox') {
-                  a.search_logic = { key:'in', label: '等于' }
-                  a.search_param = []
-                } else if (a.field_type === 'select') {
-                  a.search_logic = { key:'eq', label: '等于' }
-                  a.search_param = {}
-                } else if (a.field_type === 'string' || a.field_type === 'num') {
-                  a.search_logic = { key:'eq', label: '等于' }
-                  a.search_param = ''
-                } else if (a.field_type === 'datetime') {
-                  a.search_param = []
-                } else if (a.field_type === 'data') {
-                  a.search_param = []
+      if (!this.aTagDatasL.length) {
+        (this as any).$message.error('请先添加列', 3); // 弹出成功message
+      } else {
+        if (value) {
+          if (this.fixedScreening.indexOf(value) === -1) {
+            this.dataSourceTree.map((val:any, ind:number) => {
+              val.children.map((v:any, i:number) => {
+                if (v.id === value) {
+                  console.log(v.popover)
+                  let a:any = Object.assign({}, v)
+                  a.popover = true
+                  a.field_type = 'datetime'
+                  a.new = true // 用来判断是否是第一次
+                  a.tableId = val.id
+                  if (a.field_type === 'checkbox') {
+                    a.search_logic = { key:'in', label: '等于' }
+                    a.search_param = []
+                  } else if (a.field_type === 'select') {
+                    a.search_logic = { key:'eq', label: '等于' }
+                    a.search_param = {}
+                  } else if (a.field_type === 'string' || a.field_type === 'num') {
+                    a.search_logic = { key:'eq', label: '等于' }
+                    a.search_param = ''
+                  } else if (a.field_type === 'datetime') {
+                    a.search_param = []
+                  } else if (a.field_type === 'data') {
+                    a.search_param = []
+                  }
+                  this.fixedScreening.push(value) // push 选中的fieldId
+                  this.aTagDatasF.push(a) // push 选中的回显的信息
+                  this.screeningFlag = true // 固定筛选为true，显示筛选为false，用于visibleChange  Popover显示隐藏判断
                 }
-                this.fixedScreening.push(value) // push 选中的fieldId
-                this.aTagDatasF.push(a) // push 选中的回显的信息
-                this.screeningFlag = true // 固定筛选为true，显示筛选为false，用于visibleChange  Popover显示隐藏判断
-              }
+              })
             })
-          })
+          }
         }
       }
     }
     handleChangeX (value:any):void { // 显示筛选改变事件
-      if (value) {
-        if (this.accordScreening.indexOf(value) === -1) {
-          this.dataSourceTree.map((val:any, ind:number) => {
-            val.children.map((v:any, i:number) => {
-              if (v.id === value) {
-                console.log(v.popover)
-                let a:any = Object.assign({}, v)
-                a.popover = true
-                a.new = true // 用来判断是否是第一次
-                a.tableId = val.id
-                if (a.field_type === 'checkbox') {
-                  a.search_logic = { key:'in', label: '等于' }
-                  a.search_param = []
-                } else if (a.field_type === 'select') {
-                  a.search_logic = { key:'eq', label: '等于' }
-                  a.search_param = {}
-                } else if (a.field_type === 'string' || a.field_type === 'num') {
-                  a.search_logic = { key:'eq', label: '等于' }
-                  a.search_param = ''
-                } else if (a.field_type === 'datetime') {
-                  a.search_param = []
-                } else if (a.field_type === 'data') {
-                  a.search_param = []
+      if (!this.aTagDatasL.length) {
+        (this as any).$message.error('请先添加列', 3); // 弹出成功message
+      } else {
+        if (value) {
+          if (this.accordScreening.indexOf(value) === -1) { // 判断是否存在
+            this.dataSourceTree.map((val:any, ind:number) => {
+              val.children.map((v:any, i:number) => {
+                if (v.id === value) {
+                  let a:any = Object.assign({}, v)
+                  /* a.popover = true
+                  a.new = true // 用来判断是否是第一次
+                  a.tableId = val.id
+                  if (a.field_type === 'checkbox') {
+                    a.search_logic = { key:'in', label: '等于' }
+                    a.search_param = []
+                  } else if (a.field_type === 'select') {
+                    a.search_logic = { key:'eq', label: '等于' }
+                    a.search_param = {}
+                  } else if (a.field_type === 'string' || a.field_type === 'num') {
+                    a.search_logic = { key:'eq', label: '等于' }
+                    a.search_param = ''
+                  } else if (a.field_type === 'datetime') {
+                    a.search_param = []
+                  } else if (a.field_type === 'data') {
+                    a.search_param = []
+                  }
+                  this.screeningFlag = false // 固定筛选为true，显示筛选为false，用于visibleChange  Popover显示隐藏判断
+                  */
+                  a.tableId = val.id // 父节点id
+                  this.xianshifilterFun(a) // 调用增加显示筛选器方法
                 }
-                this.accordScreening.push(value) // push 选中的fieldId
-                this.aTagDatasX.push(a) // push 选中的回显的信息
-                this.screeningFlag = false // 固定筛选为true，显示筛选为false，用于visibleChange  Popover显示隐藏判断
-              }
+              })
             })
-          })
+          }
         }
       }
     }
+    xianshifilterFun (a:any) { // 显示筛选器新增方法
+      this.spinning = true;
+      (this as any).$post('custom/ReportManageDetail/addReportShowSearch', { reportId: this.reportId, tableId: a.tableId, fieldId: a.id }).then((res: any) => { // 请求新增字段
+        if (res.state === 2000) {
+          this.spinning = false;
+          this.accordScreening.push(a.id) // push 选中的fieldId
+          this.aTagDatasX.push(a) // push 选中的回显的信息
+          this.searchIdX.push(res.data.searchId); // 存放筛选器id
+          this.getReportDetail(); // 请求table表格
+          (this as any).$message.success(res.message, 3); // 弹出成功message
+        } else {
+          this.spinning = false;
+          (this as any).$message.error(res.message, 3); // 弹出错误message
+        }
+      }).catch((err: any) => {
+        console.log(err);
+        this.spinning = false;
+        (this as any).$message.error('请求新增显示筛选器失败', 3); // 弹出错误message
+      });
+    }
     filterOption (input:any, option:any):boolean { // 搜索框输入搜索 过滤方法
-      console.log(input, option)
       return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
     }
     deleteSearch (index: number, type:string):void { // 删除筛选器方法
@@ -1032,11 +953,14 @@
       }
       this.delReportSearch(searchId, index, type)
     }
-    hidePopover (e:any, type:string):void { // 取消关闭气泡框
-      console.log(e);
+    hidePopover (e:any, index:number, type:string):void { // 取消关闭气泡框
+      if (e.new) {
+        this.fixedScreening.splice(index, 1)
+        this.aTagDatasF.splice(index, 1)
+      }
       e.popover = false
     }
-    enterPopover (e:any, type:string):void { // 确认应用关闭气泡框
+    enterPopover (e:any, type:string):void { // 固定筛选确认应用关闭气泡框
       const that = this;
       if (e.new) { // 如果是第一次点击
         e.new = false
@@ -1085,7 +1009,6 @@
               ...values,
               'range-picker': [rangeValue[0].format('YYYY-MM-DD'), rangeValue[1].format('YYYY-MM-DD')]
             } */
-            // console.log(subData)
             e.extra = rangeValue[0].format('YYYY-MM-DD HH:mm') + ' ～' + rangeValue[1].format('YYYY-MM-DD HH:mm')
             e.search_param = values.search_param
             e.popover = false;
@@ -1203,7 +1126,7 @@
         })
       }
     }
-    subDataSearch (subData:subData):void { // 筛选器确认提交方法
+    subDataSearch (subData:subData):void { // 固定筛选器确认提交方法
       console.log(subData)
       this.spinning = true;
       (this as any).$post('custom/ReportManageDetail/addReportSearch', subData).then((res: any) => { // 请求新增字段
@@ -1220,7 +1143,7 @@
       }).catch((err: any) => {
         console.log(err);
         this.spinning = false;
-        (this as any).$message.error('新增筛选器失败', 3); // 弹出错误message
+        (this as any).$message.error('新增固定筛选器失败', 3); // 弹出错误message
       });
     }
     delReportSearch (searchId:any, index:number, type:string):void { // 筛选器删除请求方法
@@ -1371,6 +1294,12 @@
               (this as any).messageForm.resetFields(); // 重置输入控件
               (this as any).formatForm.resetFields(); // 重置输入控件
               this.showFormulaFlag = false;
+              /* this.treeList.map((val:any, ind:any) => {
+                val.id
+              }) */
+              this.fieldIdArrLie.push(res.data.colId) // push 标识
+              this.aTagDatasL.push({ title: params.col_title}) // push 选中的回显的文字
+              this.colColId.push(res.data.colId) // 存放新增后返回列id
               // (this as any).$message.success(res.message, 3); // 弹出成功message
             } else {
               (this as any).$message.error(res.message, 3); // 弹出错误message
@@ -1742,6 +1671,35 @@
         }
         .active_item {
           border: 1px solid #40a9ff;
+        }
+        .task-item {
+          font-variant: tabular-nums;
+          width: 100%;
+          color: rgba(0, 0, 0, 0.65);
+          -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+          margin: 5px 0;
+          line-height: 22px;
+          height: 22px;
+          padding: 0 7px;
+          border-radius: 4px;
+          border: 1px solid #d9d9d9;
+          background: #fafafa;
+          font-size: 12px;
+          -webkit-transition: all 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
+          transition: all 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
+          opacity: 1;
+          white-space: nowrap;
+          cursor: move;
+          .anticon-close {
+            display: inline-block;
+            float: right;
+            margin-top: 5px;
+            color: rgb(176, 173, 171);
+            :hover {
+              cursor: pointer;
+            }
+          }
         }
       }
     }
