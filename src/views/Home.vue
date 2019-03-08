@@ -76,6 +76,13 @@
       (this as any).changeOpenKeys({ openKeys: e.key })
     } */
     logout ():void {
+      (this as any).$post('/custom/GlobalApi/freshCache').then((res: any) => { // 更新缓存
+        if (res.state === 2000) {
+          (this as any).$message.success(res.message, 3);
+        } else {
+          (this as any).$message.error(res.message, 3);
+        }
+      });
       (this as any).$post('/custom/GlobalApi/logOut').then((res: any) => {
         if (res.state === 2000) {
           window.location.replace(`${res.data.redirectUrl}`);

@@ -55,7 +55,10 @@
       @ok="handleCreate">
       <a-form ref="collectionForm" :form="modelForm">
         <a-form-item label="关联表" :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
-          <a-select 
+          <a-select
+            allowClear
+            showSearch
+            :filterOption="filterOption"
             ref="joinTableId"
             @change="joinTableIdSelectChange"
             v-decorator="['joinTableId', { rules: [{ required: true, message: '请选择关联表' }]}]"
@@ -65,7 +68,10 @@
           </a-select>
         </a-form-item>
         <a-form-item label="关联字段" :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
-          <a-select 
+          <a-select
+            allowClear
+            showSearch
+            :filterOption="filterOption"
             ref="joinFieldId"
             :disabled="joinTabFiledSelectDis"
             v-decorator="['joinFieldId', {  rules: [{ required: true, message: '请选择字段' }]}]"
@@ -77,6 +83,9 @@
         <a-form-item label="数据主表" :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
           <!-- <a-input :defaultValue="dataTabVal" ref="dataTabVal"/> -->
           <a-select
+            allowClear
+            showSearch
+            :filterOption="filterOption"
             ref="mainTableIdModel"
             @change="modalDataZB"
             v-decorator="['mainTableId', { rules: [{ required: true, message: '请选择字段' }]}]"
@@ -86,7 +95,10 @@
           </a-select>
         </a-form-item>
         <a-form-item label="主表字段" :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
-          <a-select 
+          <a-select
+            allowClear
+            showSearch
+            :filterOption="filterOption"
             ref="mainFieldId"
             :disabled="zbFiledSelectDis"
             v-decorator="['mainFieldId', { rules: [{ required: true, message: '请选择主表字段' }]}]"
@@ -158,6 +170,8 @@
           this.spinning = false; // 关闭加载动画
           (this as any).$message.error('请求失败', 3); // 弹出错误message
         });
+      } else {
+        this.spinning = false // 关闭加载动画
       }
     }
     dataSourceSelectChange (val:number):void { // 数据源下拉框改变事件
@@ -295,6 +309,9 @@
           this.visible = false
         }
       })
+    }
+    filterOption (input:any, option:any):boolean { // 搜索框输入搜索 过滤方法
+      return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
     }
  }
 </script>

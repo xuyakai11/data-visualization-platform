@@ -162,7 +162,7 @@
 
 <style lang='scss' scoped rel='stylesheet/scss'>
   .leftMenu {
-    height: 64vh;
+    border-right: 1px solid #e8e8e8;
     .lpc-hide-set {
       background-color: #f9f9fa;
       border-right: 1px solid #e9eaec;
@@ -179,8 +179,8 @@
     }
     .lpc-full {
       width: 250px;
+      height: 64vh;
       height: 100%;
-      border-right: 1px solid #e8e8e8;
       transition: all .2s;
       .header {
         background-color: #f9f7f7;

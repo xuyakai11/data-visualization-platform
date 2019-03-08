@@ -154,12 +154,12 @@
                         <a-form :form="numberForm">
                           <a-form-item label="运算符">
                             <a-select labelInValue v-decorator="['search_logic', { initialValue: item.search_logic, rules: [{ required: false }]}]">
-                              <a-select-option value="eq">等于</a-select-option>
-                              <a-select-option value="neq">不等于</a-select-option>
-                              <a-select-option value="lt">小于</a-select-option>
-                              <a-select-option value="gt">大于</a-select-option>
-                              <a-select-option value="elt">小于等于</a-select-option>
-                              <a-select-option value="egt">大于等于</a-select-option>
+                              <a-select-option value="=">等于</a-select-option>
+                              <a-select-option value="!=">不等于</a-select-option>
+                              <a-select-option value="<">小于</a-select-option>
+                              <a-select-option value=">">大于</a-select-option>
+                              <a-select-option value="<=">小于等于</a-select-option>
+                              <a-select-option value=">=">大于等于</a-select-option>
                             </a-select>
                           </a-form-item>
                           <a-form-item >
@@ -171,6 +171,8 @@
                         <a-form :form="stringForm">
                           <a-form-item label="运算符">
                             <a-select labelInValue v-decorator="['search_logic', { initialValue: item.search_logic, rules: [{ required: false }]}]">
+                              <a-select-option value="=">等于</a-select-option>
+                              <a-select-option value="!=">不等于</a-select-option>
                               <a-select-option value="like">包含</a-select-option>
                               <a-select-option value="not like">不包含</a-select-option>
                             </a-select>
@@ -184,8 +186,8 @@
                         <a-form :form="selectForm">
                           <a-form-item label="运算符">
                             <a-select labelInValue style="width: 250px" v-decorator="['search_logic', { initialValue: item.search_logic, rules: [{ required: false }]}]">
-                              <a-select-option value="eq">等于</a-select-option>
-                              <a-select-option value="neq">不等于</a-select-option>
+                              <a-select-option value="=">等于</a-select-option>
+                              <a-select-option value="!=">不等于</a-select-option>
                             </a-select>
                           </a-form-item>
                           <a-form-item label="值">
@@ -200,9 +202,6 @@
                               <a-select-option value="4">未启用</a-select-option>
                               <a-select-option value="5">未比较</a-select-option>
                               <a-select-option value="">无选择</a-select-option>
-                              <!-- <a-select-option v-for="(item, index) in selectMultiple" :key="index" :value="item.value">
-                                {{item.title}}
-                              </a-select-option> -->
                             </a-select>
                           </a-form-item>
                         </a-form>
@@ -298,29 +297,76 @@
               </div> -->
             </div>
             <div class="table-header-right">
-              <a-button type="primary" :loading="saveLoading" @click="saveFun">保存</a-button>
+              <!-- <a-button type="primary" :loading="saveLoading" @click="saveFun">保存</a-button> -->
               <a-button type="primary" class="runBtn" :loading="runLoading" @click="runFun">运行</a-button>
             </div>
           </div>
+          <div style="padding: 10px" class="tabSearch" id="components-form-demo-advanced-search">
+            <a-form layout='inline' class="ant-advanced-search-from" :form="form" @submit="handleSearch" v-if="search.length">
+              <a-row :gutter="24">
+                <a-col :span="8" v-for="(item, i) in search" :key="i">
+                  <a-form-item>
+                    <a-input
+                      v-if="item.searchType === 'string'"
+                      v-decorator="[item.searchName, { rules: [{ required: false}] }]"
+                      :placeholder="item.showTitle" />
+                    <a-input
+                      v-if="item.searchType === 'num'"
+                      v-decorator="[item.searchName, { rules: [{ required: false}] }]"
+                      :placeholder="item.showTitle" />
+                    <a-select
+                      v-decorator="[item.searchName, { rules: [{ required: false}] }]"
+                      v-if="item.searchType === 'select'"
+                      showSearch
+                      allowClear
+                      :filterOption="filterOption"
+                      :placeholder="item.showTitle">
+                      <a-select-option v-for="(par, index) in item.searchParam" :key="index" :value="par.value">{{par.title}}</a-select-option>
+                    </a-select>
+                    <a-select
+                      v-decorator="[item.searchName, { rules: [{ required: false}] }]"
+                      v-if="item.searchType === 'checkbox'"
+                      mode="multiple"
+                      showSearch
+                      allowClear
+                      :filterOption="filterOption"
+                      :placeholder="item.showTitle">
+                      <a-select-option v-for="(par, index) in item.searchParam" :key="index" :value="par.value">{{par.title}}</a-select-option>
+                    </a-select>
+                    <a-range-picker
+                      v-if="item.searchType === 'date'"
+                      v-decorator="[item.searchName, { rules: [{ required: false}] }]"
+                      :placeholder="[item.showTitle+'开始', item.showTitle+'结束']"
+                      format="YYYY-MM-DD"/>
+                    <a-range-picker
+                      v-if="item.searchType === 'datetime'"
+                      v-decorator="[item.searchName, { rules: [{ required: false}] }]"
+                      :placeholder="[item.showTitle+'开始', item.showTitle+'结束']"
+                      :showTime="{ format: 'HH:mm' }" format="YYYY-MM-DD HH:mm"/>
+                  </a-form-item>
+                </a-col>
+                <!-- <a-col :span="12" v-for="(item, ind) in search">
+                  <a-form-item :label="item.showTitle">
+                  
+                  </a-form-item>
+                </a-col> -->
+              </a-row>
+              <a-row>
+                <a-col :span="24" :style="{ textAlign: 'right' }">
+                  <a-button type="primary" html-type="submit" :loading="searchLoading">搜索</a-button>
+                  <a-button @click="handleReset" :style="{ marginLeft: '8px' }">重置</a-button>
+                </a-col>
+              </a-row>
+            </a-form>
+          </div>
           <div class="table-content" ref="tableContent">
-            <a-table v-if="columns.length > 0" :loading="tableLoading" :columns="columns" :dataSource="data" bordered :scroll="screenWidth" :rowKey="record => record.keyFlagId"></a-table>
+            <a-table v-if="columns.length > 0" :pagination="pagination" @change="onChangeTab" :loading="tableLoading" :columns="columns" :dataSource="data" bordered :scroll="screenWidth" :rowKey="record => record.keyFlagId"></a-table>
             <div v-else class="noneIcon">
               <div>
                 <a-icon type="table"/>
                 <p>暂无数据</p>
               </div>
             </div>
-
-            <!-- <div class="ant-table-body">
-              <table>
-                <thead>
-                  <tr>
-                    <th v-for="(item, index) in columns" :key="index" :style="{width: item.title.length * 18 + 'px'}">{{item.title}}</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </div> -->
           </div>
         </div>
       </div>
@@ -371,7 +417,7 @@
                     </div>
                     <div class="footer">
                       <div>
-                        <a-select style="width: 170px">
+                        <a-select style="width: 170px" v-model="fieldCalculate">
                           <a-select-option value="SUM">总和</a-select-option>
                           <a-select-option value="AVG">平均</a-select-option>
                           <a-select-option value="MIN">最小值</a-select-option>
@@ -504,7 +550,18 @@
     search_name: string,
     search_param: string
   }
-  /* eslint-disable */
+  interface pagination {
+    current:number,
+    pageSize:number,
+    total:number
+  }
+  interface searchParam {
+    name: string,
+    logic: string,
+    search_param: string,
+    search_type: string
+  }
+   /* eslint-disable */
   @Component({
     components: { leftMenu, Draggable }
   })
@@ -514,6 +571,7 @@
     spinning:boolean = true // 整个页面加载动画
     systeming:boolean = true // 弹窗函数模块加载动画
     tableLoading:boolean = false // 表格加载动画
+    searchLoading:boolean = false // 搜索按钮加载动画
     dataSourceTree:Array<object> = []
     loading: boolean = false
     saveLoading:boolean = false
@@ -536,9 +594,7 @@
     screenWidth: object = { x: 100, y: 400 }
     // tableWidth:number = 10
     // screenWidth:any = document.body.clientWidth
-    rangeConfig:object = { // 筛选器时间组件规则
-      rules: [{ type: 'array', required: false, message: '请选择时间！' }]
-    }
+    
     showFormulaFlag:boolean = false // 控制添加公式列模态框
     showFormulaTitle:string = '编辑公式列'
 
@@ -590,7 +646,6 @@
     searchValueFun:string = ''
     autoExpandParentFun:boolean = true
    
-    isActive:boolean = false
     insertFun:boolean = true // 函数插入按钮
     insertField:boolean = true // 字段插入按钮
     fieldData:any = {} // 存放字段选中
@@ -601,7 +656,6 @@
       id: 0,
       title: ''
     } // 存放函数选中
-    wrapperCol:any = { span: 4}
     fieldCalculate:string = 'SUM' // 存放字段求值字段
     radioValue:number = 0 // 编辑公式列弹框 格式单选model
     formulaTextarea:string = '' // 编辑列公式弹框 公式内容
@@ -624,6 +678,7 @@
 
     columns:Array<object> = [] // 表格表头数据
     data:Array<object> = [] // 表格数据
+    search:Array<any> = [] // 表格搜索条件
     dataListFun:Array<object> = [] // 存放弹窗中函数项 处理后 数据
     funcTreeData:Array<object> = [] // 存放弹窗中函数树数据
     grammarSuccess:boolean = true // 检查语法是否通过，初始化true显示按钮
@@ -633,6 +688,13 @@
     funcTree:boolean = false // 控制是否显示 选中函数注释
     checkFormulaLoading:boolean = false // 检查语法btn loading
     checkFormulaSuccess:boolean = false // 检查语法不否验证成功
+    pagination:pagination = { // 定义分页数据
+      current: 1,
+      pageSize: 10,
+      total: 1
+    }
+    searchParam:Array<searchParam> = [] // 定义请求报表详情search参数
+    reportParams:any = {}
 
     moment () {}
     treeMsg (e:number):void { // 接收子组件的值 的方法
@@ -640,12 +702,12 @@
       if (this.fieldIdArrLie.indexOf(e) === -1) {
         // this.fieldIdArrLie.push(e); // 将接收到的子组件传过来的值push到列数中
         this.treeList.map((v:any, i:number) => {
-            if (v.id === e) {
-              const url: string = 'custom/ReportManageDetail/addReportCols'
-              const type:string = 'lie'
-              this.addReportColsFun(url, v, type)
-            }
-          })
+          if (v.id === e) {
+            const url: string = 'custom/ReportManageDetail/addReportCols'
+            const type:string = 'lie'
+            this.addReportColsFun(url, v, type)
+          }
+        })
       }
     }
     beforeCreate () { // 挂载前创建ant form
@@ -658,6 +720,7 @@
       (this as any).modalForm = (this as any).$form.createForm(this); // 定义添加公式 弹窗modalForm
       (this as any).messageForm = (this as any).$form.createForm(this); // 定义添加公式 messageForm
       (this as any).formatForm = (this as any).$form.createForm(this); // 定义添加公式 formatForm
+      (this as any).form = (this as any).$form.createForm(this); // 定义添加公式 form
     }
     get aTagDatasFcomput () { // computed计算属性， 过滤出visible为true的对象来渲染，因为当 v-if 与 v-for 一起使用时，v-for 具有比 v-if 更高的优先级，这意味着 v-if 将分别重复运行于每个 v-for 循环中
       return this.aTagDatasF.filter(item => item.visible)
@@ -691,13 +754,20 @@
         })()
       }
     }
-    getReportDetail() { // 获取报表table数据
+    getReportDetail(searchParam?:any) { // 获取报表table数据
       this.tableLoading = true;
-      (this as any).$post('custom/Report/getReportDetail', { reportId: this.reportId, pageSize: 10, nowpage: 1 }).then((res: any) => { // 请求新增字段
+      let searchPar:any;
+      if (searchParam) {
+        searchPar = searchParam
+      } else {
+        searchPar = { reportId: this.reportId, pageSize: 10, nowpage: 1, searchParam: '' }
+      }
+      (this as any).$post('custom/Report/getReportDetail', searchPar).then((res: any) => { // 请求新增字段
         if (res.state === 2000) {
           console.log(res);
           this.data = res.data.data
           this.columns = res.data.columns
+          this.search = res.data.search
           if (this.columns.length > 7) {
             this.screenWidth = { x: '150%', y: 400 }
           }
@@ -708,9 +778,13 @@
             v.width = v.title.length * 15
           })
           this.tableLoading = false;
+          const pagination = { ...this.pagination }
+          pagination.total = res.data.count;
+          this.pagination = pagination
           // (this as any).$message.success(res.message, 3); // 弹出成功message
         } else {
           this.tableLoading = false;
+          this.data = [];
           (this as any).$message.error(res.message, 3); // 弹出错误message
         }
       }).catch((err: any) => {
@@ -856,17 +930,16 @@
                   console.log(v.popover)
                   let a:any = Object.assign({}, v)
                   a.popover = true
-                  a.field_type = 'datetime'
                   a.new = true // 用来判断是否是第一次
                   a.tableId = val.id
                   if (a.field_type === 'checkbox') {
                     a.search_logic = { key:'in', label: '等于' }
                     a.search_param = []
                   } else if (a.field_type === 'select') {
-                    a.search_logic = { key:'eq', label: '等于' }
+                    a.search_logic = { key:'=', label: '等于' }
                     a.search_param = {}
                   } else if (a.field_type === 'string' || a.field_type === 'num') {
-                    a.search_logic = { key:'eq', label: '等于' }
+                    a.search_logic = { key:'=', label: '等于' }
                     a.search_param = ''
                   } else if (a.field_type === 'datetime') {
                     a.search_param = []
@@ -893,25 +966,6 @@
               val.children.map((v:any, i:number) => {
                 if (v.id === value) {
                   let a:any = Object.assign({}, v)
-                  /* a.popover = true
-                  a.new = true // 用来判断是否是第一次
-                  a.tableId = val.id
-                  if (a.field_type === 'checkbox') {
-                    a.search_logic = { key:'in', label: '等于' }
-                    a.search_param = []
-                  } else if (a.field_type === 'select') {
-                    a.search_logic = { key:'eq', label: '等于' }
-                    a.search_param = {}
-                  } else if (a.field_type === 'string' || a.field_type === 'num') {
-                    a.search_logic = { key:'eq', label: '等于' }
-                    a.search_param = ''
-                  } else if (a.field_type === 'datetime') {
-                    a.search_param = []
-                  } else if (a.field_type === 'data') {
-                    a.search_param = []
-                  }
-                  this.screeningFlag = false // 固定筛选为true，显示筛选为false，用于visibleChange  Popover显示隐藏判断
-                  */
                   a.tableId = val.id // 父节点id
                   this.xianshifilterFun(a) // 调用增加显示筛选器方法
                 }
@@ -1022,13 +1076,12 @@
               search_param: rangeValue[0].format('YYYY-MM-DD HH:mm') + ',' + rangeValue[1].format('YYYY-MM-DD HH:mm')
             };
             this.subDataSearch(subData); // 调用增加报表筛选器接口
-            (this as any).dataForm.resetFields(); // 重置输入控件的值
+            (this as any).datetimeForm.resetFields(); // 重置输入控件的值
           }
         })
       } else if (e.field_type === 'num') { // 数字
         (this as any).numberForm.validateFields((err: any, values: any) => {
             if (!err) {
-              console.log(values)
               e.extra = values.search_logic.label + '  '
               e.extra += values.search_param ? values.search_param : '  " "'
               e.popover = false;
@@ -1050,7 +1103,6 @@
       } else if (e.field_type === 'string') { // 字符串
         (this as any).stringForm.validateFields((err:any, values: any) => {
           if (!err) {
-            console.log(values)
             e.extra = values.search_logic.label + '  '
             e.extra += values.search_param ? values.search_param : '  " "'
             e.search_logic = values.search_logic
@@ -1066,13 +1118,12 @@
               search_param: values.search_param
             };
             this.subDataSearch(subData); // 调用增加报表筛选器接口
-            (this as any).numberForm.resetFields(); // 重置输入控件
+            (this as any).stringForm.resetFields(); // 重置输入控件
           }
         })
       } else if (e.field_type === 'select') { // 单选
         (this as any).selectForm.validateFields((err:any, values:any) => {
           if (!err) {
-            console.log(values)
             e.extra = values.search_logic.label + '  '
             e.extra += values.search_param ? values.search_param.label : '  " "'
             e.popover = false;
@@ -1094,7 +1145,6 @@
       } else if (e.field_type === 'checkbox') { // 复选框
         (this as any).checkboxForm.validateFields((err:any, values:any) => {
           if (!err) {
-            console.log(values)
             let search_param:Array<string> = []
             let extra:Array<string> = []
             if(!values.search_param) {
@@ -1127,11 +1177,9 @@
       }
     }
     subDataSearch (subData:subData):void { // 固定筛选器确认提交方法
-      console.log(subData)
       this.spinning = true;
       (this as any).$post('custom/ReportManageDetail/addReportSearch', subData).then((res: any) => { // 请求新增字段
         if (res.state === 2000) {
-          console.log(res);
           this.spinning = false;
           this.searchIdF.push(res.data.searchId); // 存放筛选器id
           this.getReportDetail(); // 请求table表格
@@ -1150,7 +1198,6 @@
       this.spinning = true;
       (this as any).$post('custom/ReportManageDetail/delReportSearch', { searchId }).then((res: any) => { // 请求新增字段
         if (res.state === 2000) {
-          console.log(res);
           this.spinning = false;
           if (type === 'F') { // 配置固定与显示筛选 参数
             this.searchIdF.splice(index, 1)
@@ -1240,21 +1287,6 @@
     }
     /* 报表名称 修改方法 end */
 
-    saveFun ():void { // 保存方法
-      this.saveLoading = true
-      let _this = this
-      setTimeout(() => {
-        _this.saveLoading = false
-      }, 2000)
-    }
-    runFun ():void { // 运行方法
-      this.runLoading = true
-      let _this = this
-      setTimeout(() => {
-        _this.runLoading = false
-      }, 2000)
-    }
-
     /* 添加汇总公式弹窗  start*/
     showFormulaModel ():void { // 添加汇总公式弹窗方法
       // this.generateList(this.dataSource) // 先处理数据
@@ -1283,24 +1315,17 @@
       }
       (this as any).messageForm.validateFields((err: any, values: any) => {
         if (!err) {
-          console.log(values);
           let params:any = Object.assign({}, values, format)
-          console.log(params);
           params.reportId = this.reportId;
           (this as any).$post('custom/reportManageDetail/addFormulaCols', params).then((res: any) => { // 请求新增字段
             if (res.state === 2000) {
-              console.log(res);
               this.getReportDetail(); // 调用请求表格方法
               (this as any).messageForm.resetFields(); // 重置输入控件
               (this as any).formatForm.resetFields(); // 重置输入控件
               this.showFormulaFlag = false;
-              /* this.treeList.map((val:any, ind:any) => {
-                val.id
-              }) */
               this.fieldIdArrLie.push(res.data.colId) // push 标识
               this.aTagDatasL.push({ title: params.col_title}) // push 选中的回显的文字
               this.colColId.push(res.data.colId) // 存放新增后返回列id
-              // (this as any).$message.success(res.message, 3); // 弹出成功message
             } else {
               (this as any).$message.error(res.message, 3); // 弹出错误message
             }
@@ -1397,7 +1422,6 @@
     }
     onSelectTreeFun (selectedKeys:any, info:any):void { // 函数选中
       this.funData = info.node.dataRef // 将选中的函数保存到funData中
-      console.log(this.funData)
       this.funcTree = true // 显示注释
       this.insertFun = false
     }
@@ -1450,6 +1474,64 @@
         });
       }
     }
+    /* 搜索条件 */
+    handleReset ():void { // 重置方法
+      this.searchParam = [];
+      (this as any).form.resetFields()
+    }
+    handleSearch (e: any):void { // 搜索方法
+      e.preventDefault();
+      this.searchParam = [];
+      (this as any).form.validateFields((err:any, values:any) => {
+        this.search.map((v:any, i:number) => {
+          let key:string = v.searchName.split('.')[0];
+          let zhi:string = v.searchName.split('.')[1];
+          let searchName:any = ''
+          if (v.searchName === key + '.' + zhi) {
+            searchName = values[key][zhi] || ''
+            if (values[key][zhi]) {
+              if (v.searchType === 'datetime') {
+                  const rangeValue:any = values[key][zhi]
+                  searchName = rangeValue[0].format('YYYY-MM-DD HH:mm') + ',' + rangeValue[1].format('YYYY-MM-DD HH:mm')
+                } else if (v.searchType === 'date') {
+                  const rangeValue:any = values[key][zhi]
+                  searchName = rangeValue[0].format('YYYY-MM-DD') + ',' + rangeValue[1].format('YYYY-MM-DD')
+                }
+            }
+            this.searchParam.push({ logic: v.logic, name: v.searchName, search_type: v.searchType, search_param: searchName })
+          }
+        })
+        let searchParam:any = JSON.stringify(this.searchParam)
+        if (!err) {
+          let params:any = { reportId: this.reportId, searchParam: searchParam, pageSize: 10, nowpage: 1 }
+          this.getReportDetail(params)
+        }
+     })
+   }
+    onChangeTab (pagination:any):void { // 表格切换页数
+      console.log(pagination)
+      const pager:any = { ...this.pagination };
+      pager.current = pagination.current;
+      this.pagination = pager
+      let searchParam:any = JSON.stringify(this.searchParam) || ''
+      let params:any = { reportId: this.reportId, searchParam: searchParam, nowpage: pagination.current, pageSize: pagination.pageSize }
+      this.getReportDetail(params);
+    }
+    /* saveFun ():void { // 保存方法
+      this.saveLoading = true
+      let _this = this
+      setTimeout(() => {
+        _this.saveLoading = false
+      }, 2000)
+    } */
+    runFun ():void { // 运行方法
+      this.runLoading = true
+      let _this = this
+      setTimeout(() => {
+        _this.runLoading = false;
+        (this as any).$router.push({ path: '/reportTable', query: { reportId: this.reportId }}) // 报表表格 
+      }, 200)
+    } 
  }
 </script>
 
@@ -1745,26 +1827,20 @@
         }
       }
     }
+    #components-form-demo-advanced-search {
+      background-color: #fbfbfb;
+      .ant-form-item {
+        display: flex;
+        .ant-form-item-control-wrapper {
+          flex: 1;
+          .ant-calendar-picker {
+            width: 100%;
+          }
+        }
+      }
+    }
     .table-content {
       height: calc(64vh - 43px);
-      /* width: 100%;
-      overflow-x: scroll;
-      table tr th {
-        padding: 12px 8px;
-        border-right: 1px solid #e8e8e8;
-        background: #fafafa;
-        text-align: center;
-        color: rgba(0, 0, 0, 0.85);
-        font-weight: 500;
-        border-bottom: 1px solid #e8e8e8;
-        white-space: nowrap;
-      } */
-      .ant-table-header {
-        /* min-width: 1000px;
-        thead tr th {
-          white-space: nowrap;
-        }  */
-      }
       table tr {
         th {
           text-align: center;
@@ -1915,19 +1991,6 @@
             color: #6b6d70;
             overflow:hidden;
           }
-          /* p::after{
-            content: "...";
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            padding-left: 40px;
-            background: -webkit-linear-gradient(left, transparent, #fff 55%);
-            background: -o-linear-gradient(right, transparent, #fff 55%);
-            background: -moz-linear-gradient(right, transparent, #fff 55%);
-            background: linear-gradient(to right, transparent, #fff 55%);
-          } */
-
-          
         }
         .footer {
           margin: 10px 0;

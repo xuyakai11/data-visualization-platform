@@ -31,8 +31,8 @@
         <span slot="action" slot-scope="text, record">
           <a-button type="primary" size="small" @click="go($event, record)">编辑</a-button>
           <a-divider type="vertical" />
-          <!-- <a-button type="primary" size="small" @click="go($event, record, '1')">抽取规则</a-button>
-          <a-divider type="vertical" /> -->
+          <a-button type="primary" size="small" @click="look($event, record)">查看</a-button>
+          <a-divider type="vertical" />
           <a-button type="primary" size="small">添加到菜单</a-button>
           <a-divider type="vertical" />
           <a-button type="primary" size="small" :loading="delBtnLoading" @click="deleteFun($event, record)">删除</a-button>
@@ -127,10 +127,15 @@
   
   go (e: any, record: any): void {
     e.preventDefault();
-    console.log(record);
     let reportId = record ? record.report_id : '' // 报表id
     // 打开报表制作
     window.open(window.location.origin + '/statementMake?reportId=' + reportId); // _target 表示只打开一个，重复点击会回到第一个打开的窗口
+  }
+  look (e:any, record:any):void { // 查看
+    e.preventDefault();
+    let reportId = record ? record.report_id : '' // 报表id
+    // 打开报表详情
+    window.open(window.location.origin + '/reportTable?reportId=' + reportId); // _target 表示只打开一个，重复点击会回到第一个打开的窗口
   }
   onChange (pagination: any) {
     const pager:any = { ...this.pagination };

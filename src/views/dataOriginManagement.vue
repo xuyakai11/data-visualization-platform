@@ -259,13 +259,13 @@
     });
   }
   onChange (pagination: any) {
-      const pager:any = { ...this.pagination };
-      pager.current = pagination.current;
-      this.pagination = pager
-      let searchLinkName:string = (this as any).$refs.searchLinkName.value || '';
-      let params: object = { linkName: searchLinkName, nowpage: pagination.current, pageSize: pagination.pageSize }
-      this.initDataFun(params);
-    }
+    const pager:any = { ...this.pagination };
+    pager.current = pagination.current;
+    this.pagination = pager
+    let searchLinkName:string = (this as any).$refs.searchLinkName.value || '';
+    let params: object = { linkName: searchLinkName, nowpage: pagination.current, pageSize: pagination.pageSize }
+    this.initDataFun(params);
+  }
  }
 </script>
 <style lang='scss' scoped>

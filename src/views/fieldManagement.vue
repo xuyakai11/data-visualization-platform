@@ -11,7 +11,7 @@
     </div>
     <!-- 表格 -->
     <div class="search-result-list">
-      <a-table :pagination="pagination" :loading="loading" @change="onChange" :columns="columns" :dataSource="data" bordered :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}">
+      <a-table :pagination="pagination" :loading="loading" @change="onChange" :columns="columns" :dataSource="data" bordered :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}" :rowKey="record => record.id">
         <span slot="action" slot-scope="text, record">
           <a-button type="primary" size="small" :loading="editBtnLoading" :data-type="record.key" @click="editFun($event, record)">编辑</a-button>
           <a-divider type="vertical" />
@@ -112,11 +112,9 @@
   }
 
   beforeCreate () { // 挂载前创建ant form
-    // (this as any).form = (this as any).$form.createForm(this); // 定义搜索form
     (this as any).modelForm = (this as any).$form.createForm(this); // 定义modalform
   }
   mounted () {
-    console.log((this as any).$route.query.model_id)
     this.model_id = (this as any).$route.query.model_id
     let params: any = { model_id: this.model_id, pageSize: 10, nowpage: 1 }
     this.initDataFun(params) // 请求表格数据

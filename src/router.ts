@@ -36,6 +36,11 @@ export default new Router({
           component: () => import('./views/statementMake.vue')
         },
         {
+          path: '/reportTable',
+          name: '报表表格',
+          component: () => import('./views/reportTable.vue')
+        },
+        {
           path: '/modelManagement',
           name: '模型管理',
           component: () => import('./views/modelManagement.vue')
