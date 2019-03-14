@@ -16,6 +16,9 @@
               <a href="javascript:void(0);" class="ant-dropdown-link">{{ userName }}</a>
               <a-menu slot="overlay" @click="logout">
                 <a-menu-item>
+                  <a href="javascript:;" key="0">清除缓存</a>
+                </a-menu-item>
+                <a-menu-item>
                   <a href="javascript:;" key="1">退出</a>
                 </a-menu-item>
               </a-menu>
@@ -71,30 +74,26 @@
       this.collapsed = !this.collapsed;
       this.collapsed ? this.left = '80' : this.left = '200'; // 控制右侧模块margin-left的值 
     }
-    /* selectMenu (e: any):void { // 将点击选中的实时替换
-      this.selectKeys = [e.key];
-      (this as any).changeOpenKeys({ openKeys: e.key })
-    } */
-    logout ():void {
-      (this as any).$post('/custom/GlobalApi/freshCache').then((res: any) => { // 更新缓存
-        if (res.state === 2000) {
-          (this as any).$message.success(res.message, 3);
-        } else {
-          (this as any).$message.error(res.message, 3);
-        }
-      });
-      (this as any).$post('/custom/GlobalApi/logOut').then((res: any) => {
-        if (res.state === 2000) {
-          window.location.replace(`${res.data.redirectUrl}`);
-          (this as any).$message.success(res.message, 3);
-        } else {
-          (this as any).$message.error(res.message, 3);
-        }
-      });
+    logout (e:any):void {
+      if (e.key === 'item_0') {
+        (this as any).$post('/custom/GlobalApi/freshCache').then((res: any) => { // 更新缓存
+          if (res.state === 2000) {
+            (this as any).$message.success(res.message, 3);
+          } else {
+            (this as any).$message.error(res.message, 3);
+          }
+        });
+      } else if (e.key === 'item_1') {
+        (this as any).$post('/custom/GlobalApi/logOut').then((res: any) => {
+          if (res.state === 2000) {
+            window.location.replace(`${res.data.redirectUrl}`);
+            (this as any).$message.success(res.message, 3);
+          } else {
+            (this as any).$message.error(res.message, 3);
+          }
+        });
+      }
     }
-    /* go (item: any):void {
-      (this as any).changeOpenKeys({ openKeys: item.key })
-    } */
  }
 </script>
 
@@ -108,7 +107,8 @@
   background: rgb(255, 255, 255);
   box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
   .lpc-header {
-    display: flex;
+    /* display: flex; */
+    position: relative;
     .triggMenu {
       cursor: pointer;
       display: inline-block;
@@ -117,11 +117,17 @@
       transition: color .3s;
       padding: 0 14px;
       line-height: 64px;
-      flex: 1;
+      /* flex: 1; */
       text-align: left;
+      position: absolute;
+      top: 0;
+      left: 0;
     }
     .user-icon {
-      flex: 0 0 200px;
+      /* flex: 0 0 200px; */
+      position: absolute;
+      top: 0;
+      right: 50px;
       cursor: pointer;
       .ant-avatar {
         margin-right: 20px;

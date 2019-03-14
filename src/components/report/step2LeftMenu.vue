@@ -1,7 +1,7 @@
 <template>
   <div class="leftMenu">
-    <div class="lpc-hide-set" :class="{ trigger: isTrigger }" @click="openSet"><a-icon type="right"/><p>字段配置</p></div>
-    <div class="lpc-full" :class="{ active: isActive }">
+    <div :class="ziduan ? 'hide-set' : 'lpc-show-set'" @click="openSet"><a-icon type="right"/><p>字段配置</p></div>
+    <div :class="ziduan ? 'lpc-full' : 'lpc-full-hide'">
       <div class="header">
         <a-input-search placeholder="搜索表字段" @change="onChange" />
         <a-icon type="close" @click="closeSet"/>
@@ -81,8 +81,8 @@
         }]
     }];
     dataList:Array<object> = [] // 存放处理后的tree数据
-    isActive:boolean = false
-    isTrigger:boolean = true; // 配置 字段配置是否显示
+    ziduan:boolean = true // 配置 字段配置是否显示
+
     @Emit('treeDblData') treeDblDataFun (e: number) {};
 
     // deep: 深度监听， immediate代表声明监听后立即执行方法
@@ -139,12 +139,10 @@
       })
     }
     openSet ():void { // 点击配置栏
-      this.isTrigger = true
-      this.isActive = false
+      this.ziduan = !this.ziduan
     }
     closeSet ():void { // 点击关闭按钮
-      this.isTrigger = false
-      this.isActive = true
+      this.ziduan = !this.ziduan
     }
     selectTreeFun (e:any, node:any):void { // 点击选中事件
       console.log(e, node)
@@ -163,13 +161,12 @@
 <style lang='scss' scoped rel='stylesheet/scss'>
   .leftMenu {
     border-right: 1px solid #e8e8e8;
-    .lpc-hide-set {
+    .lpc-show-set {
       background-color: #f9f9fa;
-      border-right: 1px solid #e9eaec;
       height: 100%;
       width: 25px;
       padding: 5px;
-      transition: all .2s;
+      transition: all .5s;
       overflow: hidden;
       cursor: pointer;
       p {
@@ -177,11 +174,44 @@
         letter-spacing: 15px;
       }
     }
+    .hide-set {
+      position: relative;
+      top: 0;
+      left: -25px;
+      height: 0;
+      width: 0;
+      overflow: hidden;
+    }
     .lpc-full {
       width: 250px;
-      height: 64vh;
       height: 100%;
-      transition: all .2s;
+      transition: all .5s;
+      .header {
+        background-color: #f9f7f7;
+        padding: 5px 10px;
+        border-bottom: 1px solid #e8e8e8;
+        height: 43px;
+        overflow: hidden;
+        .ant-input-affix-wrapper {
+          width: 90%;
+        }
+        .anticon {
+          margin-left: 8px;
+          cursor: pointer;
+        }
+      }
+      ul.ant-tree {
+        height: calc(64vh - 43px);
+        overflow-y: scroll;
+      }
+    }
+    .lpc-full-hide {
+      position: relative;
+      top: 0;
+      left: -250px;
+      width: 0;
+      height: 0;
+      transition: all .5s;
       .header {
         background-color: #f9f7f7;
         padding: 5px 10px;
@@ -198,12 +228,6 @@
         height: calc(64vh - 43px);
         overflow-y: scroll;
       }
-    }
-    .trigger {
-      display: none;
-    }
-    .active {
-      display: none;
     }
   }
 </style>

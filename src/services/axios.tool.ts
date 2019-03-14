@@ -10,6 +10,8 @@ import store from '../store'
 //   'Content-Type': 'application/x-www-form-urlencoded',
 // }
 axios.defaults.baseURL = store.state.domain;
+// axios.defaults.baseURL = location.href.indexOf('test') !== -1 ? 'http://test.report.pxjy.com' : 'http://report.staff.pxjy.com'
+
 // 请求超时的时间限制
 axios.defaults.timeout = 20000;
 

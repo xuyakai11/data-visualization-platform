@@ -17,5 +17,7 @@
 </script>
 
 <style lang='scss' scoped rel='stylesheet/scss'>
-
+.ant-card-head-title {
+  font-weight: bolder;
+}
 </style>

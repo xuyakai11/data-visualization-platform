@@ -313,6 +313,9 @@
   }
 </script>
 <style lang='scss' scoped>
+.ant-card-head-title {
+  font-weight: bolder;
+}
 .dataOrigin {
   margin: 10px;
   .ant-form {

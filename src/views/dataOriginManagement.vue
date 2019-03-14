@@ -16,7 +16,7 @@
     <div class="operation">
       <a-row>
         <a-col :span="24" :style="{ textAling: 'right'}">
-          <a-button type="primary" htmlType="button" @click="showModel">新增</a-button>
+          <a-button type="primary" htmlType="button" @click="showModel" :loading="addLoading">新增</a-button>
         </a-col>
       </a-row>
     </div>
@@ -111,6 +111,7 @@
  export default class dataOrinig extends Vue {
   @Prop() private msg!: string;
 
+  addLoading:boolean = false // 新增按钮动画
   searchLoading:boolean = false // 搜索按钮加载效果
   tabload:boolean = false // 控制btn加载效果
   loading:boolean = true // 初始化显示loading加载动画
@@ -140,16 +141,6 @@
   beforeCreate () { // 挂载前创建ant form
     (this as any).form = (this as any).$form.createForm(this); // 定义搜索form
     (this as any).modelForm = (this as any).$form.createForm(this); // 定义modelform
-    
-    /* (this as any).$post('/custom/Datasmanage/getDataSourceList').then((res: any) => { // 请求表格数据
-      if (res.state === 2000) {
-        this.data = res.data;
-        this.loading = false // 关闭加载动画
-      } else {
-        this.loading = false;
-        (this as any).$message.error(res.message, 3); // 弹出错误message
-      }
-    }); */
   }
   mounted () {
     let searchLinkName:string = (this as any).$refs.searchLinkName.value || '';
@@ -183,11 +174,13 @@
   }
   showModel ():void { // 新增显示模态框
     this.modelTitle = '新增数据源'
-    this.visible = true;
+    this.visible = true
+    this.addLoading = true
   }
   handleCancel ():void { // 隐藏模态框
     this.visible = false;
     this.modalBtn = true;
+    this.addLoading = false
     this.editBtnReportId = '' // 每次关闭模态框都将其id重置为空
     this.modelFormDatas = {};
     (this as any).modelForm.resetFields(); // 重置输入控件的值
@@ -245,6 +238,7 @@
   addEditFun (testConnectDatas: object): void { // 新增/编辑方法
     (this as any).$post('custom/Datasmanage/subDataSource', testConnectDatas).then((res: any) => {
       if (res.state === 2000) {
+        this.addLoading = false;
         this.editBtnReportId = '' // 将判断id重置为空
         this.modelFormDatas = {}; // 回显信息置空
         (this as any).modelForm.resetFields(); // 清空表单
@@ -269,6 +263,9 @@
  }
 </script>
 <style lang='scss' scoped>
+.ant-card-head-title {
+  font-weight: bolder;
+}
 .dataOrigin {
   margin: 10px;
   .ant-form {

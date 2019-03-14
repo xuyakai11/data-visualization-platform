@@ -1,6 +1,6 @@
 <template>
 <div>
-  <a-card title="报表详情" :bordered="false"></a-card>
+  <a-card :title="reportName" :bordered="false"></a-card>
   <div class="reportTable" id="components-form-demo-advanced-search">
     <a-form layout='inline' class="ant-advanced-search-from" :form="form" @submit="handleSearch" v-if="search.length">
       <a-row :gutter="24">
@@ -71,6 +71,7 @@
       <a-table :columns="columns" :dataSource="data" bordered :pagination="pagination" @change="onChangeTab" :loading="loading" :rowKey="record => record.keyFlagId" />
     </div>
   </div>
+  <div id="testId"><img id="testImg"/></div>
 </div>
 </template>
 
@@ -107,6 +108,7 @@
    loading:boolean = true // 初始化显示loading加载动画
    modalBtn:boolean = true // 控制新增编辑时确认按钮
    exportLoading:boolean = false // 导出按钮
+   reportName:string = '报表详情' // 报表名称
    columns: Array<object> = [] // 定义表格表头
    data: Array<object> = [] // 定义表格内容
    search: Array<search> = [] // 定义搜索条件
@@ -146,6 +148,7 @@
          const pagination = { ...this.pagination }
          pagination.total = res.data.count;
          this.pagination = pagination
+         this.reportName = res.data.reportName
        } else {
          this.loading = false;
          this.data = [];
@@ -199,7 +202,6 @@
      })
    }
     onChangeTab (pagination:any):void {
-     console.log(pagination)
       const pager:any = { ...this.pagination };
       pager.current = pagination.current;
       this.pagination = pager
@@ -234,6 +236,9 @@
   }
 </script>
 <style lang='scss'>
+.ant-card-head-title {
+  font-weight: bolder;
+}
 .reportTable {
   margin: 10px;
   .ant-form {
@@ -264,6 +269,18 @@
     background-color: #fafafa;
     min-height: 200px;
     padding: 10px;
+  }
+}
+#testId {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid gray;
+  img {
+    width: 50px;
+    height: 50px;
+    border: 1px solid red;
   }
 }
 </style>

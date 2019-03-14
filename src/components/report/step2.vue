@@ -301,8 +301,8 @@
               <a-button type="primary" class="runBtn" :loading="runLoading" @click="runFun">运行</a-button>
             </div>
           </div>
-          <div style="padding: 10px" class="tabSearch" id="components-form-demo-advanced-search">
-            <a-form layout='inline' class="ant-advanced-search-from" :form="form" @submit="handleSearch" v-if="search.length">
+          <div style="padding: 10px" class="tabSearch" id="components-form-demo-advanced-search" v-if="search.length">
+            <a-form layout='inline' class="ant-advanced-search-from" :form="form" @submit="handleSearch">
               <a-row :gutter="24">
                 <a-col :span="8" v-for="(item, i) in search" :key="i">
                   <a-form-item>
@@ -481,7 +481,16 @@
                     <a-form-item class="twoCol" label="描述" :wrapper-col="{ span: 24 }" style="margin-left: 20px">
                       <a-input name="col_desc" v-decorator="['col_desc', { initialValue: '', rules: [{ required: false }]}]"/>
                     </a-form-item>
-                    <a-form-item label="公式" style="margin:0">
+                    <a-form-item label="公式" style="margin: 0; position: relative;">
+                      <div class="editInsertButton">
+                        <span @click.stop="symbolInsertFun('+')">+</span>
+                        <span @click.stop="symbolInsertFun('-')">-</span>
+                        <span @click.stop="symbolInsertFun('*')">*</span>
+                        <span @click.stop="symbolInsertFun('/')">/</span>
+                        <span @click.stop="symbolInsertFun('^')">^</span>
+                        <span @click.stop="symbolInsertFun('(')">(</span>
+                        <span @click.stop="symbolInsertFun(')')">)</span>
+                      </div>
                       <a-textarea ref="formulaTextarea" placeholder="请在此键入公式。" :rows="10" @change="textareaChange($event)" v-decorator="['formula', { initialValue: formula, rules: [{ required: true, message: '请键入公式' }]}]"/>
                     </a-form-item>
                     <p class="errMsg" v-show="errMsgFlag"><a-icon type="warning" theme="twoTone" twoToneColor="#faad14"/>{{errMsg}}</p>
@@ -1441,6 +1450,13 @@
       addTextareaCursor(textarea, cursor, text) // 调用插入文本方法
       this.formula = textarea.value
     }
+    symbolInsertFun (symbol:string):void { // textarea符号插入方法
+      let textarea:any = (this as any).$refs.formulaTextarea.$el // 获取文本域元素
+      let cursor:any = getTextareaCursor(textarea) // 先调用获取位置方法
+      let text: string = symbol
+      addTextareaCursor(textarea, cursor, text) // 调用插入文本方法
+      this.formula = textarea.value
+    }
     // 监听formula 是因为如果其变化则显示验证公式按钮
     @Watch('formula', { deep: true, immediate: true }) formulaWatch (newVal:string, oldVal:string) {
       if (newVal !== oldVal) {
@@ -1509,7 +1525,6 @@
      })
    }
     onChangeTab (pagination:any):void { // 表格切换页数
-      console.log(pagination)
       const pager:any = { ...this.pagination };
       pager.current = pagination.current;
       this.pagination = pager
@@ -1875,9 +1890,6 @@
   .ant-popover-inner-content {
     .ant-form-item {
       margin-bottom: 12px;
-      .ant-form-item-control {
-        /* width: 250px; */
-      }
     }
     .content-footer {
       text-align: right;
@@ -1938,9 +1950,48 @@
                 display: block;
               }
             }
+            .editInsertButton {
+              position: absolute;
+              left: 0;
+              z-index: 999;
+              display: flex;
+              width: 100%;
+              align-items: center;
+              padding: .5rem;
+              background-color: #f6f9fb;
+              border-top-right-radius: .25rem;
+              border-top-left-radius: .25rem;
+              border-bottom: 1px solid #d9dbdd;
+              span {
+                color: #16325c;
+                font-weight: 700;
+                font-size: .8125rem;
+                line-height: 2.125rem;
+                padding: 0 .825rem;
+                margin-right: .5rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-align: center;
+                vertical-align: middle;
+                border: 1px solid rgb(221, 219, 218);
+                transition: border .15s linear;
+                border-radius: .25rem;
+                border-color: rgb(221, 219, 218);
+                background-color: rgb(255, 255, 255);
+                user-select: none;
+                display: inline-block;
+                background: transparent;
+                background-clip: border-box;
+                &:hover {
+                  background-color: #e7eaef;
+                  cursor: pointer;
+                }
+              }
+            }
             textarea {
               height: 265px;
-              resize: none;
+              padding-top: 45px;
               resize: none;
             }
             p.errMsg {

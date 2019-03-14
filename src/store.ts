@@ -6,7 +6,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     openKeys: '',
-    domain: 'http://test.report.pxjy.com',
+    domain: location.href.indexOf('localhost') !== -1 ? 'http://test.report.pxjy.com' : 'http://report.staff.pxjy.com',
     menu: JSON.parse((localStorage as any).getItem('menu'))
   },
   getters: {

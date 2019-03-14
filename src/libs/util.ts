@@ -25,7 +25,6 @@ const getQueryString = (name:String) => {
 
 // 获取textarea光标位置 和 选中文本
 const getTextareaCursor = (textarea: any):void => {
-  console.log(textarea)
   let rangeData:any = {
     text: '',
     start: 0,

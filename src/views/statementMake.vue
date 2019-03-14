@@ -85,6 +85,9 @@
  }
 </script>
 <style lang='scss'>
+.ant-card-head-title {
+  font-weight: bolder;
+}
 .reportmaking {
   padding: 10px;
   border-radius: 6px;
