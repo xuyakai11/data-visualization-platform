@@ -382,6 +382,7 @@
     <a-modal
         :visible="showFormulaFlag"
         :title="showFormulaTitle"
+        :confirmLoading="formulaCreateLoading"
         okText='确认'
         cancelText='取消'
         @cancel="formulaCancel"
@@ -418,6 +419,7 @@
                     <div class="footer">
                       <div>
                         <a-select style="width: 170px" v-model="fieldCalculate">
+                          <a-select-option value="">无</a-select-option>
                           <a-select-option value="SUM">总和</a-select-option>
                           <a-select-option value="AVG">平均</a-select-option>
                           <a-select-option value="MIN">最小值</a-select-option>
@@ -585,7 +587,7 @@
     loading: boolean = false
     saveLoading:boolean = false
     runLoading:boolean = false
-
+    formulaCreateLoading = false // 添加公式列弹框确定按钮
     dragOptions: object = { // 拖拽组件相关配置
       sort: true, // 定义是否拖拽
       group: 'task', // string or array分组用的，同一组的不同的list可以相互拖拽
@@ -665,7 +667,7 @@
       id: 0,
       title: ''
     } // 存放函数选中
-    fieldCalculate:string = 'SUM' // 存放字段求值字段
+    fieldCalculate:string = '' // 存放字段求值字段
     radioValue:number = 0 // 编辑公式列弹框 格式单选model
     formulaTextarea:string = '' // 编辑列公式弹框 公式内容
 
@@ -737,7 +739,6 @@
     created () {
       (this as any).$post('custom/ReportManageDetail/getAllFields', { reportId: this.reportId }).then((res: any) => { // 请求报表所有表的所有字段
         if (res.state === 2000) {
-          console.log(res)
           this.dataSourceTree = res.data
           // this.dataSourceTree.text = res.data.title
           this.treeListFun(res.data) // 将其处理成一层数据，报表设置4个搜索下拉框会用到
@@ -747,9 +748,12 @@
           (this as any).$message.error(res.message, 3); // 弹出错误message
         }
       }).catch((err: any) => {
-        console.log(err);
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3); // 弹出错误message
+        } else {
+          (this as any).$message.error('获取报表所有表的所有字段失败', 3); // 弹出错误message
+        }
         this.spinning = false;
-        (this as any).$message.error('获取报表所有表的所有字段失败', 3); // 弹出错误message
       });
     }
     mounted () {
@@ -773,7 +777,6 @@
       }
       (this as any).$post('custom/Report/getReportDetail', searchPar).then((res: any) => { // 请求新增字段
         if (res.state === 2000) {
-          console.log(res);
           this.data = res.data.data
           this.columns = res.data.columns
           this.search = res.data.search
@@ -797,16 +800,18 @@
           (this as any).$message.error(res.message, 3); // 弹出错误message
         }
       }).catch((err: any) => {
-        console.log(err);
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3); // 弹出错误message
+        } else {
+          (this as any).$message.error('请求表格失败', 3); // 弹出错误message
+        }
         this.tableLoading = false;
-        (this as any).$message.error('请求表格失败', 3); // 弹出错误message
       });
     }
     addReportColsFun (url:string, v:any, type:string) { // 增加报表表头列方法
       this.spinning = true;
       (this as any).$post(url, { reportId: this.reportId, fieldId: v.id }).then((res: any) => { // 请求新增字段
         if (res.state === 2000) {
-          console.log(res)
           if (type === 'lie') {
             this.fieldIdArrLie.push(v.id) // push 选中的fieldId
             this.aTagDatasL.push(v) // push 选中的回显的文字
@@ -823,9 +828,12 @@
           (this as any).$message.error(res.message, 3); // 弹出错误message
         }
       }).catch((err: any) => {
-        console.log(err);
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3); // 弹出错误message
+        } else {
+          (this as any).$message.error('新增字段失败', 3); // 弹出错误message
+        }
         this.spinning = false;
-        (this as any).$message.error('新增字段失败', 3); // 弹出错误message
       });
     }
     treeListFun (data:any):void { // 将datasourceTree处理成一层
@@ -920,8 +928,11 @@
           (this as any).$message.error(res.message, 3); // 弹出message
         }
       }).catch((err: any) => {
-        console.log(err);
-        (this as any).$message.error('删除失败', 3); // 弹出错误message
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3); // 弹出错误message
+        } else {
+          (this as any).$message.error('删除失败', 3); // 弹出错误message
+        }
       });
     }
     /* 报表设置 end */
@@ -999,12 +1010,17 @@
           (this as any).$message.error(res.message, 3); // 弹出错误message
         }
       }).catch((err: any) => {
-        console.log(err);
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3); // 弹出错误message
+        } else {
+          (this as any).$message.error('请求新增显示筛选器失败', 3); // 弹出错误message
+        }
         this.spinning = false;
-        (this as any).$message.error('请求新增显示筛选器失败', 3); // 弹出错误message
       });
     }
-    filterOption (input:any, option:any):boolean { // 搜索框输入搜索 过滤方法
+    filterOption (input:any, option:any):any { // 搜索框输入搜索 过滤方法
+      console.log(option)
+      console.log(this.dataSourceTree)
       return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
     }
     deleteSearch (index: number, type:string):void { // 删除筛选器方法
@@ -1198,9 +1214,12 @@
           (this as any).$message.error(res.message, 3); // 弹出错误message
         }
       }).catch((err: any) => {
-        console.log(err);
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3); // 弹出错误message
+        } else {
+          (this as any).$message.error('新增固定筛选器失败', 3); // 弹出错误message
+        }
         this.spinning = false;
-        (this as any).$message.error('新增固定筛选器失败', 3); // 弹出错误message
       });
     }
     delReportSearch (searchId:any, index:number, type:string):void { // 筛选器删除请求方法
@@ -1224,9 +1243,12 @@
           (this as any).$message.error(res.message, 3); // 弹出错误message
         }
       }).catch((err: any) => {
-        console.log(err);
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3); // 弹出错误message
+        } else {
+          (this as any).$message.error('删除筛选器失败', 3); // 弹出错误message
+        }
         this.spinning = false;
-        (this as any).$message.error('删除筛选器失败', 3); // 弹出错误message
       });
     }
     visibleChangeFun (visible:any):void { // popover 显示隐藏的回调
@@ -1312,12 +1334,16 @@
           (this as any).$message.error(res.message, 3); // 弹出错误message
         }
       }).catch((err: any) => {
-        console.log(err);
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3); // 弹出错误message
+        } else {
+          (this as any).$message.error('删除筛选器失败', 3); // 弹出错误message
+        }
         this.systeming = false;
-        (this as any).$message.error('删除筛选器失败', 3); // 弹出错误message
       });
     }
     formulaCreate ():void { // 模态框确认方法
+      this.formulaCreateLoading = true // 打开动画
       let format:any = (this as any).formatForm.getFieldsValue(['col_format', 'decimal_num']);
       if (!format.col_format) {
          format = {col_format: 'num', decimal_num: '0'}; // 先设置一个默认的值
@@ -1327,6 +1353,7 @@
           let params:any = Object.assign({}, values, format)
           params.reportId = this.reportId;
           (this as any).$post('custom/reportManageDetail/addFormulaCols', params).then((res: any) => { // 请求新增字段
+            this.formulaCreateLoading = false
             if (res.state === 2000) {
               this.getReportDetail(); // 调用请求表格方法
               (this as any).messageForm.resetFields(); // 重置输入控件
@@ -1339,12 +1366,17 @@
               (this as any).$message.error(res.message, 3); // 弹出错误message
             }
           }).catch((err: any) => {
-            console.log(err);
-            (this as any).$message.error('添加公式列失败', 3); // 弹出错误message
+            if (err.code === 'ECONNABORTED') {
+              (this as any).$message.error('请求超时', 3); // 弹出错误message
+            } else {
+              (this as any).$message.error('添加公式列失败', 3); // 弹出错误message
+            }
+            this.formulaCreateLoading = false
           });
+        } else {
+          this.formulaCreateLoading = false
         }
       });
-      
     }
     textareaChange (e:any):void { // textarea change事件
       console.log(e.target.value)
@@ -1439,7 +1471,7 @@
     insertFieldFun ():void { // 字段插入方法
       let textarea:any = (this as any).$refs.formulaTextarea.$el // 获取文本域元素
       let cursor:any = getTextareaCursor(textarea) // 先调用获取位置方法
-      let text: string = this.fieldCalculate + '(' + this.fieldData.formula + ') '
+      let text: string = this.fieldCalculate ? this.fieldCalculate + '(' + this.fieldData.formula + ') ' : this.fieldData.formula + ' '
       addTextareaCursor(textarea, cursor, text) // 调用插入文本方法
       this.formula = textarea.value
     }

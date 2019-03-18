@@ -166,9 +166,12 @@
             (this as any).$message.error(res.message, 3); // 弹出错误message
           }
         }).catch((err: any) => {
-          console.log(err);
+          if (err.code === 'ECONNABORTED') {
+            (this as any).$message.error('请求超时', 3); // 弹出错误message
+          } else {
+            (this as any).$message.error('请求失败', 3); // 弹出错误message
+          }
           this.spinning = false; // 关闭加载动画
-          (this as any).$message.error('请求失败', 3); // 弹出错误message
         });
       } else {
         this.spinning = false // 关闭加载动画
@@ -187,7 +190,9 @@
             (this as any).$message.error(res.message, 3); // 弹出错误message
           }
         }).catch((err: any) => {
-          console.log(err);
+          if (err.code === 'ECONNABORTED') {
+            (this as any).$message.error('请求超时', 3); // 弹出错误message
+          } 
           this.dataTab = [];
           (this as any).$message.error('请求失败', 3); // 弹出错误message
         });
@@ -216,8 +221,11 @@
             (this as any).$message.error(res.message, 3); // 弹出错误message
           }
         }).catch((err: any) => {
-          console.log(err);
-          (this as any).$message.error('请求失败', 3); // 弹出错误message
+          if (err.code === 'ECONNABORTED') {
+            (this as any).$message.error('请求超时', 3); // 弹出错误message
+          } else {
+            (this as any).$message.error('请求失败', 3); // 弹出错误message
+          }
         });
       }
     }
@@ -233,8 +241,11 @@
             (this as any).$message.error(res.message, 3); // 弹出错误message
           }
         }).catch((err: any) => {
-          console.log(err);
-          (this as any).$message.error('请求失败', 3); // 弹出错误message
+          if (err.code === 'ECONNABORTED') {
+            (this as any).$message.error('请求超时', 3); // 弹出错误message
+          } else {
+            (this as any).$message.error('请求失败', 3); // 弹出错误message
+          }
         });
       }
     }
@@ -251,7 +262,6 @@
         if (!err) {
           values.joinArr = this.joinArr // 设置关联表数据
           if (getQueryString('reportId')) { // 如果是编辑
-            console.log('编辑')
             values.type = 'edit'
             values.reportId = getQueryString('reportId')
           }
@@ -267,8 +277,11 @@
               (this as any).$message.error(res.message, 3); // 弹出错误message
             }
           }).catch((err: any) => {
-            console.log(err);
-            (this as any).$message.error('请求失败', 3); // 弹出错误message
+            if (err.code === 'ECONNABORTED') {
+              (this as any).$message.error('请求超时', 3); // 弹出错误message
+            } else {
+              (this as any).$message.error('请求失败', 3); // 弹出错误message
+            }
           });
         }
       })
@@ -282,7 +295,6 @@
           }
         }
       })
-     // console.log(this.mainTableIdModel)
     }
     handleCancel ():void {
       this.visible = false;

@@ -71,13 +71,11 @@
       <a-table :columns="columns" :dataSource="data" bordered :pagination="pagination" @change="onChangeTab" :loading="loading" :rowKey="record => record.keyFlagId" />
     </div>
   </div>
-  <div id="testId"><img id="testImg"/></div>
 </div>
 </template>
 
 <script lang='ts'>
   import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-  import { interfaces } from 'mocha';
   import { State, Mutation } from 'vuex-class'
   import { getQueryString } from '@/libs/util.ts';
   /* eslint-disable */
@@ -155,10 +153,13 @@
          (this as any).$message.error(res.message, 3); // 弹出错误message
        }
      }).catch((err: any) => {
-       console.log(err)
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3); // 弹出错误message
+        } else {
+          (this as any).$message.error('请求失败', 3); // 弹出错误message
+        }
        this.loading = false;
        this.data = [];
-       (this as any).$message.error('请求失败', 3); // 弹出错误message
      });
    }
    filterOption (input:any, option:any):boolean { // 搜索框输入搜索 过滤方法
@@ -210,11 +211,10 @@
       this.initDataFun(params);
      // this.reportParams = { reportId: this.reportId, searchParam: this.searchParam, nowpage: pagination.current, pageSize: pagination.pageSize }
     }
-    exportFile ():void {
+    exportFile ():void { // 导出
       let searchParam:any = this.searchParam.length ? JSON.stringify(this.searchParam) : ''
       let params:any = { reportId: this.reportId, searchParam: searchParam };
       this.exportLoading = true;
-      console.log(window.location);
       window.open('http://test.report.pxjy.com/custom/Report/exportReport?reportId='+this.reportId + '&searchParam=' + searchParam)
       let _this = this
       setTimeout(() => {
@@ -228,7 +228,9 @@
          (this as any).$message.error(res.message, 3); // 弹出错误message
        }
      }).catch((err: any) => {
-       console.log(err)
+       if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3); // 弹出错误message
+        } 
        this.exportLoading = false;
        (this as any).$message.error('导出请求失败', 3); // 弹出错误message
      }); */
@@ -269,18 +271,6 @@
     background-color: #fafafa;
     min-height: 200px;
     padding: 10px;
-  }
-}
-#testId {
-  height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid gray;
-  img {
-    width: 50px;
-    height: 50px;
-    border: 1px solid red;
   }
 }
 </style>

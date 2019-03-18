@@ -47,6 +47,12 @@ export default class menuList extends Vue {
         } else {
           (this as any).$message.error(res.message, 3);
         }
+      }).catch((err:any) => {
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3); // 弹出错误message
+        } else {
+          (this as any).$message.error('请求失败', 3); // 弹出错误message
+        }
       });
     // }
   }

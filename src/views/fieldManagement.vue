@@ -136,10 +136,13 @@
         (this as any).$message.error(res.message, 3); // 弹出错误message
       }
     }).catch((err: any) => {
-      console.log(err)
+      if (err.code === 'ECONNABORTED') {
+        (this as any).$message.error('请求超时', 3); // 弹出错误message
+      } else {
+        (this as any).$message.error('请求失败', 3); // 弹出错误message
+      }
       this.loading = false;
       this.data = [];
-      (this as any).$message.error('请求失败', 3); // 弹出错误message
     });
   }
   initFieldTypeFun ():void { // 初始化请求字段类型列表
@@ -151,8 +154,11 @@
         (this as any).$message.error(res.message, 3); // 弹出错误message
       }
     }).catch((err: any) => {
-      console.log(err);
-      (this as any).$message.error('请求失败', 3); // 弹出错误message
+      if (err.code === 'ECONNABORTED') {
+        (this as any).$message.error('请求超时', 3); // 弹出错误message
+      } else {
+        (this as any).$message.error('请求失败', 3); // 弹出错误message
+      }
     });
   }
   showModel () { // 模态框
@@ -201,11 +207,16 @@
         this.addBtnLoading = false
         this.editBtnLoading = false;
         (this as any).$message.success(res.message, 3);
-        console.log(this.pagination)
         let par: object = { model_id: this.model_id, nowpage: this.pagination.current, pageSize: this.pagination.pageSize }
         this.initDataFun(par);
       } else {
         (this as any).$message.error(res.message, 3); // 弹出错误message
+      }
+    }).catch((err:any) => {
+      if (err.code === 'ECONNABORTED') {
+        (this as any).$message.error('请求超时', 3); // 弹出错误message
+      } else {
+        (this as any).$message.error('请求失败', 3)
       }
     });
   }
@@ -252,9 +263,13 @@
         this.delBtnLoading = !this.delBtnLoading;
         (this as any).$message.error(res.message, 3); // 弹出错误message
       }
-    }).catch(() => {
+    }).catch((err:any) => {
+      if (err.code === 'ECONNABORTED') {
+        (this as any).$message.error('请求超时', 3); // 弹出错误message
+      } else {
+        (this as any).$message.error('删除失败', 3);
+      }
       this.delBtnLoading = !this.delBtnLoading;
-      (this as any).$message.error('删除失败', 3);
     });
   }
  }

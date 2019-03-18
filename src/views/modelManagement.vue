@@ -140,10 +140,13 @@
           (this as any).$message.error(res.message, 3); // 弹出错误message
         }
       }).catch((err: any) => {
-        console.log(err)
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3); // 弹出错误message
+        } else {
+          (this as any).$message.error('请求失败', 3); // 弹出错误message
+        }
         this.loading = false;
         this.data = [];
-        (this as any).$message.error('请求失败', 3); // 弹出错误message
       });
     }
     initDbTabFun ():void {
@@ -153,8 +156,12 @@
         } else {
           (this as any).$message.error(res.message, 3); // 弹出错误message
         }
-      }).catch(() => {
-        (this as any).$message.error('数据表请求失败', 3);
+      }).catch((err:any) => {
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3); // 弹出错误message
+        } else {
+          (this as any).$message.error('数据表请求失败', 3);
+        }
       });
     }
     // 表格选中与否改变事件
@@ -210,6 +217,12 @@
           this.initDataFun(par);
         } else {
           (this as any).$message.error(res.message, 3); // 弹出错误message
+        }
+      }).catch((err:any) => {
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3); // 弹出错误message
+        } else {
+          (this as any).$message.error('请求失败', 3); // 弹出错误message
         }
       });
     }
@@ -295,7 +308,7 @@
           }
           (this as any).$message.error(res.message, 3); // 弹出错误message
         }
-      }).catch(() => {
+      }).catch((err:any) => {
         if (params.type === 'del') {
           this.delBtnLoading = !this.delBtnLoading;
         } else if (params.type === 'start') {
@@ -303,7 +316,11 @@
         } else if (params.type === 'forbiden') {
           this.forbidenBtnLoading = !this.forbidenBtnLoading
         }
-        (this as any).$message.error('删除失败', 3);
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3); // 弹出错误message
+        } else {
+          (this as any).$message.error('删除失败', 3);
+        }
       });
     }
     // 计算属性方法，必须有返回值

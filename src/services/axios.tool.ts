@@ -13,7 +13,7 @@ axios.defaults.baseURL = store.state.domain;
 // axios.defaults.baseURL = location.href.indexOf('test') !== -1 ? 'http://test.report.pxjy.com' : 'http://report.staff.pxjy.com'
 
 // 请求超时的时间限制
-axios.defaults.timeout = 20000;
+axios.defaults.timeout = 120000;
 
 // 开始设置请求 发起的拦截处理
 // config 代表发起请求的参数的实体
@@ -58,7 +58,7 @@ axios.interceptors.response.use((config: any) => {
   }
   return config.data
 }, (error: any) => {
-  return Promise.reject(error)
+    return Promise.reject(error)
   // 错误的请求结果处理，这里的代码根据后台的状态码来决定错误的输出信息
 })
 

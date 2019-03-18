@@ -68,6 +68,12 @@
         } else {
           (this as any).$message.error(res.message, 3);
         }
+      }).catch((err:any) => {
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3); // 弹出错误message
+        } else {
+          (this as any).$message.error('请求失败', 3)
+        }
       });
     }
     toggleCollapsed ():void {
@@ -82,6 +88,12 @@
           } else {
             (this as any).$message.error(res.message, 3);
           }
+        }).catch((err:any) => {
+          if (err.code === 'ECONNABORTED') {
+            (this as any).$message.error('请求超时', 3); // 弹出错误message
+          } else {
+            (this as any).$message.error('请求失败', 3)
+          }
         });
       } else if (e.key === 'item_1') {
         (this as any).$post('/custom/GlobalApi/logOut').then((res: any) => {
@@ -90,6 +102,12 @@
             (this as any).$message.success(res.message, 3);
           } else {
             (this as any).$message.error(res.message, 3);
+          }
+        }).catch((err:any) => {
+          if (err.code === 'ECONNABORTED') {
+            (this as any).$message.error('请求超时', 3); // 弹出错误message
+          } else {
+           (this as any).$message.error('请求失败', 3) 
           }
         });
       }

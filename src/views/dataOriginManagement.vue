@@ -160,10 +160,13 @@
         (this as any).$message.error(res.message, 3); // 弹出错误message
       }
     }).catch((err: any) => {
-      console.log(err)
+      if (err.code === 'ECONNABORTED') {
+        (this as any).$message.error('请求超时', 3); // 弹出错误message
+      } else {
+        (this as any).$message.error('请求失败', 3); // 弹出错误message
+      }
       this.loading = false;
       this.data = [];
-      (this as any).$message.error('请求失败', 3); // 弹出错误message
     });
   }
   handleSearch (e: any):void { // 搜索方法
@@ -213,6 +216,12 @@
           } else {
             (this as any).$message.error(res.message, 3);
           }
+        }).catch((err:any) => {
+          if (err.code === 'ECONNABORTED') {
+            (this as any).$message.error('请求超时', 3); // 弹出错误message
+          } else {
+            (this as any).$message.error('请求失败', 3)
+          }
         });
       }
     })
@@ -249,6 +258,12 @@
         this.initDataFun(params);
       } else {
         (this as any).$message.error(res.message, 3);
+      }
+    }).catch((err:any) => {
+      if (err.code === 'ECONNABORTED') {
+        (this as any).$message.error('请求超时', 3); // 弹出错误message
+      } else {
+        (this as any).$message.error('请求失败', 3)
       }
     });
   }
