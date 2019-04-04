@@ -7,10 +7,7 @@
 </template>
 <script>
 import zhCn from 'ant-design-vue/lib/locale-provider/zh_CN';
-/*  import * as moment from 'moment' */
-/*import 'moment/locale/zh-cn'
-moment.locale('zh-cn');
- */
+
 export default {
   data () {
     return {
@@ -33,6 +30,10 @@ body {
   width: 100%;
   height: 100%;
 }
+.ant-table {
+  td { white-space: nowrap; }
+}
+
 /* #nav {
   padding: 30px;
   text-align: right;

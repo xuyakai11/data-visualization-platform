@@ -1,7 +1,7 @@
 <template>
   <a-layout id="components-layout-demo-fixed-sider" style="min-height: 100vh">
     <!-- 菜单 -->
-    <menu-nav :collapsed="collapsed" :selectKeys="selectKeys"></menu-nav>
+    <menu-nav  @menuChildChange="changeCollapsed" :collapsed="collapsed" :selectKeys="selectKeys"></menu-nav>
     <!-- 右侧头部及内容 -->
     <a-layout :style="{ marginLeft: left + 'px', transition: 'all .2s'}">
       <a-layout-header>
@@ -54,10 +54,6 @@
     userSrc:string = ""
     userName:string = ""
 
-    created () {
-      // this.menuData = list;
-    }
-
     mounted () {
       // this.selectKeys = [this.$route.path];
       // 请求用户信息
@@ -76,9 +72,13 @@
         }
       });
     }
+    changeCollapsed (collapsed:boolean) { // 接收自组件传过来的值
+      this.collapsed = collapsed
+      this.collapsed ? this.left = '80' : this.left = '200'; // 控制右侧模块margin-left的值
+    }
     toggleCollapsed ():void {
-      this.collapsed = !this.collapsed;
-      this.collapsed ? this.left = '80' : this.left = '200'; // 控制右侧模块margin-left的值 
+      this.collapsed = !this.collapsed
+      this.collapsed ? this.left = '80' : this.left = '200'; // 控制右侧模块margin-left的值
     }
     logout (e:any):void {
       if (e.key === 'item_0') {

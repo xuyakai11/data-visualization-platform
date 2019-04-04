@@ -11,7 +11,7 @@
     </div>
     <!-- 表格 -->
     <div class="search-result-list">
-      <a-table :pagination="pagination" :loading="loading" @change="onChange" :columns="columns" :dataSource="data" bordered :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}" :rowKey="record => record.id">
+      <a-table :scroll="{x: true}" :pagination="pagination" :loading="loading" @change="onChange" :columns="columns" :dataSource="data" bordered :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}" :rowKey="record => record.id">
         <span slot="action" slot-scope="text, record">
           <a-button type="primary" size="small" :loading="editBtnLoading" :data-type="record.key" @click="editFun($event, record)">编辑</a-button>
           <a-divider type="vertical" />

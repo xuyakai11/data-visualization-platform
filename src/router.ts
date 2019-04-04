@@ -49,6 +49,21 @@ export default new Router({
           path: '/fieldManagement',
           name: '字段管理',
           component: () => import('./views/fieldManagement.vue')
+        },
+        {
+          path: '/roleManagement',
+          name: '角色管理',
+          component: () => import('./views/roleManagement.vue')
+        },
+        {
+          path: '/accountManagement',
+          name: '账号管理',
+          component: () => import('./views/accountManagement.vue')
+        },
+        {
+          path: '/menuManagement',
+          name: '菜单管理',
+          component: () => import('./views/menuManagement.vue')
         }
       ]
     }

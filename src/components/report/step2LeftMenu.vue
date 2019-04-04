@@ -34,7 +34,7 @@
 
   @Component
   export default class step2LeftMenu extends Vue {
-    @Prop({}) dataSourceTree!:any // 从父组件接收树数据
+    @Prop({}) dataSourceTree!:any // 从父组件接收树数据  这里的感叹号是对属性的非空断言；（null和undefined）的判断
 
     expandedKeys:Array<any> = []
     searchValue:string = ''
@@ -149,11 +149,17 @@
       // let obj:object = { text: e } // 将双击选中的传递给父组件
       // this.treeDblDataFun(obj)
     }
-    getInfo (e:any, node:any) { // 树控件双击事件
+    getInfo (e:any, node:any) { // 树控件单击事件
       if (e.length) {
         let fieldId:number = node.id
         this.treeDblDataFun(+e.toString())
       }
+    }
+    filterOption (input:any, option:any):any { // 搜索框输入搜索 过滤方法
+      console.log(option)
+      console.log(this.dataSourceTree)
+      console.log(option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0)
+      return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
     }
  }
 </script>

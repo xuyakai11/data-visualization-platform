@@ -13,7 +13,7 @@
     </div>
     <!-- 表格 -->
     <div class="search-result-list">
-      <a-table bordered :pagination="pagination" :loading="loading" @change="onChange" :columns="columns" :dataSource="data" :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"><!-- :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange }" -->
+      <a-table bordered :scroll="{x: true}" :pagination="pagination" :loading="loading" @change="onChange" :columns="columns" :dataSource="data" :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"><!-- :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange }" -->
         <span slot="action" slot-scope="text, record">
           <a-button type="primary" size="small" @click="editFun($event, record)">编辑</a-button>
           <a-divider type="vertical" />

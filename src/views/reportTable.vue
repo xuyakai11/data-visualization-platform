@@ -68,7 +68,7 @@
       </a-row>
     </div>
     <div class="search-result-list">
-      <a-table :columns="columns" :dataSource="data" bordered :pagination="pagination" @change="onChangeTab" :loading="loading" :rowKey="record => record.keyFlagId" />
+      <a-table :scroll="{x: true}" :columns="columns" :dataSource="data" bordered :pagination="pagination" @change="onChangeTab" :loading="loading" :rowKey="record => record.keyFlagId" />
     </div>
   </div>
 </div>

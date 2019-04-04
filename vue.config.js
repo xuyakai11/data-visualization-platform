@@ -5,7 +5,14 @@ module.exports = {
     : './',
   productionSourceMap: false,
   chainWebpack: config => {
-    config
-      .plugins.delete('pwa')
-   }
+    config.plugins.delete('pwa')
+  },
+  /* devServer: { // 通过代理实现跨域请求
+    proxy: {
+      '/api': {
+        target: 'http://alsjdlfkajlsdjf', // 真实地址
+        changeOrigin: true, // 是否跨域
+      }
+    }
+  } */
 }

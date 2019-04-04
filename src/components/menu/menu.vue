@@ -1,6 +1,10 @@
 <template>
   <div>
-    <a-layout-sider :trigger="null" collapsible v-model="collapsed" style="background: #fff">
+    <a-layout-sider :trigger="null" collapsible :collapsed="collapsed" style="background: #fff"
+      breakpoint="lg"
+      collapsedWidth="80"
+      @breakpoint="onBreakpoint"
+    >
       <div class="logo">朴新</div>
       <a-menu mode="inline" :selectedKeys="selectKeys" :defaultOpenKeys="[openKeys]" :inlineCollapsed="collapsed" @select="selectMenu">
         <template v-for="item in menuData">
@@ -28,16 +32,22 @@
 
   @Component
 export default class menuList extends Vue {
-  @Prop() 
-  collapsed: boolean = false;
-  selectKeys:Array<String> = [];
+  // collapsed: boolean = false;
+  @Prop({
+      type: Boolean, // 父组件传递给子组件的数据类型
+      required: false, // 是否必填
+      default: false // 默认值， 如果传入的是 Object，则要 default: ()=>({}) 参数为函数
+  }) collapsed !: boolean
+  selectKeys:Array<String> = []
 
   @State openKeys: any
   @Mutation changeOpenKeys: any
   @State('menu') menuData: any
   @Mutation menuList: any
+  @Emit('menuChildChange') send (collapse: boolean) {};
 
   created () {
+    console.log(this.collapsed);
     // 请求菜单
     // if (!this.menuData) {
       (this as any).$post('custom/GlobalApi/getMenu').then((res: any) => {
@@ -62,6 +72,14 @@ export default class menuList extends Vue {
   selectMenu (e: any):void { // 将点击选中的实时替换
     this.selectKeys = [e.key];
     (this as any).changeOpenKeys({ openKeys: e.key })
+  }
+  onCollapse (collapsed:boolean, type:string) { // 展开-收起时的回调函数，有点击 trigger 以及响应式反馈两种方式可以触发
+    // console.log(collapsed)
+    // this.collapsed = collapsed
+    // console.log(type)
+  }
+  onBreakpoint (broken:boolean) { // 触发响应式布局断点时的回调
+    this.send(broken)
   }
 }
 </script>

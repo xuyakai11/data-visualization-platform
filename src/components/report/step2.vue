@@ -23,23 +23,25 @@
                   <div class="tab1-top-content">
                     <h4>组行</h4>
                     <a-select
+                      showSearch
                       allowClear
                       placeholder="添加组行"
                       ref="handleChangeH"
                       style="width: 100%"
                       @change="handleChangeH"
-                      optionFilterProp="children"
-                      :filterOption="filterOption"><!-- showSearch -->
+                      v-if="!spinning"
+                      :filterOption="filterOption"><!-- showSearch  -->
                       <!-- optionFilterProp:搜索时过滤对应的option属性，如设置为children表示对内嵌内容进行搜索 -->
-                      <a-select-opt-group v-for="(source, index) in dataSourceTree" :key="index">
+                      <!-- <a-select-opt-group v-for="(source, index) in dataSourceTree" :key="index">
                         <span slot="label"><a-icon type="user"/>{{source.title}}</span>
-                        <a-select-option v-for="(child, i) in source.children" :key="i" :value="child.id">{{ child.title }}</a-select-option>
-                      </a-select-opt-group>
+                        <a-select-option v-for="(child, i) in source.children" :key="i" :value="child.id" v-if="child.title" >{{ child.title }}</a-select-option>
+                      </a-select-opt-group> -->
+                      <a-select-option :disabled="list.children ? true : false" :value="list.id" v-for="(list, index) in treeListFilter" :key="index" :class="list.children ? 'disabled' : ''"><a-icon type="smile" theme="twoTone" v-if="list.children"/>{{list.title}}</a-select-option>
                     </a-select>
                     <div class="task-content">
                       <draggable class="hang"> <!-- :options="dragOptions" @end="onEndHang" @update="onUpdateHang" -->
                         <p class="task-item" type="inner" v-for="(item, i) in aTagDatasH" :key="i" :title="item.text">
-                          <span v-if="item.title.length > 17">{{item.title.substr(0, 17)}}...</span>
+                          <span v-if="item.title.length > 15">{{item.title.substr(0, 15)}}...</span>
                           <span v-else>{{item.title}}</span>
                           <a-tooltip placement="right">
                             <template slot="title">
@@ -74,20 +76,23 @@
                   </div>
                   <a-select
                     allowClear
+                    showSearch
                     placeholder="添加组列"
                     optionFilterProp="children"
                     style="width: 100%"
                     @change="handleChangeL"
+                    v-if="!spinning"
                     :filterOption="filterOption">
-                    <a-select-opt-group v-for="(source, index) in dataSourceTree" :key="index">
+                    <a-select-option :disabled="list.children ? true : false" :value="list.id" v-for="(list, index) in treeListFilter" :key="index" :class="list.children ? 'disabled' : ''"><a-icon type="smile" theme="twoTone" v-if="list.children"/>{{list.title}}</a-select-option>
+                    <!-- <a-select-opt-group v-for="(source, index) in dataSourceTreeFilter" :key="index">
                       <span slot="label"><a-icon type="user"/>{{source.title}}</span>
-                      <a-select-option v-for="(child) in source.children" :key="child.id" :value="child.id">{{child.title}}</a-select-option>
-                    </a-select-opt-group>
+                      <a-select-option v-for="(child) in source.children" :key="child.id" :value="child.id" v-if="child.title">{{child.title}}</a-select-option>
+                    </a-select-opt-group> -->
                   </a-select>
                   <div class="task-content">
                     <draggable class="lie"> <!--  :options="dragOptions" @end="onEndLie" @update="onUpdateLie" -->
                       <p class="task-item" type="inner" v-for="(item, i) in aTagDatasL" :key="i">
-                        <span v-if="item.title.length > 17">{{item.title.substr(0, 17)}}...</span>
+                        <span v-if="item.title.length > 15">{{item.title.substr(0, 15)}}...</span>
                         <span v-else>{{item.title}}</span>
                         <a-tooltip placement="right">
                           <template slot="title">
@@ -122,15 +127,18 @@
                 </div>
                 <a-select
                   allowClear
+                  showSearch
                   placeholder="添加固有筛选"
                   optionFilterProp="children"
                   style="width: 100%"
                   @change="handleChangeF"
+                  v-if="!spinning"
                   :filterOption="filterOption">
-                  <a-select-opt-group v-for="(source, index) in dataSourceTree" :key="index">
+                  <a-select-option :disabled="list.children ? true : false" :value="list.id" v-for="(list, index) in treeListFilter" :key="index" :class="list.children ? 'disabled' : ''"><a-icon type="smile" theme="twoTone" v-if="list.children"/>{{list.title}}</a-select-option>
+                  <!-- <a-select-opt-group v-for="(source, index) in dataSourceTree" :key="index">
                     <span slot="label"><a-icon type="user"/>{{source.title}}</span>
                     <a-select-option v-for="(child, i) in source.children" :key="i" :value="child.id">{{child.title}}</a-select-option>
-                  </a-select-opt-group>
+                  </a-select-opt-group> -->
                 </a-select>
                 <div class="screening-content">
                   <a-popover arrowPointAtCenter placement="right" @visibleChange="visibleChangeFun" title="编辑筛选器" trigger="click" v-model="item.popover" :visible="item.popover" v-for="(item, i) in aTagDatasF" :key="i">
@@ -255,20 +263,23 @@
                   <h4>显示筛选器</h4>
                 </div>
                 <a-select
+                  showSearch
                   allowClear
                   placeholder="添加显示筛选"
                   optionFilterProp="children"
                   style="width: 100%"
+                  v-if="!spinning"
                   @change="handleChangeX"
                   :filterOption="filterOption">
-                  <a-select-opt-group v-for="(source, index) in dataSourceTree" :key="index">
+                  <a-select-option :disabled="list.children ? true : false" :value="list.id" v-for="(list, index) in treeListFilter" :key="index" :class="list.children ? 'disabled' : ''"><a-icon type="smile" theme="twoTone" v-if="list.children"/>{{list.title}}</a-select-option>
+                  <!-- <a-select-opt-group v-for="(source, index) in dataSourceTree" :key="index">
                     <span slot="label"><a-icon type="user"/>{{source.title}}</span>
                     <a-select-option v-for="(child, i) in source.children" :key="i" :value="child.id">{{child.title}}</a-select-option>
-                  </a-select-opt-group>
+                  </a-select-opt-group> -->
                 </a-select>
                 <div class="According-content">
                   <p class="task-item" type="inner" v-for="(item, i) in aTagDatasX" :key="i">
-                    <span v-if="item.title.length > 17">{{item.title.substr(0, 17)}}...</span>
+                    <span v-if="item.title.length > 15">{{item.title.substr(0, 15)}}...</span>
                     <span v-else>{{item.title}}</span>
                     <a-tooltip placement="right">
                       <template slot="title">
@@ -736,6 +747,9 @@
     get aTagDatasFcomput () { // computed计算属性， 过滤出visible为true的对象来渲染，因为当 v-if 与 v-for 一起使用时，v-for 具有比 v-if 更高的优先级，这意味着 v-if 将分别重复运行于每个 v-for 循环中
       return this.aTagDatasF.filter(item => item.visible)
     }
+    get treeListFilter () { // 过滤出不为空的值
+      return this.treeList.filter(list => list.title !== "")
+    }
     created () {
       (this as any).$post('custom/ReportManageDetail/getAllFields', { reportId: this.reportId }).then((res: any) => { // 请求报表所有表的所有字段
         if (res.state === 2000) {
@@ -900,6 +914,7 @@
     deleteGroupL (item:any, index:number):void { // 删除列数方法
       this.aTagDatasL.splice(index, 1) // 删除回显文字
       this.fieldIdArrLie.splice(index, 1) // 删除选中id
+      console.log(this.colColId)
       let delCol:Array<number> = this.colColId.slice(index, 1) // 获取要删除的那个id
       this.colColId.splice(index, 1) // 删除新增返回id
       const type:string = 'lie'
@@ -947,11 +962,11 @@
             this.dataSourceTree.map((val:any, ind:number) => {
               val.children.map((v:any, i:number) => {
                 if (v.id === value) {
-                  console.log(v.popover)
                   let a:any = Object.assign({}, v)
                   a.popover = true
                   a.new = true // 用来判断是否是第一次
                   a.tableId = val.id
+                  a.field_type = 'checkbox'
                   if (a.field_type === 'checkbox') {
                     a.search_logic = { key:'in', label: '等于' }
                     a.search_param = []
@@ -1021,7 +1036,8 @@
     filterOption (input:any, option:any):any { // 搜索框输入搜索 过滤方法
       console.log(option)
       console.log(this.dataSourceTree)
-      return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      console.log(option.componentOptions.children[1].text.toLowerCase().indexOf(input.toLowerCase()) >= 0)
+      return option.componentOptions.children[1].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
     }
     deleteSearch (index: number, type:string):void { // 删除筛选器方法
       let searchId
@@ -1324,7 +1340,6 @@
       this.showFormulaFlag = true;
       (this as any).$post('custom/Formula/getSystemFunc', null).then((res: any) => { // 请求新增字段
         if (res.state === 2000) {
-          console.log(res);
           this.generateList(res.data)
           this.funcTreeData = res.data
           this.systeming = false;
@@ -2082,6 +2097,18 @@
           }
         }
       }
+    }
+  }
+}
+.ant-select-dropdown .ant-select-dropdown-content li {
+  padding: 5px 12px 5px 22px;
+  font-size: 12px;
+  &.disabled {
+    color: rgb(0, 0, 0);
+    padding: 5px 12px;
+    font-size: 14px;
+    i {
+      margin-right: 5px;
     }
   }
 }
