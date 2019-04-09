@@ -108,7 +108,7 @@
  @Component({
    components: {}
  })
- export default class dataOrinig extends Vue {
+ export default class dataOriginManagement extends Vue {
   @Prop() private msg!: string;
 
   addLoading:boolean = false // 新增按钮动画

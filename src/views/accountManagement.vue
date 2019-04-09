@@ -8,7 +8,7 @@
   import { Component, Prop, Vue } from 'vue-property-decorator'
 
   @Component
-  export default class XXX extends Vue {
+  export default class accountManageement extends Vue {
     data:object = [{
       children: [],
       icon: "database",

@@ -80,7 +80,7 @@
   @Component({
     components: {}
   })
-  export default class dataOrinig extends Vue {
+  export default class modelManagement extends Vue {
     @Mutation changeOpenKeys: any
 
     loading:boolean = true

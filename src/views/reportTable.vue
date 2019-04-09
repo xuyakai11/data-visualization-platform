@@ -101,7 +101,7 @@
   @Component({
     components: {}
   })
-  export default class dataOrinig extends Vue {
+  export default class report extends Vue {
    searchLoading:boolean = false // 搜索按钮加载效果
    loading:boolean = true // 初始化显示loading加载动画
    modalBtn:boolean = true // 控制新增编辑时确认按钮

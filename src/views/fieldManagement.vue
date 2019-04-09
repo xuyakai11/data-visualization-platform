@@ -79,7 +79,7 @@
  @Component({
    components: {}
  })
- export default class dataOrinig extends Vue {
+ export default class fieldManagement extends Vue {
   @Prop() private msg!: string;
 
   loading:boolean = true

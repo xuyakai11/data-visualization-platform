@@ -89,6 +89,7 @@
       const dropKey = info.node.eventKey
       const dragKey = info.dragNode.eventKey
       const dropPos = info.node.pos.split('-')
+      console.log(dropPos)
       const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1])
       console.log(dropPosition)
       const loop = (data:any, key:string, callback:any) => {
@@ -105,6 +106,7 @@
       // Find dragObject
       let dragObj:any
       loop(data, dragKey, (item:object, index:number, arr:Array<object>) => {
+        console.log(arr)
         arr.splice(index, 1)
         dragObj = item
       })
@@ -139,6 +141,7 @@
         }
       }
       this.menuData = data
+      console.log(this.menuData)
     }
   }
 </script>
