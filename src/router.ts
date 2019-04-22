@@ -61,6 +61,11 @@ export default new Router({
           component: () => import('./views/roleManagement.vue')
         },
         {
+          path: '/roleManagementAdd',
+          name: '添加角色',
+          component: () => import('./views/roleManagementAdd.vue')
+        },
+        {
           path: '/accountManagement',
           name: '账号管理',
           component: () => import('./views/accountManagement.vue')
