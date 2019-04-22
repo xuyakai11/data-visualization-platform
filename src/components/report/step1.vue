@@ -114,7 +114,7 @@
 
 <script lang='ts'>
   import { Component, Prop, Vue, Emit } from 'vue-property-decorator'
-  import { getQueryString } from '@/libs/util.ts';
+  import { getQueryString } from '@/libs/util.ts'
 
   @Component
   export default class sterp1 extends Vue {

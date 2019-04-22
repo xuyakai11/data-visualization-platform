@@ -2,24 +2,35 @@
   <div>
     <a-spin :spinning="spinning" delayTime="500">
       <div class="lpc-leftTree">
-        <a-tree
+        <!-- <a-tree
         class="draggable-tree"
         draggable
         @dragenter="onDragEnter"
         @drop="onDrop"
+        @dragend="onDragend"
+        @dragleave="onDragleave"
+        @dragover="onDragover"
+        @dragstart="onDragstart"
         :treeData="menuData"
         >
           <span slot="title0010" style="color: #1890ff">sss</span>
-        </a-tree>
+        </a-tree> -->
+        <!-- <vue-nestable v-model="menuData">
+          <vue-nestable-handle 
+            slot-scope="{ item }"
+            :item="item"
+          >
+            {{item.title}}
+          </vue-nestable-handle>
+        </vue-nestable> -->
       </div>
     </a-spin>
   </div>
 </template>
 
 <script lang='ts'>
-  import { Component, Prop, Vue } from 'vue-property-decorator'
-  import Draggable from 'vuedraggable'
-
+  import  { Component, Prop, Vue } from 'vue-property-decorator'
+  import  Draggable from 'vuedraggable'
    /* eslint-disable */
   interface treeObject {
     title: string;
@@ -56,7 +67,7 @@
 
     created () {
        console.log('请求菜单列表')
-      // this.initDataFun()
+      this.initDataFun()
     }
 
     initDataFun () { // 初始化请求数据
@@ -81,17 +92,31 @@
     clickFun (index:number) {
       console.log(index)
     }
-    onDragEnter (info:any) {
-
+    onDragEnter (event:any) {
+      // console.log('ondragenter')
+      // console.log(event)
+    }
+    onDragend (event:any) {
+      console.log('ondragend')
+      console.log(event.node.children)
+    }
+    onDragleave (event:any) {
+      // console.log('ondragleave')
+      // console.log(event)
+    }
+    onDragover (event:any) {
+      // console.log('onDragover')
+      // console.log(event)
+    }
+    onDragstart (event:any) {
+      // console.log('ondragstart')
+      // console.log(event)
     }
     onDrop (info:any) {
-      console.log(info)
       const dropKey = info.node.eventKey
       const dragKey = info.dragNode.eventKey
       const dropPos = info.node.pos.split('-')
-      console.log(dropPos)
       const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1])
-      console.log(dropPosition)
       const loop = (data:any, key:string, callback:any) => {
         data.forEach((item:any, index:number, arr:Array<object>) => {
           if (item.key === key) {
@@ -106,7 +131,6 @@
       // Find dragObject
       let dragObj:any
       loop(data, dragKey, (item:object, index:number, arr:Array<object>) => {
-        console.log(arr)
         arr.splice(index, 1)
         dragObj = item
       })
@@ -141,7 +165,6 @@
         }
       }
       this.menuData = data
-      console.log(this.menuData)
     }
   }
 </script>

@@ -172,7 +172,7 @@
     })
   }
   delFieldFun (params:any):void {
-    (this as any).$post('custom/ReportManage/delReport', params).then((res: any) => { // 请求表格数据
+    (this as any).$post('custom/ReportManage/delReport', params).then((res: any) => { // 删除表格数据
       if (res.state === 2000) {
         let sourceName:string = (this as any).$refs.sourceName.value || ''; // 连接名
         let reportName:string = (this as any).$refs.reportName.value || ''; // 报表名

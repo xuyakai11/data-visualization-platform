@@ -215,7 +215,8 @@
       let searchParam:any = this.searchParam.length ? JSON.stringify(this.searchParam) : ''
       let params:any = { reportId: this.reportId, searchParam: searchParam };
       this.exportLoading = true;
-      window.open('http://test.report.pxjy.com/custom/Report/exportReport?reportId='+this.reportId + '&searchParam=' + searchParam)
+      const url:string = location.href.indexOf('test') !== -1 ? 'http://test.report.pxjy.com' : 'http://report.staff.pxjy.com'
+      window.open(url + '/custom/Report/exportReport?reportId='+this.reportId + '&searchParam=' + searchParam)
       let _this = this
       setTimeout(() => {
         _this.exportLoading = false;

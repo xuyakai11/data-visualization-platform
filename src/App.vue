@@ -30,7 +30,7 @@ body {
   width: 100%;
   height: 100%;
 }
-.ant-table {
+.ant-table { // 设置表格自适应样式
   td { white-space: nowrap; }
 }
 

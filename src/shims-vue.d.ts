@@ -14,6 +14,10 @@ declare module 'echarts' {
   const echarts: any;
   export default echarts;
 }
+declare module 'v-charts' {
+  const vCharts: any;
+  export default vCharts;
+}
 declare module 'ant-design-vue' {
   const antDesignVue: any;
   export default antDesignVue;
@@ -21,6 +25,10 @@ declare module 'ant-design-vue' {
 declare module 'vuedraggable' {
   const vuedraggable: any;
   export default vuedraggable;
+}
+declare module 'vue-nestable' {
+  const vuenestable: any;
+  export default vuenestable;
 }
 /* declare module 'moment' {
   const moment: any;

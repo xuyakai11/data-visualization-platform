@@ -4,7 +4,7 @@
     <menu-nav  @menuChildChange="changeCollapsed" :collapsed="collapsed" :selectKeys="selectKeys"></menu-nav>
     <!-- 右侧头部及内容 -->
     <a-layout :style="{ marginLeft: left + 'px', transition: 'all .2s'}">
-      <a-layout-header>
+      <a-layout-header :class="theme === 'bark' ? 'barkClass' : ''">
         <!-- 收缩按钮 -->
         <div class="lpc-header">
           <a-icon class="triggMenu" @click="toggleCollapsed" :type="collapsed ? 'menu-unfold' : 'menu-fold'"></a-icon>
@@ -53,7 +53,7 @@
     selectKeys: Array<String> = []
     userSrc:string = ""
     userName:string = ""
-
+    theme:string = (localStorage as any).getItem('theme') || 'light'
     mounted () {
       // this.selectKeys = [this.$route.path];
       // 请求用户信息

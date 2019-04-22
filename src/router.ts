@@ -11,6 +11,11 @@ export default new Router({
       redirect: '/dataOriginManagement' // 从定向
     },
     {
+      path: '/reportScreen',
+      name: '报表图形',
+      component: () => import('./views/reportCharts/reportScreen.vue')
+    },
+    {
       path: '/home',
       name: '首页',
       component: Home,
@@ -61,12 +66,17 @@ export default new Router({
           component: () => import('./views/accountManagement.vue')
         },
         {
+          path: '/accountMessage',
+          name: '账号编辑详情',
+          component: () => import('./views/accountMessage.vue')
+        },
+        {
           path: '/menuManagement',
           name: '菜单管理',
           component: () => import('./views/menuManagement.vue')
         }
       ]
-    }
+    },
   ]
 })
    /*  {

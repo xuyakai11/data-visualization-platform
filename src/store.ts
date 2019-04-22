@@ -6,6 +6,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     openKeys: '',
+    theme: 'light',
+    themeColor: (localStorage as any).getItem('themeColor') || '#1890ff',
     domain: location.href.indexOf('localhost') !== -1 ? 'http://test.report.pxjy.com' : 'http://report.staff.pxjy.com',
     menu: JSON.parse((localStorage as any).getItem('menu'))
   },
@@ -25,6 +27,14 @@ export default new Vuex.Store({
         state.menu = data;
         localStorage.setItem('menu', JSON.stringify(data) || '')
       }
+    },
+    themeMutation (state, data) {
+      let theme = data ? 'light' : 'dark'
+      state.theme = theme
+      localStorage.setItem('theme', theme || 'light')
+    },
+    themeColor (state, data) {
+
     }
   },
   actions: {

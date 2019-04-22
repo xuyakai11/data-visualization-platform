@@ -1,12 +1,13 @@
 <template>
   <div>
-    <a-layout-sider :trigger="null" collapsible :collapsed="collapsed" style="background: #fff"
+    <a-layout-sider :trigger="null" collapsible :collapsed="collapsed"
       breakpoint="lg"
       collapsedWidth="80"
       @breakpoint="onBreakpoint"
-    >
+      :class="theme === 'light' ? 'lightClass' : 'barkClass'"
+    > <!-- :style="{ background: (theme === 'light' ? 'white' : '#001529') }" -->
       <div class="logo">朴新</div>
-      <a-menu mode="inline" :selectedKeys="selectKeys" :defaultOpenKeys="[openKeys]" :inlineCollapsed="collapsed" @select="selectMenu">
+      <a-menu mode="inline" :theme="theme" :selectedKeys="selectKeys" :defaultOpenKeys="[openKeys]" :inlineCollapsed="collapsed" @select="selectMenu">
         <template v-for="item in menuData">
           <a-menu-item v-if="item.children.length === 0" :key="item.path"> 
             <a-icon :type="item.icon"/>
@@ -22,15 +23,25 @@
           </a-sub-menu>
         </template>
       </a-menu>
+      <div class="setting" v-if="!setting">
+        <a-switch
+          defaultChecked
+          @change="changeTheme"
+          checkedChildren="light"
+          unCheckedChildren="dark"
+        />
+      </div>
     </a-layout-sider>
   </div>
 </template>
 
 <script lang='ts'>
-  import { Component, Prop, Vue, Emit } from 'vue-property-decorator'
+  import { Component, Prop, Vue, Emit, Watch } from 'vue-property-decorator'
   import { State, Mutation } from 'vuex-class'
 
-  @Component
+  @Component({
+    components: {}
+  })
 export default class menuList extends Vue {
   // collapsed: boolean = false;
   @Prop({
@@ -39,15 +50,25 @@ export default class menuList extends Vue {
       default: false // 默认值， 如果传入的是 Object，则要 default: ()=>({}) 参数为函数
   }) collapsed !: boolean
   selectKeys:Array<String> = []
+  // theme:string = (localStorage as any).getItem('theme') || 'light'
+  setting:boolean = this.collapsed
 
   @State openKeys: any
   @Mutation changeOpenKeys: any
   @State('menu') menuData: any
   @Mutation menuList: any
-  @Emit('menuChildChange') send (collapse: boolean) {};
+  @Emit('menuChildChange') send (collapse: boolean) {}
 
+  @Mutation themeMutation: any
+  @State('theme') theme: any
+
+  @Watch('collapsed', { deep: true, immediate: true }) collapsedWatch (newVal:boolean, oldVal:boolean) {
+    if (newVal !== oldVal) {
+       this.setting = this.collapsed
+    }
+  }
   created () {
-    console.log(this.collapsed);
+    console.log(this.setting);
     // 请求菜单
     // if (!this.menuData) {
       (this as any).$post('custom/GlobalApi/getMenu').then((res: any) => {
@@ -73,13 +94,12 @@ export default class menuList extends Vue {
     this.selectKeys = [e.key];
     (this as any).changeOpenKeys({ openKeys: e.key })
   }
-  onCollapse (collapsed:boolean, type:string) { // 展开-收起时的回调函数，有点击 trigger 以及响应式反馈两种方式可以触发
-    // console.log(collapsed)
-    // this.collapsed = collapsed
-    // console.log(type)
-  }
-  onBreakpoint (broken:boolean) { // 触发响应式布局断点时的回调
+  onBreakpoint (broken:boolean):void { // 触发响应式布局断点时的回调
     this.send(broken)
+  }
+  changeTheme (check:boolean):void { // 切换主题
+    // this.theme = check ? 'light' : 'dark'
+    this.themeMutation(check)
   }
 }
 </script>
@@ -98,17 +118,37 @@ export default class menuList extends Vue {
   position: fixed;
   min-height: 100vh;
   left: 0;
-  .ant-menu-item {
-    padding: 0;
-    .lidiv {
-      display: inline-block;
-      width: 100%;
-      a {
+  .ant-layout-sider-children {
+    position: relative;
+    .ant-menu-item {
+      padding: 0;
+      .lidiv {
         display: inline-block;
         width: 100%;
-        padding: 0;
+        a {
+          display: inline-block;
+          width: 100%;
+          padding: 0;
+        }
       }
     }
+    .setting { // 配置项样式
+      position: absolute;
+      text-align: center;
+      width: 100%;
+      bottom: 20px;
+      left: 0;
+    }
+  }
+}
+// 主题颜色切换样式
+.lightClass {
+  background: white;
+}
+.barkClass {
+  background: #001529;
+  .logo {
+    color: white!important;
   }
 }
 </style>
