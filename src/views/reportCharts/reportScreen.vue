@@ -91,14 +91,14 @@
           <div class="textMessage">
             <h4 class="title">学校售卖中的产品量</h4>
             <a-row>
-              <a-col :sm="12" :md="12" :xl="12">
+              <a-col :xs="12" :sm="12" :md="12" :xl="12">
                 <p>总计售卖合同数： 6个</p>
                 <p>签约产品20个</p>
                 <p>咨询平均单笔 50000</p>
                 <p>培训平均单笔 10000</p>
                 <p>咨询平均单笔 50000</p>
               </a-col>
-              <a-col :sm="12" :md="12" :xl="12" style="text-align: right;">
+              <a-col :xs="12" :sm="12" :md="12" :xl="12" style="text-align: right;">
                 <p class="bigNumber">20</p>
                 <p>8.2% <a-icon type="rise" /></p>
               </a-col>
@@ -222,8 +222,6 @@
         })
       }
     }
-
-
   }
 </script>
 

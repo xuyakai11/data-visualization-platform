@@ -4,7 +4,7 @@
     <div class="rolemanageList">
       <a-form layout='inline' class="ant-advanced-search-from" :form="form">
         <a-form-item :span="24">
-          <a-input
+          <a-input autocomplete="off"
             ref="roleName"
             v-decorator="['roleName']"
             placeholder="角色名称" />
@@ -12,20 +12,20 @@
         <a-form-item>
           <a-button type="primary" @click="handleSearch" :loading="searchLoading">搜索</a-button>
         </a-form-item>
-      </a-form> 
+      </a-form>
       <div class="operation">
         <a-row>
           <a-col :span="24" :style="{ textAling: 'right'}">
-            <a-button type="primary" htmlType="button" @click="addfn">新增</a-button>
+            <a-button type="primary" htmlType="button" @click="editRole($event, 'add')">新增</a-button>
           </a-col>
         </a-row>
-      </div>  
+      </div>
       <div class="search-result-list">
         <a-table :scroll="{x: true}" :columns="columns" :dataSource="data" bordered :pagination="pagination" @change="onChange" :loading="loading" :rowKey="record => record.id">
-          <span slot="action">
-            <a-button type="primary" size="small">编辑</a-button>
+          <span slot="action" slot-scope="text, record">
+            <a-button type="primary" size="small" @click="editRole($event, 'edit', record.id,)">编辑</a-button>
             <a-divider type="vertical" />
-            <a-button type="primary" size="small">查看</a-button>
+            <a-button type="primary" size="small" @click="editRole($event, 'look', record.id,)">查看</a-button>
             <a-divider type="vertical" />
             <a-button type="primary" size="small">停用</a-button>
             <a-divider type="vertical" />
@@ -54,14 +54,13 @@
     loading:boolean = true // 初始化显示loading加载动画
     data: Array<any> = [] // 定义表格内容
     columns: Array<any> = [ // 定义表格表头
-      {title: '角色名称', dataIndex: 'name'}, // fixed: 'left' 设置是否固定
-      {title: '角色描述', dataIndex: 'description'},
-      {title: '操作', dataIndex: '', width: '40%', scopedSlots: { customRender: 'action'}} // scopedSlots配置操作列
+      {title: '角色名称', dataIndex: 'name', key: '' }, // fixed: 'left' 设置是否固定
+      {title: '角色描述', dataIndex: 'description', key: '' },
+      {title: '操作', dataIndex: '', key: '', width: '40%', scopedSlots: { customRender: 'action'}} // scopedSlots配置操作列
     ]
     searchLoading: boolean = false;
     beforeCreate () {
       (this as any).form = (this as any).$form.createForm(this); // 定义搜索form
-      (this as any).modelForm = (this as any).$form.createForm(this); // 定义modelform
     }
     mounted () {
       /* let testConnectDatas:any = (this as any).form.getFieldsValue();
@@ -105,8 +104,10 @@
       let params:any = { roleName: roleName, nowpage: pagination.current, pageSize: pagination.pageSize }
       this.initDataFun(params); // 请求表格数据
     }
-    addfn ():void {
-      window.open(window.location.origin + '/roleManagementAdd'); // _target 表示只打开一个，重复点击会回到第一个打开的窗口
+    editRole (e:any, type:string, id?:number):void {
+      console.log(id)
+      id ? window.open(window.location.origin + '/roleManagementAdd?type=' + type + '&roleId=' + id) : window.open(window.location.origin + '/roleManagementAdd?type=' + type)
+      // window.open(window.location.origin + '/roleManagementAdd?type=' + type) // _target 表示只打开一个，重复点击会回到第一个打开的窗口
     }
   }
 </script>

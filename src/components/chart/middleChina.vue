@@ -51,7 +51,7 @@
         left: 'left',
         top: 'bottom',
         text: ['高', '低'], // 文本，默认为数值文本
-        calculable: true, //是否拖拽
+        calculable: true, // 是否拖拽
         textStyle: {
           color: 'white'
         },

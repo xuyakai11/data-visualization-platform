@@ -81,7 +81,7 @@ export default new Router({
           component: () => import('./views/menuManagement.vue')
         }
       ]
-    },
+    }
   ]
 })
    /*  {

@@ -966,7 +966,8 @@
                   a.popover = true
                   a.new = true // 用来判断是否是第一次
                   a.tableId = val.id
-                  a.field_type = 'checkbox'
+                  // console.log(v)
+                  // a.field_type = 'data'
                   if (a.field_type === 'checkbox') {
                     a.search_logic = { key:'in', label: '等于' }
                     a.search_param = []

@@ -33,7 +33,6 @@
       let isIncrease = this.isIncrease === null ? this.value >= this.target : this.isIncrease
       return isIncrease ? 'up' : 'down'
     }
-  
 }
 </script>
 
