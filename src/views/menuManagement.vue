@@ -358,7 +358,8 @@
       (this as any).$post('custom/menuManage/deleteMenuInfo', {menuId: this.treeId}).then((res: any) => {
         if (res.state === 2000) {
           (this as any).$message.success(res.message, 3);
-          this.createTreeData();         
+          this.createTreeData();   
+          this.treeId = 0;      
         } else {
           (this as any).$message.error(res.message, 3);
         }
