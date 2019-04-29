@@ -5,7 +5,7 @@
             class="draggable-tree"
             :treeData="dataSourceTree"
             draggable
-            :autoExpandParent="autoExpandParent"
+            :defaultExpandParent="defaultExpandParent"
             :expandedKeys="expandedKeys"
             :selectedKeys="selectedKeys"
             @expand="onExpand"
@@ -18,7 +18,7 @@
 </template>
 
 <script lang='ts'>
-  import  { Component, Prop, Vue, Emit } from 'vue-property-decorator'
+  import  { Component, Prop, Vue, Emit, Watch } from 'vue-property-decorator'
    /* eslint-disable */
   interface treeObject {
     title: string;
@@ -32,9 +32,18 @@
     spinning: boolean = true // 进入页面缓冲动画
     loading: boolean = false
     expandedKeys: Array<string|number> = [0]
-    autoExpandParent:boolean =  true
+    defaultExpandParent:boolean =  false
     selectedKeys: Array<string|number> = [0]
     @Emit('treeDblData') treeDblDataFun (e: number) {};
+
+    // 监听dataSourceTree 是因为父组件传过来的时候有可能为空
+    @Watch('dataSourceTree', { deep: true, immediate: true }) onAtagDatasHChangeFun (newVal:string, oldVal:string) { 
+      if (newVal) {
+        (this as any).$nextTick(() => {
+            this.defaultExpandParent = true
+        })
+      }
+    }
     onSelect (e:any, node:any) {
       if (e.length) {
         this.selectedKeys = [+e.toString()]
@@ -137,7 +146,13 @@
             &.ant-tree-node-selected{
                 color:#1890ff;
             }
-        }        
+        }  
+        span{
+            &.ant-tree-switcher{
+                height:34px;
+                line-height:34px;
+            }      
+        }
     }
 }
 </style>

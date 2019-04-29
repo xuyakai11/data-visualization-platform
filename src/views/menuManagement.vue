@@ -7,12 +7,12 @@
          title="菜单管理"
          :bodyStyle='{"padding-right":0,"padding-top":0}'
         >
-          <div clas="lefttree" style="padding-top:24px;">
+          <div clas="lefttree" style="padding-top:2.4rem;">
             <left-tree :dataSourceTree="dataSourceTree" @treeDblData="treeMsg"></left-tree>
           </div>
         </a-card>
       </a-col>
-      <a-col :xs="24" :sm="24" :md="18">
+      <a-col :xs="24" :sm="24" :md="18" class="menuright">
         <a-card
           style="width:100%"
           :tabList="tabList"
@@ -40,7 +40,6 @@
                   ref="systemName"
                   v-decorator="[ 'systemName', { initialValue: modelFormDatas.system_name, rules: [{ required: true, message: '请选择所属系统' }] }]"
                   placeholder="请选择所属系统">
-                  <a-select-option value="">请选择所属系统</a-select-option>
                   <a-select-option v-for="(item, i) in systemName" :value="i" :key="i">{{item}}</a-select-option>
                 </a-select>
               </a-form-item>      
@@ -71,7 +70,7 @@
             </a-form>
           </div>
         </a-card>
-        <a-card title="菜单对应权限" :style="{ marginTop: '16px' }">
+        <a-card title="菜单对应权限" :style="{ marginTop: '1.6rem' }">
           <a href="#" slot="extra"><a-icon type="plus" @click="menuBtnAdd"/></a>
           <div class="menuLimit">
             <template v-for="(tag) in menuBtnCodes">
@@ -168,7 +167,7 @@
       (this as any).$post('custom/menuManage/menuList').then((res: any) => { // 请求tree数据
         if (res.state === 2000) {         
           this.dataSourceTree = [{id: 0,key: 0, title: '总目录', scopedSlots: {title: 'title'}, children: res.data}];
-          this.getEditMenuInfo(0);
+          this.getEditMenuInfo(this.treeId);
         } else {
           (this as any).$message.error(res.message, 3); // 弹出错误message
         }
@@ -189,7 +188,7 @@
     }
     getEditMenuInfo (treeId:number) { // 获取对应的菜单信息,渲染编辑菜单内容
       let menuId: string|number = treeId?treeId:'';
-      (this as any).modelForm.resetFields(); // 清空表单
+      
       (this as any).$post('custom/menuManage/getEditMenuInfo', {menuId: menuId}).then((res: any) => { // 请求表格数据
         if (res.state === 2000) {
           if (this.activeTitleKey=== 'edit' && treeId) { // treeId存在的时候，会返回menuinfo           
@@ -197,6 +196,7 @@
             // 获取编辑菜单信息
             this.isdisplay = res.data.menuInfo.is_display===1?true:false;
             this.isstatus= res.data.menuInfo.status===1?true:false;
+            (this as any).modelForm.resetFields(); // 清空表单
             this.modelFormDatas = res.data.menuInfo;
             // 获取菜单对应权限
             this.menuBtnCodes = res.data.menuBtnCodes;
@@ -206,6 +206,7 @@
             this.modelFormDatas = {};
             (this as any).modelForm.resetFields(); // 清空表单
             this.validSchool = [];
+            this.menuBtnCodes = [];
             this.isdisplay = true;
             this.isstatus = true;
           }
@@ -259,7 +260,7 @@
     }
     // 删除菜单权限
     menulimitDelete (tag:any) {
-      (this as any).$post('custom/menuManage/deleteMenuBtnCodeInfo', {priId: tag.id}).then((res: any) => {
+      (this as any).$post('custom/menuManage/deleteMenuBtnCodeInfo', { priId: tag.id }).then((res: any) => {
         if (res.state === 2000) {
           (this as any).$message.success(res.message, 3);
         } else {
@@ -271,7 +272,7 @@
         } else {
           (this as any).$message.error('请求失败', 3)
         }
-      });
+      });          
     }
     // 确认弹框事件
     confirmModal () {   
@@ -335,7 +336,7 @@
           (this as any).$post('custom/menuManage/updateMenuInfo', sendmenuData).then((res: any) => {
             if (res.state === 2000) {
               (this as any).$message.success(res.message, 3);
-              this.createTreeData();             
+              this.createTreeData();
             } else {
               (this as any).$message.error(res.message, 3);
             }
@@ -353,23 +354,41 @@
       (this as any).modelForm.resetFields(); // 清空表单
       this.modelFormDatas = {};
       this.validSchool = [];
+      this.isdisplay = true;
+      this.isstatus = true;
     }
     deleteMenufn () {
-      (this as any).$post('custom/menuManage/deleteMenuInfo', {menuId: this.treeId}).then((res: any) => {
-        if (res.state === 2000) {
-          (this as any).$message.success(res.message, 3);
-          this.createTreeData();   
-          this.treeId = 0;      
-        } else {
-          (this as any).$message.error(res.message, 3);
+      let params: object = { menuId: this.treeId };
+      this.showdelConfirm('提示', '确认要删除该菜单么？', params, (params:any) => {
+        (this as any).$post('custom/menuManage/deleteMenuInfo', params).then((res: any) => {
+          if (res.state === 2000) {
+            (this as any).$message.success(res.message, 3);
+            this.createTreeData();   
+            this.treeId = 0;      
+          } else {
+            (this as any).$message.error(res.message, 3);
+          }
+        }).catch((err:any) => {
+          if (err.code === 'ECONNABORTED') {
+            (this as any).$message.error('请求超时', 3); // 弹出错误message
+          } else {
+            (this as any).$message.error('请求失败', 3)
+          }
+        });
+      });      
+    }
+    showdelConfirm (title: string, content: string , params: any, callback:any) {
+        let _this:any = this;
+      (this as any).$confirm({
+        title: title,
+        content: content,
+        okType: 'danger',
+        okText: '确认',
+        cancelText: '取消',
+        onOk () {
+          callback(params)
         }
-      }).catch((err:any) => {
-        if (err.code === 'ECONNABORTED') {
-          (this as any).$message.error('请求超时', 3); // 弹出错误message
-        } else {
-          (this as any).$message.error('请求失败', 3)
-        }
-      });
+      })
     }
   }
 </script>
@@ -377,6 +396,7 @@
 <style lang='scss' rel='stylesheet/scss'>
 .menumanage{
   margin:10px;
+  min-height:80vh;
   .ant-form{
     .ant-checkbox-group{
       .ant-checkbox-wrapper{
@@ -393,6 +413,7 @@
     }
   }
   .menuLimit{
+    min-height: 5rem;
     .ant-tag{
       padding:0 12px !important;
       height:34px !important;
@@ -401,7 +422,44 @@
     }
   }
   .menuleft{
-    margin-bottom:8px; 
+    .ant-card-body{
+        height: calc(100vh - 144px - 70px);
+        overflow-y: scroll;
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+        &::-webkit-scrollbar-track {
+            background-color:#eaeaea;
+            -webkit-border-radius: 2em;
+            -moz-border-radius: 2em;
+            border-radius:2em;
+        }
+        &::-webkit-scrollbar-thumb {
+            background-color:#c1c1c1;
+            -webkit-border-radius: 2em;
+            -moz-border-radius: 2em;
+            border-radius:2em;
+        }
+    }
+  }
+  .menuright{
+    height:calc(100vh - 88px - 70px);
+    overflow-y: scroll;
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+    &::-webkit-scrollbar-track {
+        background-color:#eaeaea;
+        -webkit-border-radius: 2em;
+        -moz-border-radius: 2em;
+        border-radius:2em;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color:#c1c1c1;
+        -webkit-border-radius: 2em;
+        -moz-border-radius: 2em;
+        border-radius:2em;
+    }
   }
 }
 </style>
