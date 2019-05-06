@@ -32,7 +32,7 @@
               </a-form-item>
             </a-col>
           </a-row>
-          <a-row :gutter="22">
+          <!-- <a-row :gutter="22">
             <a-col :span="8">
               <a-form-item v-bind="formInputSelectlayout" label="密码">
                 <a-input type="password"
@@ -58,7 +58,7 @@
                 </a-input>
               </a-form-item>
             </a-col>
-          </a-row>
+          </a-row> -->
           <a-row :gutter="22">
             <a-col :span="8">
               <a-form-item v-bind="formInputSelectlayout" label="手机号码">
@@ -68,14 +68,14 @@
                 </a-input>
               </a-form-item>
             </a-col>
-            <a-col :span="7">
+            <!-- <a-col :span="7">
               <a-form-item v-bind="formInputSelectlayout" label="微信号码">
                 <a-input v-decorator="['wechat', { initialValue: data.userInfo.Wechat, rules: [{ required: false, message: '请输入微信号码' }] }]"
                   :disabled="commonDisabled"
                   placeholder="微信号码">
                 </a-input>
               </a-form-item>
-            </a-col>
+            </a-col> -->
           </a-row>
           <a-row :gutter="22">
             <a-col :span="8">
@@ -127,7 +127,7 @@
               </a-row>
             </a-checkbox-group>
           </a-form-item>
-          <a-form-item v-bind="formItemLayout" label="岗位角色">
+          <!-- <a-form-item v-bind="formItemLayout" label="岗位角色">
             <a-checkbox-group
               :disabled="allDisabled"
               v-decorator="['positionRoleCode', { initialValue: data.userInfo.position_role_codes, rules: [{ required: false, message: '请选择岗位角色' }] }]"
@@ -142,8 +142,8 @@
                 </a-col>
               </a-row>
             </a-checkbox-group>
-          </a-form-item>
-          <a-form-item v-bind="formItemLayout" label="校区权限">
+          </a-form-item> -->
+          <!-- <a-form-item v-bind="formItemLayout" label="校区权限">
             <a-checkbox
               :disabled="allDisabled"
               :indeterminate="indeterminate"
@@ -156,7 +156,7 @@
               v-model="checkedList"
               @change="onChange"
               style="width: 100%;" >
-              <a-row><!-- v-decorator="['areaId', { initialValue: data.areaInfo }]" -->
+              <a-row>
                 <a-col :span="4" v-for="(list, index) in data.areaList" :key="index">
                   <a-checkbox :value="list.Code">
                     <a-tooltip placement="topLeft" :title="list.Name" arrowPointAtCenter>
@@ -166,8 +166,8 @@
                 </a-col>
               </a-row>
             </a-checkbox-group>
-          </a-form-item>
-          <a-form-item v-bind="formItemLayout" label="条线">
+          </a-form-item> -->
+          <!-- <a-form-item v-bind="formItemLayout" label="条线">
             <a-checkbox-group
               :disabled="allDisabled"
               v-decorator="['businessLineCodes', { initialValue: data.userInfo.business_line_codes }]"
@@ -180,9 +180,9 @@
                 </a-col>
               </a-row>
             </a-checkbox-group>
-          </a-form-item>
+          </a-form-item> -->
 
-          <a-form-item v-bind="formItemLayout" label="工作性质">
+          <!-- <a-form-item v-bind="formItemLayout" label="工作性质">
             <a-radio-group :disabled="allDisabled" v-decorator="['stuffType', { initialValue: data.userInfo.stuff_type }]">
               <a-radio value="0">
                 兼职
@@ -191,14 +191,14 @@
                 全职
               </a-radio>
             </a-radio-group>
-          </a-form-item>
-          <a-form-item v-bind="formItemLayout" label="EHR员工编号">
+          </a-form-item> -->
+          <!-- <a-form-item v-bind="formItemLayout" label="EHR员工编号">
             <a-input v-decorator="['EHR_code', { initialValue: data.userInfo.EHR_code, rules: [{ required: false, message: '请输入ehr员工编号' }] }]"
               :disabled="commonDisabled"
               placeholder="ehr员工编号">
             </a-input>
-          </a-form-item>
-          <a-form-item v-bind="formItemLayout" label="办公电话">
+          </a-form-item> -->
+          <!-- <a-form-item v-bind="formItemLayout" label="办公电话">
             <div class="lpc-onlineForm">
               <a-row :gutter="24">
                 <a-col :span="4">
@@ -227,8 +227,8 @@
                 </a-col>
               </a-row>
             </div>
-          </a-form-item>
-          <a-form-item v-bind="formItemLayout" label="证件类型">
+          </a-form-item> -->
+          <!-- <a-form-item v-bind="formItemLayout" label="证件类型">
             <a-input-group compact>
               <a-select style="width: 10%"
                 :disabled="allDisabled"
@@ -240,8 +240,8 @@
               </a-select>
               <a-input :disabled="allDisabled" style="width: 50%" v-decorator="['idCardCode', { initialValue: data.userInfo.id_card_code, rules: [{ required: false, message: '请输入证件号码' }] }]"/>
             </a-input-group>
-          </a-form-item>
-          <a-form-item label="呼叫中心" v-bind="formItemLayout">
+          </a-form-item> -->
+          <!-- <a-form-item label="呼叫中心" v-bind="formItemLayout">
             <div class="lpc-formDivform">
               <a-form-item label="工号" v-bind="formDIvform">
                 <a-input :disabled="allDisabled" v-decorator="['ccIdNumber', { initialValue: data.userInfo.cc_id_number, rules: [{ required: false, message: '请输入工号' }] }]"
@@ -259,8 +259,8 @@
                 </a-input>
               </a-form-item>
             </div>
-          </a-form-item>
-          <a-form-item style="text-align: center;">
+          </a-form-item> -->
+          <a-form-item style="text-align: center;padding: 20px 0;">
             <a-button type="primary" v-if="type === 'edit'" html-type="submit" @click="handleSubmit">提交</a-button>
           </a-form-item>
         </a-form>
@@ -351,20 +351,17 @@
           this.roleInfoDealWith = res.data.roleInfo.length ? res.data.roleInfo.map((v:any, i:number) => { // 处理要回显的数据
             return v.id
           }) : []
-          this.data.userInfo.business_line_codes ? this.data.userInfo.business_line_codes.split(',') : this.data.userInfo.business_line_codes = []
-          this.data.userInfo.position_role_codes ? this.data.userInfo.position_role_codes.split(',') : this.data.userInfo.position_role_codes = []
+          /* this.data.userInfo.business_line_codes ? this.data.userInfo.business_line_codes.split(',') : this.data.userInfo.business_line_codes = []
+          this.data.userInfo.position_role_codes ? this.data.userInfo.position_role_codes.split(',') : this.data.userInfo.position_role_codes = [] */
           console.log(this.data)
           // this.data.userInfo.hire_date = this.data.userInfo.hire_date ? this.data.userInfo.hire_date = null : moment(this.data.userInfo.hire_date, 'YYYY-MM-DD')
-          this.data.userInfo.hire_date = moment('20190423', 'YYYY-MM-DD')
+          this.data.userInfo.hire_date = (this as any).moment('20190423', 'YYYY-MM-DD')
           this.data.userInfo.gender = this.data.userInfo.gender.toString() // 将返回过来的性别字段转为字符串格式
-          this.checkedList = this.data.areaInfo // 赋值默认选中的校区权限
+          /* this.checkedList = this.data.areaInfo // 赋值默认选中的校区权限
           this.areaList = this.data.areaList.length ? this.data.areaList.map((v:any, i:number) => {
             return v.Code
-          }) : [] // 设置获取全选时的选中
+          }) : [] */ // 设置获取全选时的选中
           this.spinning = false;
-          (this as any).form.setFieldsValue({
-            // 'hireDate': {'direDate': '2019-04-23'}
-          })
         } else {
           this.spinning = false;
           (this as any).$message.error(res.message, 3) // 弹出错误message

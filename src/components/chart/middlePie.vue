@@ -1,5 +1,5 @@
 <template>
-  <div class="middlePie"> <!-- 柱状图 -->
+  <div class="middlePie"> <!-- 饼图 -->
     <p>{{title}}</p>
     <div class="map" >
       <ve-pie :data="chartData" height="100%" :extend="extend" :settings="chartSettings"></ve-pie>
@@ -38,12 +38,11 @@
         radius : [40, 110],
         tooltip: { // 鼠标悬浮时，提示tooltip位置
           formatter: "{a} <br/> {b} : {c} ({d}%)",
-          position:  'right'// ['50%', '50%']
+          position: 'right' // ['50%', '50%']
         },
         label: {
           normal: { // 是否显示指标线
             show: false,
-            
             position: 'center' // 标签显示位置
           },
           emphasis: {
@@ -55,7 +54,7 @@
       animationType: 'scale',
       animationEasing: 'elasticOut',
       animationDelay: function (idx:any) {
-          return Math.random() * 200;
+        return Math.random() * 200;
       }
     }
   }

@@ -17,9 +17,9 @@ const getQueryString = (name:String) => {
   let reg:any = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
   let r:any = window.location.search.substr(1).match(reg)
   if (r != null) {
-      return (r[2])
+    return (r[2])
   } else {
-      return null
+    return null
   }
 }
 
@@ -93,4 +93,33 @@ const addTextareaCursor = (textarea:any, cursor:any, text:string) => {
   }
 }
 
-export { getQueryString, getTextareaCursor, setTextareaCursor, addTextareaCursor }
+// 数字每隔3位插入逗号
+const toThousands = (num:number) => {
+  let numStr:string = (num || 0).toString()
+  let result:string = ''
+  while (numStr.length > 3) {
+    result = ',' + numStr.slice(-3) + result
+    numStr = numStr.slice(0, numStr.length - 3)
+  }
+  if (numStr) { result = numStr + result; }
+  return result;
+}
+
+// 获取当前年月日和星期
+const getTime = (par:string):string => {
+  let myDate = new Date()
+  const weekDate = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
+  if (par === 'YYYY') {
+    return myDate.getFullYear().toString()
+  } else if (par === 'MM') {
+    return (myDate.getMonth() + 1).toString()
+  } else if (par === 'DD') {
+    return myDate.getDate().toString()
+  } else if (par === 'dddd') {
+    return weekDate[myDate.getDay()] // myDate.getDay() 返回0-6，0代表周日
+  } else {
+    return ''
+  }
+}
+
+export { getQueryString, getTextareaCursor, setTextareaCursor, addTextareaCursor, toThousands, getTime }

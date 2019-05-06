@@ -16,6 +16,11 @@ export default new Router({
       component: () => import('./views/reportCharts/reportScreen.vue')
     },
     {
+      path: '/reportPc',
+      name: '报表驾驶舱',
+      component: () => import('./views/reportCharts/reportPc.vue')
+    },
+    {
       path: '/home',
       name: '首页',
       component: Home,
