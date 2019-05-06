@@ -33,10 +33,6 @@
       setTimeout(() => {
         this.initEchartsFun()
       }, 1000)
-      /* window.onresize = () => {//  根据窗口大小调整曲线大小
-		    const myChart = echarts.init(this.$refs.map as HTMLDivElement)
-		    myChart.resize();
-		  } */
     }
     initEchartsFun () {
       const myChart = echarts.init(this.$refs.map as HTMLDivElement)
