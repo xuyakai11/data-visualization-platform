@@ -3,7 +3,7 @@
     <div>
      <a-spin :spinning="spinning" delayTime="500">
        <div class="top">
-        <span><i v-for="(item, i) in year" :key="i">{{item}}</i> 年 <i v-for="(item, i) in month" :key="i">{{item}}</i> 月 <i v-for="(item, i) in day" :key="i">{{item}}</i> 日  &nbsp;&nbsp;&nbsp; {{ week }}</span>
+        <span><i v-for="(item, i) in year" :key="`${i}year`">{{item}}</i> 年 <i v-for="(item, i) in month" :key="`${i}month`">{{item}}</i> 月 <i v-for="(item, i) in day" :key="`${i}day`">{{item}}</i> 日  &nbsp;&nbsp;&nbsp; {{ week }}</span>
         <p>啄木鸟教育运营数据监控</p>
        </div>
        <div class="lpc-content">
@@ -207,8 +207,8 @@
           <pc-china datas="ggsmd"/>
         </div>
        </div>
-       <div class="timeNum">
-
+       <div class="timeNum" ref="timeNum">
+         <p class="daoJiShi" v-if="daoJiShi">{{ timeOut }}</p>
        </div>
      </a-spin>
     </div>
@@ -238,7 +238,8 @@
     @Prop() private msg!: string;
     clientHeight:number = 0
     spinning:boolean = true
-    baseFont:number = 0 // 滚动跑马灯高度设置
+    timeOut:number = 0 // init倒计时设置
+    daoJiShi:boolean = true
     year:string = ''
     month:string = ''
     day:string = ''
@@ -576,13 +577,14 @@
       let _this = this
       // let doc:HTMLDivElement = document.body.clientHeight
       let clientHeight:any = document.body.clientHeight
+      let docEl = document.documentElement as HTMLDivElement
       this.clientHeight = clientHeight
-      // (this as any).$refs.echartChina.style.height = this.clientHeight + 'px';
-      document.body.style.fontSize = Math.round((100 * clientHeight) / 1080) + 'px'
+      docEl.style.fontSize = Math.round((100 * clientHeight) / 1080) + 'px'
       window.onresize = () => {
-        let clientHeight:any | null = document.body.clientHeight
+        let clientHeight:any = document.body.clientHeight
         this.clientHeight = clientHeight
-        document.body.style.fontSize = Math.round((100 * clientHeight) / 1080) + 'px'
+        let docEl = document.documentElement as HTMLDivElement
+        docEl.style.fontSize = Math.round((100 * clientHeight) / 1080) + 'px'
         // (this as any).$refs.echartChina.style.height = this.clientHeight + 'px';
       }
       this.year = getTime('YYYY')
@@ -592,7 +594,10 @@
       /* console.log(moment().format('YYYY'), moment().format('MM'), moment().format('DD'))
       console.log(moment().format('dddd')) */
       this.splitObjFun(this.data.carryTotalMoney, 5) // 结转
-      this.splitObjFun(this.data.preYearMoney, 8) // 预算
+      this.splitObjFun(this.data.preYearMoney, 8); // 预算
+      // setTimeout(() => {
+      //   this.timeRun()
+      // }, 5000)
     }
     splitObjFun (obj:Array<any>, sliceNum:number):void { // 将数组切割成每5or8个一组
       let arr:Array<any> = []
@@ -614,6 +619,21 @@
       for (let i = 0; i < obj.length; i+=8) {
         arrlength.push(obj.slice(i, i+8))
       } */
+    }
+    timeRun ():void { // 请求倒计时
+      if (this.timeOut !== 0) {
+        this.daoJiShi = true
+        this.timeOut--
+        setTimeout(() => {
+          this.timeRun()
+        }, 1000)
+      } else {
+        this.timeOut = 6
+        this.daoJiShi = false
+        setTimeout(() => {
+          this.timeRun()
+        }, 10 * 1000) // 一分钟后再次请求
+      }
     }
   }
 </script>
@@ -936,6 +956,32 @@
           height: 100%;
         }
       }
+      .timeNum {
+        .daoJiShi {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          font-size: 150px;
+          height: 150px;
+          animation: flipOutY 1s ease both infinite;
+          -webkit-animation: flipOutY 1s ease both infinite;
+          -moz-animation: flipOutY 1s ease both infinite;
+        }
+      }
+    }
+  }
+  @keyframes flipOutY { // 倒计时动画
+    0% {
+      -webkit-transform: perspective(400px) rotateY(0deg);
+      opacity: .8;
+      transform: scaleX(3) scaleY(3);
+      margin-top: -225px;
+    }
+    100% {
+      -webkit-transform: perspective(400px) rotateY(90deg);
+      opacity: 0;
+      transform: scaleX(0) scaleY(1);
+      margin-top: -150px;
     }
   }
 </style>
