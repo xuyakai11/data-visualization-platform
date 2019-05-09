@@ -11,11 +11,6 @@ export default new Router({
       redirect: '/dataOriginManagement' // 从定向
     },
     {
-      path: '/reportScreen',
-      name: '报表图形',
-      component: () => import('./views/reportCharts/reportScreen.vue')
-    },
-    {
       path: '/reportPc',
       name: '报表驾驶舱',
       component: () => import('./views/reportCharts/reportPc.vue')
@@ -25,6 +20,11 @@ export default new Router({
       name: '首页',
       component: Home,
       children: [
+        {
+          path: '/reportScreen',
+          name: '报表图形',
+          component: () => import('./views/reportCharts/reportScreen.vue')
+        },
         {
           path: '/dataOriginManagement',
           name: '数据源管理',

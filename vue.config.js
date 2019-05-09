@@ -1,5 +1,6 @@
 module.exports = {
   // 基本路径
+  
   baseUrl: process.env.NODE_ENV === 'production'
     ? '/static/custom/'
     : './',
@@ -22,9 +23,12 @@ module.exports = {
   }
   /* devServer: { // 通过代理实现跨域请求
     proxy: {
-      '/api': {
-        target: 'http://alsjdlfkajlsdjf', // 真实地址
+      '/': {
+        target: 'http://192.168.0.176:8080', // 真实地址
         changeOrigin: true, // 是否跨域
+        pathRewrite: {
+          '^/': '' // 将编译成‘’
+        }
       }
     }
   } */

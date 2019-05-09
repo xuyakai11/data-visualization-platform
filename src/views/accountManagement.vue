@@ -84,8 +84,8 @@
               <a-button type="primary" size="small" :loading="lookLoading" @click="go($event, record.id, 'look')">查看</a-button>
               <a-divider type="vertical" />
               <a-button type="primary" size="small" :loading="editLoading" @click="go($event, record.id, 'edit')">编辑</a-button>
-              <a-divider type="vertical" />
-              <a-button type="primary" size="small" @click="openReportScreen">绑定账号</a-button>
+              <!-- <a-divider type="vertical" />
+              <a-button type="primary" size="small" @click="openReportScreen">绑定账号</a-button> -->
             </span>
           </a-table>
         </div>

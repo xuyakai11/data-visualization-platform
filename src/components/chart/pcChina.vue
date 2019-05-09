@@ -209,180 +209,61 @@
       '武汉': [114.31, 30.52],
       '大庆': [125.03, 46.58]
     }
-    data:Array<any> = [
-      {name: '海门', value: 9},
-      {name: '鄂尔多斯', value: 12},
-      {name: '招远', value: 12},
-      {name: '舟山', value: 12},
-      {name: '齐齐哈尔', value: 14},
-      {name: '盐城', value: 15},
-      {name: '赤峰', value: 16},
-      {name: '青岛', value: 18},
-      {name: '乳山', value: 18},
-      {name: '金昌', value: 19},
-      {name: '泉州', value: 21},
-      {name: '莱西', value: 21},
-      {name: '日照', value: 21},
-      {name: '胶南', value: 22},
-      {name: '南通', value: 23},
-      {name: '拉萨', value: 24},
-      {name: '云浮', value: 24},
-      {name: '梅州', value: 25},
-      {name: '文登', value: 25},
-      {name: '上海', value: 25},
-      {name: '攀枝花', value: 25},
-      {name: '威海', value: 25},
-      {name: '承德', value: 25},
-      {name: '厦门', value: 26},
-      {name: '汕尾', value: 26},
-      {name: '潮州', value: 26},
-      {name: '丹东', value: 27},
-      {name: '太仓', value: 27},
-      {name: '曲靖', value: 27},
-      {name: '烟台', value: 28},
-      {name: '福州', value: 29},
-      {name: '营口', value: 37},
-      {name: '惠州', value: 37},
-      {name: '江阴', value: 37},
-      {name: '蓬莱', value: 37},
-      {name: '韶关', value: 38},
-      {name: '嘉峪关', value: 38},
-      {name: '广州', value: 38},
-      {name: '延安', value: 38},
-      {name: '太原', value: 39},
-      {name: '清远', value: 39},
-      {name: '中山', value: 39},
-      {name: '昆明', value: 39},
-      {name: '寿光', value: 40},
-      {name: '张家港', value: 52},
-      {name: '三门峡', value: 53},
-      {name: '锦州', value: 54},
-      {name: '南昌', value: 54},
-      {name: '柳州', value: 54},
-      {name: '三亚', value: 54},
-      {name: '自贡', value: 56},
-      {name: '吉林', value: 56},
-      {name: '阳江', value: 57},
-      {name: '泸州', value: 57},
-      {name: '西宁', value: 57},
-      {name: '宜宾', value: 58},
-      {name: '呼和浩特', value: 58},
-      {name: '成都', value: 58},
-      {name: '大同', value: 58},
-      {name: '句容', value: 75},
-      {name: '北京', value: 79},
-      {name: '徐州', value: 79},
-      {name: '衡水', value: 80},
-      {name: '包头', value: 80},
-      {name: '绵阳', value: 80},
-      {name: '乌鲁木齐', value: 84},
-      {name: '枣庄', value: 84},
-      {name: '杭州', value: 84},
-      {name: '淄博', value: 85},
-      {name: '鞍山', value: 86},
-      {name: '溧阳', value: 86},
-      {name: '库尔勒', value: 86},
-      {name: '安阳', value: 90},
-      {name: '开封', value: 90},
-      {name: '济南', value: 92},
-      {name: '德阳', value: 93},
-      {name: '温州', value: 95},
-      {name: '九江', value: 96},
-      {name: '邯郸', value: 98},
-      {name: '临安', value: 99},
-      {name: '兰州', value: 99},
-      {name: '沧州', value: 100},
-      {name: '临沂', value: 103},
-      {name: '南充', value: 104},
-      {name: '天津', value: 105},
-      {name: '富阳', value: 106},
-      {name: '泰安', value: 112},
-      {name: '诸暨', value: 112},
-      {name: '郑州', value: 113},
-      {name: '哈尔滨', value: 114},
-      {name: '聊城', value: 116},
-      {name: '芜湖', value: 117},
-      {name: '唐山', value: 119},
-      {name: '平顶山', value: 119},
-      {name: '邢台', value: 119},
-      {name: '德州', value: 120},
-      {name: '济宁', value: 120},
-      {name: '荆州', value: 127},
-      {name: '宜昌', value: 130},
-      {name: '义乌', value: 132},
-      {name: '丽水', value: 133},
-      {name: '洛阳', value: 134},
-      {name: '秦皇岛', value: 136},
-      {name: '株洲', value: 143},
-      {name: '石家庄', value: 147},
-      {name: '莱芜', value: 148},
-      {name: '常德', value: 152},
-      {name: '保定', value: 153},
-      {name: '湘潭', value: 154},
-      {name: '金华', value: 157},
-      {name: '岳阳', value: 169},
-      {name: '长沙', value: 175},
-      {name: '衢州', value: 177},
-      {name: '廊坊', value: 193},
-      {name: '菏泽', value: 194},
-      {name: '合肥', value: 229},
-      {name: '武汉', value: 273},
-      {name: '大庆', value: 279}
+    provinceMap:Array<any> = [
+      {name: '北京', value: 0 },
+      {name: '天津', value: 0 },
+      {name: '上海', value: 0 },
+      {name: '重庆', value: 0 },
+      {name: '河北', value: 0 },
+      {name: '河南', value: 0 },
+      {name: '云南', value: 0 },
+      {name: '辽宁', value: 0 },
+      {name: '黑龙江', value: 0 },
+      {name: '湖南', value: 0 },
+      {name: '安徽', value: 0 },
+      {name: '山东', value: 0 },
+      {name: '新疆', value: 0 },
+      {name: '江苏', value: 0 },
+      {name: '浙江', value: 0 },
+      {name: '江西', value: 0 },
+      {name: '湖北', value: 0 },
+      {name: '广西', value: 0 },
+      {name: '甘肃', value: 0 },
+      {name: '山西', value: 0 },
+      {name: '内蒙古', value: 0 },
+      {name: '陕西', value: 0 },
+      {name: '吉林', value: 0 },
+      {name: '福建', value: 0 },
+      {name: '贵州', value: 0 },
+      {name: '广东', value: 0 },
+      {name: '青海', value: 0 },
+      {name: '西藏', value: 0 },
+      {name: '四川', value: 0 },
+      {name: '宁夏', value: 0 },
+      {name: '海南', value: 0 },
+      {name: '台湾', value: 0 },
+      {name: '香港', value: 0 },
+      {name: '澳门', value: 0 }
     ]
-    @Watch('datas', {deep: true})
-    /* watchDatas (): void {
-      if (!this.datas) return;
-      (this as any).$get(this.baseUrl+'json/china.json').then((r: any) => {
-        this.drawChartAreaBasic(r)
-      })
-    }; */
+    data: Array<any> = []
+    @Watch('datas', { deep: true, immediate: true }) datasWatch (newVal:Array<any>, oldVal:Array<any>) {
+      if (newVal !== oldVal && newVal.length) {
+        this.data = []
+        newVal.map((v:any, i:number) => {
+         this.data.push({ name: v.city_name, value: v.total, schoolList: v.schoolList })
+        })
+       this.initEchartsFun()
+      } else {
+        // this.initEchartsFun()
+      }
+    }
     mounted () {
-      /* (this as any).$get(this.baseUrl+'json/china.json').then((r: any) => {
-        this.drawChartAreaBasic(r)
-      }) */
-      this.initEchartsFun()
-      /* window.onresize = () => { //  根据窗口大小调整曲线大小
-		    const myChart = echarts.init(this.$refs.map as HTMLDivElement)
-		    myChart.resize();
-		  } */
+      // console.log(this.data)
+      // setTimeout(() => {
+        // this.initEchartsFun()
+      // }, 1000)
     }
-    drawChartAreaBasic (geoJson: any) {
-      const myChart = echarts.init(this.$refs.echartGeo as HTMLDivElement)
-      myChart.resize()
-      echarts.registerMap('henan', geoJson);
-      myChart.setOption({
-        tooltip: {
-          trigger: 'item',
-          formatter: '{b}<br/>{c} (p / km2)'
-        },
-        visualMap: {
-          min: 800,
-          max: 50000,
-          text: ['High', 'Low'],
-          realtime: false,
-          calculable: true,
-          inRange: {
-            color: ['lightskyblue', 'yellow', 'orangered']
-          }
-        },
-        series: [
-          {
-            name: 'title',
-            type: 'map',
-            mapType: 'henan', // 自定义扩展图表类型
-            itemStyle: {
-              normal: { label: { show: true } },
-              emphasis: { label: { show: true } }
-            },
-            data: [
-              { name: '金水区', value: 20057.34 },
-              { name: '中原区', value: 15477.48 }
-            ]
-          }
-        ]
-      }, true)
-    }
-
+    
     convertData (data:Array<any>) {
       var res = [];
       for (var i = 0; i < data.length; i++) {
@@ -390,7 +271,7 @@
         if (geoCoord) {
           res.push({
             name: data[i].name,
-            value: geoCoord.concat(data[i].value)
+            value: geoCoord.concat(data[i].value, JSON.stringify(data[i].schoolList))
           });
         }
       }
@@ -399,14 +280,14 @@
     initEchartsFun () {
       const myChart = echarts.init(this.$refs.echartGeo as HTMLDivElement)
       let _this = this
-      // let max = this.data[0].value, min = this.data[0].value // 假设第一个为最大或者最小
-      // this.data.map((v:any, i:number) => {
-      //   let cur = v.value;
-      //   cur > max ? max = cur : null;
-      //   cur < min ? min = cur : null;
-      // })
-      // console.log(min, max)
-      myChart.setOption({
+      let max:number = this.data[0].value
+      let min:number = this.data[0].value // 假设第一个为最大或者最小
+      this.data.map((v:any, i:number) => {
+        let cur:number = v.value
+        cur > max ? max = cur : null
+        cur < min ? min = cur : null
+      })
+      /* myChart.setOption({
         tooltip: {
           trigger: 'item'
         },
@@ -471,15 +352,16 @@
             name: '啄木鸟教育运营',
             type: 'scatter',
             coordinateSystem: 'geo',
-            data: _this.convertData(_this.data),
+            data: _this.convertData(this.data),
             symbolSize: function (val:any) {
+              console.log(val)
               return val[2] / 10;
             },
             label: {
               normal: {
                 formatter: '{b}', // 地名
                 position: 'right',
-                show: false
+                show: true
               },
               emphasis: {
                 show: true
@@ -523,7 +405,198 @@
             zlevel: 1
           }
         ]
-      })
+      }) */
+      myChart.setOption({
+        tooltip: { show: true },
+        visualMap: {
+          show: false,
+          // min: min,
+          // max: max,
+          // left: '30%',
+          // top: 'bottom',
+          // text: ['High','Low'],
+          textStyle: {
+            color: '#fff'
+          },
+          seriesIndex: [2],
+          calculable: true, // 是否拖拽
+          inRange: { // 设置颜色
+            color: ['rgba(63, 155, 255, .5)', 'rgba(63, 155, 255, 1)']
+          }
+        },
+        geo: {
+          map: 'china',
+          roam: true,
+          left: '30%',
+          top: '2%',
+          scaleLimit: { // 规模限制
+            min: 1,
+            max: 4
+          },
+          label: {
+            normal: {
+              show: true, // 是否显示地区文本
+              textStyle: {
+                color: '#fff'
+              }
+            }
+          },
+          emphasis: { // 高亮时样式
+            label: {
+              show: true,
+              textStyle: {
+                color: '#FFF'
+              }
+            }
+          },
+          itemStyle: {
+            normal: {
+              show: true,
+              color: '#1B3B75',
+              borderColor: '#80b3dc'
+            },
+            emphasis: {
+              color: null,
+              shadowOffsetX: 0,
+              shadowOffsetY: 0,
+              shadowBlur: 0,
+              borderWidth: 0
+            }
+          }
+        },
+        series: [
+          { // 配置点
+            type: 'scatter',
+            coordinateSystem: 'geo',
+            scaleLimit: {
+              min: 1,
+              max: 1
+            },
+            data: this.convertData(this.data),
+            symbolSize: function (val:any) {
+              if (+val[2]<0) val[2] = 0;
+              var key:number = Math.abs(val[2]) / 100;
+              return Math.sqrt(key/Math.PI);
+            },
+            tooltip: {
+              trigger: 'item',
+              formatter: function (val:any) {
+                let str:string = ''
+                let schoolList:Array<any> = JSON.parse(val.value[3])
+                str += `<p style="font-size: 18px;line-height: 28.8px;background:rgba(0, 54, 115, .3)"><span style="color: #00D3E3;">${val.name}</span> : ${val.value[2]}</p>`;
+                for (let i = 0; i < schoolList.length; i++) {
+                  str += schoolList[i].short_name + ' : ' + Math.ceil(schoolList[i].school_income_money);
+                }
+                return str
+              }
+            },
+            label: {
+              normal: {
+                formatter: '{b}',
+                position: 'inside',
+                textStyle: {
+                  color: '#FFF'
+                },
+                show: true
+              },
+              emphasis: {
+                show: true
+              }
+            },
+            itemStyle: {
+              normal: {
+                color: '#FFEA00'
+              }
+            },
+            zlevel: 1
+          },
+          { // 配置提取前5名用波纹提示
+            name: '',
+            type: 'effectScatter', // 配置波纹
+            coordinateSystem: 'geo',
+            data: _this.convertData(_this.data.sort(function (a, b) {
+              return b.value - a.value;
+            }).slice(0, 6)), // 提取出最大的5个显示波纹动画
+            symbolSize: function (val:any) {
+              if (+val[2]<0) val[2] = 0;
+              let key:number = Math.abs(val[2])/100;
+              return Math.sqrt(key/Math.PI);
+            },
+            tooltip: {
+              trigger: 'item',
+              formatter: function (val:any) {
+                let str:string = ''
+                let schoolList:Array<any> = JSON.parse(val.value[3])
+                str += `<p style="font-size: 18px;line-height: 28.8px;background:rgba(0, 54, 115, .3)"><span style="color: #00D3E3;">${val.name}</span> : ${val.value[2]}</p>`;
+                for (let i = 0; i < schoolList.length; i++) {
+                  str += schoolList[i].short_name + ' : ' + Math.ceil(schoolList[i].school_income_money)
+                }
+                return str
+              }
+            },
+            showEffectOn: 'render',
+            rippleEffect: {
+              brushType: 'stroke'
+            },
+            hoverAnimation: true,
+            label: {
+              normal: {
+                formatter: '{b}',
+                position: 'right',
+                show: true
+              }
+            },
+            itemStyle: {
+              normal: {
+                color: '#FFEA00',
+                shadowBlur: 10,
+                shadowColor: '#333'
+              }
+            },
+            zlevel: 2
+          },
+          { // 配置小于0的数值用红色显示
+            name: '',
+            type: 'scatter',
+            coordinateSystem: 'geo',
+            data: _this.convertData(_this.data.filter((a) => {
+              return +a.value < 0
+            })), // 提取出最大的5个显示波纹动画
+            symbolSize: function (val:any) {
+              let key:number = Math.abs(val[2]) / 100;
+              return Math.sqrt(key/Math.PI);
+            },
+            tooltip: {
+              trigger: 'item',
+              formatter: function (val:any) {
+                let str:string = ''
+                let schoolList:Array<any> = JSON.parse(val.value[3])
+                str += `<p style="font-size: 18px;line-height: 28.8px;background:rgba(0, 54, 115, .3)"><span style="color: #00D3E3;">${val.name}</span> : ${val.value[2]}</p>`;
+                for (let i = 0; i < schoolList.length; i++) {
+                  str += schoolList[i].short_name + ' : ' + Math.ceil(schoolList[i].school_income_money);
+                }
+                return str
+              }
+            },
+            hoverAnimation: true,
+            label: {
+              normal: {
+                formatter: '{b}',
+                position: 'right',
+                show: true
+              }
+            },
+            itemStyle: {
+              normal: {
+                color: 'red',
+                shadowBlur: 10,
+                shadowColor: '#333'
+              }
+            },
+            zlevel: 3
+          }
+        ]
+      }, true)
     }
   }
 </script>

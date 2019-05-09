@@ -32,8 +32,8 @@
           <a-button type="primary" size="small" @click="go($event, record)">编辑</a-button>
           <a-divider type="vertical" />
           <a-button type="primary" size="small" @click="look($event, record)">查看</a-button>
-          <a-divider type="vertical" />
-          <a-button type="primary" size="small">添加到菜单</a-button>
+          <!-- <a-divider type="vertical" />
+          <a-button type="primary" size="small">添加到菜单</a-button> -->
           <a-divider type="vertical" />
           <a-button type="primary" size="small" :loading="delBtnLoading" @click="deleteFun($event, record)">删除</a-button>
         </span>

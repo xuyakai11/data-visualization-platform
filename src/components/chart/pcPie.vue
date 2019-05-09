@@ -8,7 +8,7 @@
 </template>
 
 <script lang='ts'>
-  import { Component, Prop, Vue } from 'vue-property-decorator'
+  import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
   import echarts from 'echarts'
   require('echarts/lib/chart/pie')
 
@@ -16,10 +16,10 @@
     components: {}
   })
   export default class pcPie extends Vue {
-    @Prop({}) title!:string // 接收父组件传过来的数据
-    // title:string = '月收入业务类型'
+    @Prop({}) title!:string // 接收父组件传过来的title
+    @Prop({}) data!:any // 接收父组件传过来的数据
 
-    chartData:any = {
+    /* chartData:any = {
       columns: ['name', 'value'],
       rows: [
         { 'name': '2018-05-22', 'value': 510 },
@@ -30,11 +30,26 @@
         { 'name': '2018-05-27', 'value': 550 },
         { 'name': '2018-05-28', 'value': 498 }
       ]
+    } */
+
+    seriesData:Array<any> = []
+    @Watch('data', { deep: true, immediate: true }) dataWatch (newVal:Array<any>, oldVal:Array<any>) {
+      if (newVal !== oldVal && newVal.length) {
+        this.seriesData = []
+        newVal.map((v:any, i:number) => {
+          if (v.money_clean > 0) {
+            this.seriesData.push({ name: v.name, value: v.money_clean })
+          }
+        })
+        this.initEchartsFun()
+      } else {
+        // this.initEchartsFun()
+      }
     }
     mounted () {
-      setTimeout(() => {
-        this.initEchartsFun()
-      }, 1000)
+      // setTimeout(() => {
+      //   this.initEchartsFun()
+      // }, 1000)
     }
     initEchartsFun () {
       const myChart = echarts.init(this.$refs.map as HTMLDivElement)
@@ -70,9 +85,9 @@
             }
           },
           color: ['#64B9FC', '#81C784', '#E57373', '#369FF1', '#f1963b', '#ff4715', '#5072b8'],
-          data: this.chartData.rows
+          data: this.seriesData
         }
-      })
+      }, true)
     }
   }
 </script>

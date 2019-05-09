@@ -39,12 +39,12 @@
                   <a-tab-pane tab="周收款排行" key="1" class="lpc-card-content">
                     <template>
                       <a-carousel vertical :dots="false" autoplay> <!-- autoplay -->
-                          <div v-for="(item, i) in arr" :key="i">
+                          <div v-for="(item, i) in weekIncomeMoney" :key="i">
                             <ul class="lpc-carUl" :class="i ? '': 'one'">
                               <li v-for="(list, index) in item" :key="index">
                                 <span class="badge">{{list.num + 1}}</span>
-                                <span>{{list.branch_name}}</span>
-                                <span>{{list.total_money}}</span>
+                                <span>{{list.short_name}}</span>
+                                <span>{{list.school_income_money}}</span>
                               </li>
                             </ul>
                           </div>
@@ -54,12 +54,12 @@
                   <a-tab-pane tab="月收款排行" key="2" class="lpc-card-content">
                     <template>
                       <a-carousel vertical :dots="false" autoplay> <!-- autoplay -->
-                          <div v-for="(item, i) in arr" :key="i">
+                          <div v-for="(item, i) in monthAmongMoney" :key="i">
                             <ul class="lpc-carUl" :class="i ? '': 'one'">
                               <li v-for="(list, index) in item" :key="index">
                                 <span class="badge">{{list.num + 1}}</span>
-                                <span>{{list.branch_name}}</span>
-                                <span>{{list.total_money}}</span>
+                                <span>{{list.short_name}}</span>
+                                <span>{{list.school_income_money}}</span>
                               </li>
                             </ul>
                           </div>
@@ -74,7 +74,7 @@
                 <p class="title">年度结转排行</p>
                 <template>
                   <a-carousel vertical :dots="false" autoplay> <!-- autoplay -->
-                      <div v-for="(item, i) in arr" :key="i">
+                      <div v-for="(item, i) in carryTotalMoney" :key="i">
                         <ul class="lpc-carUl" :class="i ? '': 'one'">
                           <li v-for="(list, index) in item" :key="index">
                             <span class="badge">{{list.num + 1}}</span>
@@ -95,7 +95,7 @@
                 <p class="title"><span>学校</span><span>预算完成</span><span>比例</span></p>
                 <template>
                   <a-carousel vertical :dots="false" autoplay> <!-- autoplay -->
-                      <div v-for="(item, i) in arrlength" :key="i">
+                      <div v-for="(item, i) in preMonthMoney" :key="i">
                         <ul class="lpc-carUl-width" :class="i ? '': 'one'">
                           <li v-for="(list, index) in item" :key="index">
                             <span class="badge">{{list.num + 1}}</span>
@@ -119,7 +119,7 @@
                 <p class="title"><span>学校</span><span>预算完成</span><span>比例</span></p>
                 <template>
                   <a-carousel vertical :dots="false" autoplay> <!-- autoplay -->
-                      <div v-for="(item, i) in arrlength" :key="i">
+                      <div v-for="(item, i) in preYearMoney" :key="i">
                         <ul class="lpc-carUl-width" :class="i ? '': 'one'">
                           <li v-for="(list, index) in item" :key="index">
                             <span class="badge">{{list.num + 1}}</span>
@@ -148,23 +148,23 @@
             <table>
               <tbody>
                 <tr>
-                  <td class="spaceTd">总计售卖合同数</td><td>{{ data.dataFenxi.total }}个</td>
-                  <td class="spaceTd">总计优惠金额</td><td>{{ data.dataFenxi.totalMoney }}</td>
-                  <td class="spaceTd">人均产出合同</td><td>{{ data.dataFenxi.svgContract }}个</td>
+                  <td class="spaceTd">总计售卖合同数</td><td>{{ data.operation.agreement_num }}个</td>
+                  <td class="spaceTd">总计优惠金额</td><td>{{ data.operation.preferential_total }}</td>
+                  <td class="spaceTd">人均产出合同</td><td>{{ data.operation.person_avg_agreement }}个</td>
                 </tr>
                 <tr>
-                  <td class="spaceTd">签约产品</td><td>{{ data.dataFenxi.chanpin }}个</td>
-                  <td class="spaceTd">优惠比例均值</td><td>{{ data.dataFenxi.bilijunzhi }}</td>
-                  <td class="spaceTd">人均产出产品</td><td>{{ data.dataFenxi.renjunchanpin }}个</td>
+                  <td class="spaceTd">签约产品</td><td>{{ data.operation.product_num }}个</td>
+                  <td class="spaceTd">优惠比例均值</td><td>{{ data.operation.prefrence_avg_protion }}</td>
+                  <td class="spaceTd">人均产出产品</td><td>{{ data.operation.person_avg_product }}个</td>
                 </tr>
                 <tr>
-                  <td class="spaceTd">咨询平均单臂</td><td>{{ data.dataFenxi.pinjundanbi }}</td>
-                  <td class="spaceTd">低于最低</td><td>{{ data.dataFenxi.min }}</td>
-                  <td class="spaceTd">咨询人均单笔</td><td>{{ data.dataFenxi.zixunrenjundanbi }}</td>
+                  <td class="spaceTd">咨询平均单笔</td><td>{{ data.operation.consulsingle_money }}</td>
+                  <td class="spaceTd">销售顾问</td><td>{{ data.operation.sign_person_num }}个</td>
+                  <td class="spaceTd">咨询人均单笔</td><td>{{ data.operation.cul_person_money }}</td>
                 </tr>
                 <tr>
-                  <td class="spaceTd">培训平均单笔</td><td>{{ data.dataFenxi.svgrenjundanbi }}</td>
-                  <td class="spaceTd">销售顾问</td><td>{{ data.dataFenxi.xiaoshouguwen }}个</td>
+                  <td class="spaceTd">培训平均单笔</td><td>{{ data.operation.pei_single_money }}</td>
+                  <td></td>
                   <td></td><td></td>
                 </tr>
               </tbody>
@@ -175,40 +175,40 @@
           <div class="lpc-right-left">
             <img src="../../assets/img/borderright.png" alt="" class="rightImg">
             <img src="../../assets/img/borderleft.png" alt="" class="leftImg">
-            <pc-line title="周收入趋势" startColor="#E57373" endColor="rgba(229, 115, 115, .3)"/>
+            <pc-line title="周收入趋势" :data="data.weekIncomeOnline" startColor="#E57373" endColor="rgba(229, 115, 115, .3)"/>
           </div>
           <div class="lpc-right-right">
             <img src="../../assets/img/borderright.png" alt="" class="rightImg">
             <img src="../../assets/img/borderleft.png" alt="" class="leftImg">
-            <pc-line title="周退费趋势" startColor="#3484f5" endColor="rgba(52, 132, 245, .3)"/>
+            <pc-line title="周退费趋势" :data="data.weekRefundOnline" startColor="#3484f5" endColor="rgba(52, 132, 245, .3)"/>
           </div>
           <div class="lpc-right-left">
             <img src="../../assets/img/borderright.png" alt="" class="rightImg">
             <img src="../../assets/img/borderleft.png" alt="" class="leftImg">
-            <pc-pie title="业务培训收入构成"/>
+            <pc-pie title="产品分类收入构成" :data="data.productMoney"/>
           </div>
           <div class="lpc-right-right">
             <img src="../../assets/img/borderright.png" alt="" class="rightImg">
             <img src="../../assets/img/borderleft.png" alt="" class="leftImg">
-            <pc-pie title="培训收入业务类型"/>
+            <pc-pie title="培训收入业务类型" :data="data.cultivateCleanMoney"/>
           </div>
           <div class="lpc-right-left">
             <img src="../../assets/img/borderright.png" alt="" class="rightImg">
             <img src="../../assets/img/borderleft.png" alt="" class="leftImg">
-            <pc-pie title="咨询收入业务类型"/>
+            <pc-pie title="咨询收入业务类型" :data="data.consulCleanMoney"/>
           </div>
           <div class="lpc-right-right">
             <img src="../../assets/img/borderright.png" alt="" class="rightImg">
             <img src="../../assets/img/borderleft.png" alt="" class="leftImg">
-            <pc-bar title="不知道显示啥玩意儿数据"/>
+            <pc-bar title="某某某数据"/>
           </div>
         </div>
         <div class="echart-geo" ref="echartChina">
-          <pc-china datas="ggsmd"/>
+          <pc-china :datas="data.citySchoolList"/>
         </div>
        </div>
        <div class="timeNum" ref="timeNum">
-         <p class="daoJiShi" v-if="daoJiShi">{{ timeOut }}</p>
+          <!-- <p class="daoJiShi" v-if="daoJiShi">{{ timeOut }}</p> -->
        </div>
      </a-spin>
     </div>
@@ -225,10 +225,19 @@
   import pcBar from '@/components/chart/pcBar.vue'
 
   interface data {
-    totalIncomeMoney:any,
     carryTotalMoney:Array<any>,
+    citySchoolList:Array<any>,
+    consulCleanMoney:Array<any>,
+    cultivateCleanMoney:Array<any>,
+    monthAmongMoney:Array<any>,
+    operation:any,
+    preMonthMoney:Array<any>,
     preYearMoney:Array<any>,
-    dataFenxi:any
+    productMoney:Array<any>,
+    totalIncomeMoney:any,
+    weekIncomeMoney:Array<any>,
+    weekIncomeOnline:Array<any>,
+    weekRefundOnline:Array<any>
   }
 
   @Component({
@@ -246,9 +255,16 @@
     week:string = ''
     arr:Array<any> = [] // 对结转排行进行切割
     arrlength:Array<any> = [] // 预算排行
-    dayIncomeMoney:string = '' // 今日收款
+
+    weekIncomeMoney:Array<any> = [] // 周收款
+    monthAmongMoney:Array<any> = [] // 月收款
+    carryTotalMoney:Array<any> = [] // 年度结转
+    preMonthMoney:Array<any> = [] // 月预算
+    preYearMoney:Array<any> = [] // 年预算
+
+    dayIncomeMoney:string = '0000' // 今日收款
     data:data = {
-      totalIncomeMoney: {
+      totalIncomeMoney: { // 今日收款模块
         'dayIncomeMoney': 23647124, // 日总收入
         'weekIncomeMoney': 236471.18, // 周总收入
         'weekProportion': '0.00', // 周同比
@@ -456,27 +472,24 @@
             "proportion":"80"
         }
       ],
-      dataFenxi: { // 运营数据分析
-        total: 6,
-        totalMoney: 20000,
-        svgContract: 5,
-        chanpin: 20,
-        bilijunzhi: '80%',
-        renjunchanpin: 10,
-        pinjundanbi: 20000,
-        min: '95%',
-        zixunrenjundanbi: 250000,
-        svgrenjundanbi: 2000,
-        xiaoshouguwen: 2
-      }
+      citySchoolList: [],
+      consulCleanMoney: [],
+      cultivateCleanMoney: [],
+      monthAmongMoney: [], // 月收款
+      operation: {},
+      preMonthMoney: [],
+      productMoney: [],
+      weekIncomeMoney: [], // 周收款
+      weekIncomeOnline: [],
+      weekRefundOnline: []
     }
     moment () {}
     created () {
       setTimeout(() => {
         this.spinning = false
-      }, 1000);
+      }, 800)
       // moment汉化
-      (moment as any).locale('zh-cn', {
+      /* (moment as any).locale('zh-cn', {
           months: '一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月'.split('_'),
           monthsShort: '1月_2月_3月_4月_5月_6月_7月_8月_9月_10月_11月_12月'.split('_'),
           weekdays: '星期日_星期一_星期二_星期三_星期四_星期五_星期六'.split('_'),
@@ -570,10 +583,9 @@
               dow: 1, // Monday is the first day of the week.
               doy: 4 // The week that contains Jan 4th is the first week of the year.
           }
-      })
+      }) */
     }
     mounted () {
-      this.dayIncomeMoney = toThousands(this.data.totalIncomeMoney.dayIncomeMoney) // 转换今日收款
       let _this = this
       // let doc:HTMLDivElement = document.body.clientHeight
       let clientHeight:any = document.body.clientHeight
@@ -593,13 +605,24 @@
       this.week = getTime('dddd')
       /* console.log(moment().format('YYYY'), moment().format('MM'), moment().format('DD'))
       console.log(moment().format('dddd')) */
-      this.splitObjFun(this.data.carryTotalMoney, 5) // 结转
-      this.splitObjFun(this.data.preYearMoney, 8); // 预算
-      // setTimeout(() => {
-      //   this.timeRun()
-      // }, 5000)
+      this.initAjaxDataFun() // 请求数据
     }
-    splitObjFun (obj:Array<any>, sliceNum:number):void { // 将数组切割成每5or8个一组
+    initAjaxDataFun ():void {
+      let _this = this;
+      (this as any).$post('/custom/PresidentScreen/getPreSidentScreen').then((res: any) => {
+        if (res.state === 2000) {
+          _this.data = res.data
+          this.dayIncomeMoney = toThousands(_this.data.totalIncomeMoney.dayIncomeMoney) // 转换今日收款
+          this.splitObjFun(this.data.weekIncomeMoney, 5, 'week') // 处理周收款
+          this.splitObjFun(this.data.monthAmongMoney, 5, 'month') // 处理月收款
+          this.splitObjFun(this.data.carryTotalMoney, 5, 'yearCarry') // 处理年度结转
+          this.splitObjFun(this.data.preMonthMoney, 8, 'preMonth'); // 处理月预算
+          this.splitObjFun(this.data.preYearMoney, 8, 'preYear'); // 处理年预算
+          _this.timeRun()
+        }
+      })
+    }
+    splitObjFun (obj:Array<any>, sliceNum:number, type:string):void { // 将数组切割成每5or8个一组
       let arr:Array<any> = []
       obj.map((v:any, i:number) => {
         v.proportion = +v.proportion
@@ -608,10 +631,16 @@
       for (let i = 0; i < obj.length / sliceNum; i++) {
         arr.push(obj.slice(i * sliceNum, (i+1) * sliceNum))
       }
-      if (sliceNum === 5) {
-        this.arr = arr
-      } else {
-        this.arrlength = arr
+      if (type === 'week') {
+        this.weekIncomeMoney = arr
+      } else if (type === 'month') {
+        this.monthAmongMoney = arr
+      } else if (type === 'yearCarry') {
+        this.carryTotalMoney = arr
+      } else if (type === 'preMonth') {
+        this.preMonthMoney = arr
+      } else if (type === 'preYear') {
+        this.preYearMoney = arr
       }
       /* for (let i = 0; i < obj.length; i+=5) {
         arr.push(obj.slice(i, i+5))
@@ -628,10 +657,10 @@
           this.timeRun()
         }, 1000)
       } else {
-        this.timeOut = 6
         this.daoJiShi = false
+        this.timeOut = 6
         setTimeout(() => {
-          this.timeRun()
+          this.initAjaxDataFun() // 请求数据
         }, 10 * 1000) // 一分钟后再次请求
       }
     }
@@ -712,6 +741,7 @@
       .lpc-content {
         height: 9.81rem;
         position: relative;
+        overflow: hidden;
         .left {
           position: absolute;
           bottom: .16rem;
@@ -813,6 +843,7 @@
               .lpc-carousel {
                 position: absolute;
                 color: #fff;
+                width: 100%;
                 p.title {
                   background: rgba(0, 54, 115, .3);
                   height: .45rem;

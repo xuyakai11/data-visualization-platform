@@ -8,7 +8,7 @@
 </template>
 
 <script lang='ts'>
-  import { Component, Prop, Vue } from 'vue-property-decorator'
+  import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
   import echarts from 'echarts'
   require('echarts/lib/chart/line')
@@ -17,33 +17,53 @@
     components: {}
   })
   export default class pcLine extends Vue {
-    @Prop({}) title!:string // 接收父组件传过来的数据
+    @Prop({}) title!:string // 接收父组件传过来的title
+    @Prop({}) data!:any // 接收父组件传过来的数据
     @Prop({}) startColor!:string // 渐变颜色
     @Prop({}) endColor!:string // 渐变颜色
-
-    chartData:any = {
-      columns: ['time', '收入'],
+    myChart:any = ''
+    /* chartData:any = {
+      columns: ['weeknum', 'money'],
       rows: [
-        { 'time': '15', '收入': 1981 },
-        { 'time': '16', '收入': 900 },
-        { 'time': '17', '收入': 5291 },
-        { 'time': '18', '收入': 1200 },
-        { 'time': '19', '收入': 4398 },
-        { 'time': '20', '收入': 1981 }
+        { 'weeknum': '15', 'money': 1981 },
+        { 'weeknum': '16', 'money': 900 },
+        { 'weeknum': '17', 'money': 5291 },
+        { 'weeknum': '18', 'money': 1200 },
+        { 'weeknum': '19', 'money': 4398 },
+        { 'weeknum': '20', 'money': 1981 }
       ]
-    }
-    mounted () {
-      setTimeout(() => {
+    } */
+    xData:Array<string> = []
+    seriesData:Array<string> = []
+    @Watch('data', { deep: true, immediate: true }) dataWatch (newVal:Array<any>, oldVal:Array<any>) {
+      // if (this.myChart) {
+      if (newVal !== oldVal && newVal.length) {
+        this.xData = []
+        this.seriesData = []
+        newVal.map((v:any, i:number) => {
+          this.xData.push(v.weeknum)
+          this.seriesData.push(v.weekIncomeMoney)
+        })
         this.initEchartsFun()
-      }, 1000)
+      } else {
+        // this.initEchartsFun()
+      }
+      // }
+    }
+
+    mounted () {
+      // setTimeout(() => {
+        // this.xData = ['12', '13', '14', '18', '10']
+        // this.initEchartsFun()
+      // }, 1000)
       /* window.onresize = () => { //  根据窗口大小调整曲线大小
 		    const myChart = echarts.init(this.$refs.map as HTMLDivElement)
 		    myChart.resize();
 		  } */
     }
     initEchartsFun () {
-      const myChart = echarts.init(this.$refs.map as HTMLDivElement)
-      myChart.setOption({
+      this.myChart = echarts.init(this.$refs.map as HTMLDivElement)
+      this.myChart.setOption({
         tooltip: {
           show: true,
           trigger: 'axis'
@@ -66,7 +86,7 @@
               fontSize: 10
             }
           },
-          data: ['15', '16', '17', '18', '19', '20']
+          data: this.xData
         },
         yAxis: {
           type: 'value',
@@ -118,9 +138,9 @@
               }
             }
           },
-          data: ['1981', '900', '5291', '1200', '1981', '2423']
+          data: this.seriesData
         }
-      })
+      }, true)
     }
   }
 </script>
