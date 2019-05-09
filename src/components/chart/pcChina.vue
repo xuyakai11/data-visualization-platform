@@ -253,8 +253,6 @@
          this.data.push({ name: v.city_name, value: v.total, schoolList: v.schoolList })
         })
        this.initEchartsFun()
-      } else {
-        // this.initEchartsFun()
       }
     }
     mounted () {
@@ -279,6 +277,7 @@
     }
     initEchartsFun () {
       const myChart = echarts.init(this.$refs.echartGeo as HTMLDivElement)
+       myChart.clear()
       let _this = this
       let max:number = this.data[0].value
       let min:number = this.data[0].value // 假设第一个为最大或者最小

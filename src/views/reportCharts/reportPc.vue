@@ -661,7 +661,7 @@
         this.timeOut = 6
         setTimeout(() => {
           this.initAjaxDataFun() // 请求数据
-        }, 10 * 1000) // 一分钟后再次请求
+        }, 60 * 1000) // 一分钟后再次请求
       }
     }
   }
@@ -673,7 +673,6 @@
     color: #AFBDD1;
     letter-spacing: 0;
     font-size: .14rem;
-    overflow: scroll;
   }
   .lpc-left-bottom .ant-carousel >>> .slick-slide {
     height: 3.02rem;
@@ -681,7 +680,6 @@
     color: #AFBDD1;
     letter-spacing: 0;
     font-size: .14rem;
-    overflow: scroll;
   }
   .lpc-carUl-width >>> .ant-progress-inner {
     background-color: #3E495B!important;
@@ -822,7 +820,6 @@
               display: inline-block;
               width: 3.02rem;
               height: 100%;
-              
               background: rgba(4, 18, 50, .6);
               margin-right: .2rem;
               position: relative;
@@ -890,7 +887,7 @@
           bottom: .16rem;
           left: 6.91rem;
           width: calc(100% - 6.27rem - 6.36rem - 1.25rem);
-          min-width: 540px;
+          min-width: 440px;
           border: 2px solid #003464;
           height: 2.5rem;
           background: rgba(4,18,50,0.80);
@@ -914,7 +911,7 @@
               line-height: .5rem;
               td.spaceTd {
                 padding: 0 .2rem;
-                width: 120px;
+                width: 110px;
                 text-overflow: ellipsis;
                 white-space: nowrap;
               }

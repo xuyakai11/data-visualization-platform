@@ -37,16 +37,14 @@
     seriesData:Array<string> = []
     @Watch('data', { deep: true, immediate: true }) dataWatch (newVal:Array<any>, oldVal:Array<any>) {
       // if (this.myChart) {
-      if (newVal !== oldVal && newVal.length) {
+      if (newVal && newVal.length) {
         this.xData = []
         this.seriesData = []
         newVal.map((v:any, i:number) => {
           this.xData.push(v.weeknum)
           this.seriesData.push(v.weekIncomeMoney)
         })
-        this.initEchartsFun()
-      } else {
-        // this.initEchartsFun()
+        this.initEchartsFun(this.xData, this.seriesData)
       }
       // }
     }
@@ -61,9 +59,11 @@
 		    myChart.resize();
 		  } */
     }
-    initEchartsFun () {
-      this.myChart = echarts.init(this.$refs.map as HTMLDivElement)
-      this.myChart.setOption({
+    initEchartsFun (x:Array<string>, y:Array<string>) {
+      console.log(1)
+      const myChart = echarts.init(this.$refs.map as HTMLDivElement)
+      myChart.clear()
+      const option = {
         tooltip: {
           show: true,
           trigger: 'axis'
@@ -86,7 +86,7 @@
               fontSize: 10
             }
           },
-          data: this.xData
+          data: x
         },
         yAxis: {
           type: 'value',
@@ -138,9 +138,10 @@
               }
             }
           },
-          data: this.seriesData
+          data: y
         }
-      }, true)
+      }
+      myChart.setOption(option, true)
     }
   }
 </script>

@@ -41,9 +41,7 @@
             this.seriesData.push({ name: v.name, value: v.money_clean })
           }
         })
-        this.initEchartsFun()
-      } else {
-        // this.initEchartsFun()
+        this.initEchartsFun(this.seriesData)
       }
     }
     mounted () {
@@ -51,9 +49,10 @@
       //   this.initEchartsFun()
       // }, 1000)
     }
-    initEchartsFun () {
+    initEchartsFun (series:Array<any>) {
       const myChart = echarts.init(this.$refs.map as HTMLDivElement)
-      myChart.setOption({
+      myChart.clear()
+      const option = {
         tooltip: { // 鼠标悬浮时，提示tooltip位置
           trigger: 'item',
           formatter: '{a} <br/> {b} : {c} ({d}%)',
@@ -85,9 +84,10 @@
             }
           },
           color: ['#64B9FC', '#81C784', '#E57373', '#369FF1', '#f1963b', '#ff4715', '#5072b8'],
-          data: this.seriesData
+          data: series
         }
-      }, true)
+      }
+      myChart.setOption(option, true)
     }
   }
 </script>
