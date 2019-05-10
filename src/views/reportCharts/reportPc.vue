@@ -760,7 +760,7 @@
             background: url('../../assets/img/day.png') 0 0 no-repeat;
             background-size: 100% 100%;
             p.title {
-              background: rgba(0,54,115,0.30);
+              // background: rgba(0,54,115,0.30);
               font-size: .24rem;
               color: #00D3E3;
               letter-spacing: 0;
