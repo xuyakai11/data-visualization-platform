@@ -22,6 +22,10 @@ declare module 'ant-design-vue' {
   const antDesignVue: any;
   export default antDesignVue;
 }
+declare module 'vue-count-to' { // 数字滚动插件
+  const vueCountTo: any;
+  export default vueCountTo;
+}
 declare module 'vuedraggable' {
   const vuedraggable: any;
   export default vuedraggable;

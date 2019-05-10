@@ -60,7 +60,6 @@
 		  } */
     }
     initEchartsFun (x:Array<string>, y:Array<string>) {
-      console.log(1)
       const myChart = echarts.init(this.$refs.map as HTMLDivElement)
       myChart.clear()
       const option = {

@@ -12,9 +12,12 @@
             <p class="title">今日收款</p>
             <div class="content">
               <p class="totalIncomeMoney">
-                <template v-for="(item, i) in dayIncomeMoney">
+                <!-- <template v-for="(item, i) in dayIncomeMoney">
                   <span :class="item !== ',' ? 'num': ''" :key="i">{{ item }}</span>
-                </template>
+                </template> -->
+                <count-to ref="totalIncomeMoney" prefix="¥ " :autoplay="true" :startVal="0" :endVal="dayMoney" :duration="1500">
+                  
+                </count-to>
               </p>
               <div class="totalIncome">
                 <div>
@@ -23,11 +26,11 @@
                 </div>
                 <div>
                   <p>月收入</p>
-                  <p>{{data.totalIncomeMoney.weekIncomeMoney}}万 <span :class="data.totalIncomeMoney.monthProportion > 0 ? 'up' : 'down'"><a-icon :type="data.totalIncomeMoney.monthProportion > 0 ? 'arrow-up' : 'arrow-down'" />{{data.totalIncomeMoney.monthProportion}}%</span></p>
+                  <p>{{data.totalIncomeMoney.monthIncomeMoney}}万 <span :class="data.totalIncomeMoney.monthProportion > 0 ? 'up' : 'down'"><a-icon :type="data.totalIncomeMoney.monthProportion > 0 ? 'arrow-up' : 'arrow-down'" />{{data.totalIncomeMoney.monthProportion}}%</span></p>
                 </div>
                 <div>
                   <p>年收入</p>
-                  <p>{{data.totalIncomeMoney.weekIncomeMoney}}万 <span :class="data.totalIncomeMoney.yearProportion > 0 ? 'up' : 'down'"><a-icon :type="data.totalIncomeMoney.yearProportion > 0 ? 'arrow-up' : 'arrow-down'" />{{data.totalIncomeMoney.yearProportion}}%</span></p>
+                  <p>{{data.totalIncomeMoney.yearIncomeMoney}}万 <span :class="data.totalIncomeMoney.yearProportion > 0 ? 'up' : 'down'"><a-icon :type="data.totalIncomeMoney.yearProportion > 0 ? 'arrow-up' : 'arrow-down'" />{{data.totalIncomeMoney.yearProportion}}%</span></p>
                 </div>
               </div>
             </div>
@@ -190,12 +193,12 @@
           <div class="lpc-right-right">
             <img src="../../assets/img/borderright.png" alt="" class="rightImg">
             <img src="../../assets/img/borderleft.png" alt="" class="leftImg">
-            <pc-pie title="培训收入业务类型" :data="data.cultivateCleanMoney"/>
+            <pc-pie title="培训收入业务构成" :data="data.cultivateCleanMoney"/>
           </div>
           <div class="lpc-right-left">
             <img src="../../assets/img/borderright.png" alt="" class="rightImg">
             <img src="../../assets/img/borderleft.png" alt="" class="leftImg">
-            <pc-pie title="咨询收入业务类型" :data="data.consulCleanMoney"/>
+            <pc-pie title="咨询收入业务构成" :data="data.consulCleanMoney"/>
           </div>
           <div class="lpc-right-right">
             <img src="../../assets/img/borderright.png" alt="" class="rightImg">
@@ -218,6 +221,7 @@
 <script lang='ts'>
   import { Component, Prop, Vue } from 'vue-property-decorator'
   import * as moment from 'moment'
+  import countTo from 'vue-count-to'
   import { toThousands, getTime } from '@/libs/util.ts'
   import pcLine from '@/components/chart/pcLine.vue'
   import pcPie from '@/components/chart/pcPie.vue'
@@ -241,7 +245,7 @@
   }
 
   @Component({
-    components: { pcLine, pcPie, pcChina, pcBar }
+    components: { pcLine, pcPie, pcChina, pcBar, countTo }
   })
   export default class reportPc extends Vue {
     @Prop() private msg!: string;
@@ -255,6 +259,8 @@
     week:string = ''
     arr:Array<any> = [] // 对结转排行进行切割
     arrlength:Array<any> = [] // 预算排行
+    
+    dayMoney:number = 0
 
     weekIncomeMoney:Array<any> = [] // 周收款
     monthAmongMoney:Array<any> = [] // 月收款
@@ -262,7 +268,7 @@
     preMonthMoney:Array<any> = [] // 月预算
     preYearMoney:Array<any> = [] // 年预算
 
-    dayIncomeMoney:string = '0000' // 今日收款
+    dayIncomeMoney:string = '0' // 今日收款
     data:data = {
       totalIncomeMoney: { // 今日收款模块
         'dayIncomeMoney': 23647124, // 日总收入
@@ -612,13 +618,15 @@
       (this as any).$post('/custom/PresidentScreen/getPreSidentScreen').then((res: any) => {
         if (res.state === 2000) {
           _this.data = res.data
-          this.dayIncomeMoney = toThousands(_this.data.totalIncomeMoney.dayIncomeMoney) // 转换今日收款
+          // this.dayIncomeMoney = toThousands(_this.data.totalIncomeMoney.dayIncomeMoney) // 转换今日收款
           this.splitObjFun(this.data.weekIncomeMoney, 5, 'week') // 处理周收款
           this.splitObjFun(this.data.monthAmongMoney, 5, 'month') // 处理月收款
           this.splitObjFun(this.data.carryTotalMoney, 5, 'yearCarry') // 处理年度结转
-          this.splitObjFun(this.data.preMonthMoney, 8, 'preMonth'); // 处理月预算
-          this.splitObjFun(this.data.preYearMoney, 8, 'preYear'); // 处理年预算
-          _this.timeRun()
+          this.splitObjFun(this.data.preMonthMoney, 8, 'preMonth') // 处理月预算
+          this.splitObjFun(this.data.preYearMoney, 8, 'preYear') // 处理年预算
+          this.dayMoney = _this.data.totalIncomeMoney.dayIncomeMoney;
+          (this.$refs.totalIncomeMoney as any).start() // 重新开始数字滚动动画
+          this.timeRun()
         }
       })
     }
@@ -775,6 +783,7 @@
                     text-align: center;
                     display: inline-block;
                     margin-right: 2px;
+                    transition: all 1s;
                   }
                 }
               }
@@ -913,6 +922,10 @@
                 padding: 0 .2rem;
                 width: 110px;
                 text-overflow: ellipsis;
+                white-space: nowrap;
+              }
+              td {
+                word-spacing: normal;
                 white-space: nowrap;
               }
             }

@@ -45,9 +45,6 @@
       }
     }
     mounted () {
-      // setTimeout(() => {
-      //   this.initEchartsFun()
-      // }, 1000)
     }
     initEchartsFun (series:Array<any>) {
       const myChart = echarts.init(this.$refs.map as HTMLDivElement)
