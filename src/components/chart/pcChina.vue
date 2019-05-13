@@ -451,7 +451,7 @@
           itemStyle: {
             normal: {
               show: true,
-              color: '#1B3B75',
+              color: '#1B3B75', // 地图颜色
               borderColor: '#80b3dc'
             },
             emphasis: {
@@ -504,7 +504,7 @@
             },
             itemStyle: {
               normal: {
-                color: 'rgba(255, 255, 0, .5)'
+                color: 'rgba(255, 255, 0, .5)' // 标记颜色rgba(255, 255, 0, .5)
               }
             },
             zlevel: 1
@@ -542,7 +542,7 @@
               normal: {
                 formatter: '{b}',
                 position: 'right',
-                show: true
+                show: false // 是否显示label
               }
             },
             itemStyle: {
@@ -582,7 +582,7 @@
               normal: {
                 formatter: '{b}',
                 position: 'right',
-                show: true
+                show: false
               }
             },
             itemStyle: {
