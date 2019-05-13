@@ -33,20 +33,23 @@
     } */
 
     seriesData:Array<any> = []
+    legendData:Array<string> = []
     @Watch('data', { deep: true, immediate: true }) dataWatch (newVal:Array<any>, oldVal:Array<any>) {
       if (newVal !== oldVal && newVal.length) {
         this.seriesData = []
+        this.legendData = []
         newVal.map((v:any, i:number) => {
           if (v.money_clean > 0) {
             this.seriesData.push({ name: v.name, value: v.money_clean })
+            this.legendData.push(v.name)
           }
         })
-        this.initEchartsFun(this.seriesData)
+        this.initEchartsFun(this.seriesData, this.legendData)
       }
     }
     mounted () {
     }
-    initEchartsFun (series:Array<any>) {
+    initEchartsFun (series:Array<any>, legendData:Array<string>) {
       const myChart = echarts.init(this.$refs.map as HTMLDivElement)
       myChart.clear()
       const option = {
@@ -55,12 +58,27 @@
           formatter: '{a} <br/> {b} : {c} ({d}%)',
           position: 'left' // ['50%', '50%']
         },
+        legend: {
+          type: 'scroll',
+          orient: 'vertical',
+          x: 'left',
+          textStyle: {
+            color: '#FFF',
+            fontSize: 10
+          },
+          pageIconSize: 10, // 翻页按钮大小
+          itemWidth: 10, // 图例颜色块设置
+          itemHeight: 10,
+          pageIconInactiveColor: '#afaeae', // 翻页按钮颜色配置 不可翻
+          pageIconColor: '#00D3E3', // 翻页按钮颜色配置 可翻
+          data: legendData
+        },
         series: {
           name: this.title,
           type: 'pie',
           radius: ['50%', '80%'],
           // roseType: 'radius', // 'area' 切换模式半径模式or面积模式
-          center: ['50%', '45%'],
+          center: ['65%', '45%'],
           avoidLabelOverlap: false,
           label: {
             normal: {

@@ -15,9 +15,7 @@
                 <!-- <template v-for="(item, i) in dayIncomeMoney">
                   <span :class="item !== ',' ? 'num': ''" :key="i">{{ item }}</span>
                 </template> -->
-                <count-to ref="totalIncomeMoney" prefix="¥ " :autoplay="true" :startVal="0" :endVal="dayMoney" :duration="1500">
-                  
-                </count-to>
+                <count-to ref="totalIncomeMoney" prefix="¥ " :autoplay="true" :startVal="0" :endVal="dayMoney" :duration="1500"></count-to>
               </p>
               <div class="totalIncome">
                 <div>
@@ -145,7 +143,7 @@
           </div>
         </div>
         <div class="middle">
-          <p class="title">运营数据分析</p>
+          <p class="title">月运营数据分析</p>
           <div>
             <table>
               <tbody>
@@ -202,7 +200,7 @@
           <div class="lpc-right-right">
             <img src="../../assets/img/borderright.png" alt="" class="rightImg">
             <img src="../../assets/img/borderleft.png" alt="" class="leftImg">
-            <pc-bar title="某某某数据"/>
+           <!--  <pc-bar title="某某某数据"/> -->
           </div>
         </div>
         <div class="echart-geo" ref="echartChina">
@@ -460,7 +458,10 @@
       } */
     }
     timeRun ():void { // 请求倒计时
-      if (this.timeOut !== 0) {
+        setTimeout(() => {
+          this.initAjaxDataFun() // 请求数据
+        }, 60 * 1000) // 一分钟后再次请求
+      /* if (this.timeOut !== 0) {
         this.daoJiShi = true
         this.timeOut--
         setTimeout(() => {
@@ -472,7 +473,7 @@
         setTimeout(() => {
           this.initAjaxDataFun() // 请求数据
         }, 60 * 1000) // 一分钟后再次请求
-      }
+      } */
     }
   }
 </script>
@@ -612,11 +613,11 @@
                   }
                   .up {
                     font-size: 12px;
-                    color: rgb(81, 236, 151);
+                    color: #E57373;
                   }
                   .down {
                     font-size: 12px;
-                    color: #E57373;
+                    color: rgb(81, 236, 151);
                   }
                 }
               }

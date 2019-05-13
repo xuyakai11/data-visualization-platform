@@ -69,7 +69,7 @@
         },
         calculable: true,
         grid: {
-          top: 10,
+          top: 35,
           bottom: 20,
           left: 40,
           right: 10
@@ -89,7 +89,11 @@
         },
         yAxis: {
           type: 'value',
-          // name: '单位：xxxx',
+          name: '单位:万(周)',
+          nameTextStyle: {
+            color: 'rgba(255, 255, 255, 1)',
+            fontSize: 10
+          },
           splitLine: { show: false }, // 刻度线
           axisLine: { show: false },
           axisTick: { // 分隔x轴下方小刻度线
