@@ -484,7 +484,7 @@
                 let schoolList:Array<any> = JSON.parse(val.value[3])
                 str += `<p style="font-size: 18px;line-height: 28.8px;background:rgba(0, 54, 115, .3)"><span style="color: #00D3E3;">${val.name}</span> : ${val.value[2]}</p>`;
                 for (let i = 0; i < schoolList.length; i++) {
-                  str += schoolList[i].short_name + ' : ' + Math.ceil(schoolList[i].school_income_money);
+                  str += '<p>'+ schoolList[i].short_name + ' : ' + Math.ceil(schoolList[i].school_income_money)+ '</p>';
                 }
                 return str
               }
@@ -504,7 +504,7 @@
             },
             itemStyle: {
               normal: {
-                color: '#FFEA00'
+                color: 'rgba(255, 255, 0, .5)'
               }
             },
             zlevel: 1
@@ -528,7 +528,7 @@
                 let schoolList:Array<any> = JSON.parse(val.value[3])
                 str += `<p style="font-size: 18px;line-height: 28.8px;background:rgba(0, 54, 115, .3)"><span style="color: #00D3E3;">${val.name}</span> : ${val.value[2]}</p>`;
                 for (let i = 0; i < schoolList.length; i++) {
-                  str += schoolList[i].short_name + ' : ' + Math.ceil(schoolList[i].school_income_money)
+                  str += '<p>'+ schoolList[i].short_name + ' : ' + Math.ceil(schoolList[i].school_income_money)+ '</p>'
                 }
                 return str
               }
@@ -547,7 +547,7 @@
             },
             itemStyle: {
               normal: {
-                color: '#FFEA00',
+                color: 'rgba(255, 255, 0, .5)', // '#FFEA00',
                 shadowBlur: 10,
                 shadowColor: '#333'
               }
@@ -572,7 +572,7 @@
                 let schoolList:Array<any> = JSON.parse(val.value[3])
                 str += `<p style="font-size: 18px;line-height: 28.8px;background:rgba(0, 54, 115, .3)"><span style="color: #00D3E3;">${val.name}</span> : ${val.value[2]}</p>`;
                 for (let i = 0; i < schoolList.length; i++) {
-                  str += schoolList[i].short_name + ' : ' + Math.ceil(schoolList[i].school_income_money);
+                  str += '<p>'+ schoolList[i].short_name + ' : ' + Math.ceil(schoolList[i].school_income_money)+ '</p>';
                 }
                 return str
               }
@@ -587,7 +587,7 @@
             },
             itemStyle: {
               normal: {
-                color: 'red',
+                color: 'rgba(255, 5, 5, .5)',
                 shadowBlur: 10,
                 shadowColor: '#333'
               }

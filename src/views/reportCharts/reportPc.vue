@@ -41,7 +41,7 @@
                 <a-tabs>
                   <a-tab-pane tab="周收款排行" key="1" class="lpc-card-content">
                     <template>
-                      <a-carousel vertical :dots="false" autoplay> <!-- autoplay -->
+                      <a-carousel vertical :dots="false" autoplay :autoplaySpeed="6000"> <!-- autoplay -->
                           <div v-for="(item, i) in weekIncomeMoney" :key="i">
                             <ul class="lpc-carUl" :class="i ? '': 'one'">
                               <li v-for="(list, index) in item" :key="index">
@@ -56,7 +56,7 @@
                   </a-tab-pane>
                   <a-tab-pane tab="月收款排行" key="2" class="lpc-card-content">
                     <template>
-                      <a-carousel vertical :dots="false" autoplay> <!-- autoplay -->
+                      <a-carousel vertical :dots="false" autoplay :autoplaySpeed="6000"> <!-- autoplay -->
                           <div v-for="(item, i) in monthAmongMoney" :key="i">
                             <ul class="lpc-carUl" :class="i ? '': 'one'">
                               <li v-for="(list, index) in item" :key="index">
@@ -76,7 +76,7 @@
               <div class="lpc-carousel">
                 <p class="title">月结转排行</p>
                 <template>
-                  <a-carousel vertical :dots="false" autoplay> <!-- autoplay -->
+                  <a-carousel vertical :dots="false" autoplay :autoplaySpeed="6000"> <!-- autoplay -->
                       <div v-for="(item, i) in carryTotalMoney" :key="i">
                         <ul class="lpc-carUl" :class="i ? '': 'one'">
                           <li v-for="(list, index) in item" :key="index">
@@ -96,7 +96,7 @@
               <a-tab-pane tab="月预算排行" key="1" class="lpc-card-content">
                 <p class="title"><span>学校</span><span>预算完成</span><span>比例</span></p>
                 <template>
-                  <a-carousel vertical :dots="false" autoplay> <!-- autoplay -->
+                  <a-carousel vertical :dots="false" autoplay :autoplaySpeed="6000"> <!-- autoplay -->
                       <div v-for="(item, i) in preMonthMoney" :key="i">
                         <ul class="lpc-carUl-width" :class="i ? '': 'one'">
                           <li v-for="(list, index) in item" :key="index">
@@ -120,7 +120,7 @@
               <a-tab-pane tab="年预算排行" key="2" class="lpc-card-content">
                 <p class="title"><span>学校</span><span>预算完成</span><span>比例</span></p>
                 <template>
-                  <a-carousel vertical :dots="false" autoplay> <!-- autoplay -->
+                  <a-carousel vertical :dots="false" autoplay :autoplaySpeed="6000"> <!-- autoplay -->
                       <div v-for="(item, i) in preYearMoney" :key="i">
                         <ul class="lpc-carUl-width" :class="i ? '': 'one'">
                           <li v-for="(list, index) in item" :key="index">
@@ -278,205 +278,8 @@
         'yearIncomeMoney': 236471.18, // 年总收入
         'yearProportion': '12.23' // 年同比
       },
-      carryTotalMoney: [ // 结转排行
-        {
-            "branch_name":"北京分公司",
-            "co_firstmoney":"603.00",
-            "co_extmoney":"0.00",
-            "co_diffmoney":"0.00",
-            "total_money":"603.00",
-            "school_code":"103",
-            "month_stamp":"201901"
-        },
-        {
-            "branch_name":"武汉分公司",
-            "co_firstmoney":"0.00",
-            "co_extmoney":"0.00",
-            "co_diffmoney":"0.00",
-            "total_money":"0.00",
-            "school_code":"104",
-            "month_stamp":"201901"
-        },
-        {
-            "branch_name": '垃圾公司1',
-            "co_firstmoney":"0.00",
-            "co_extmoney":"0.00",
-            "co_diffmoney":"0.00",
-            "total_money":"0.00",
-            "school_code":"98",
-            "month_stamp":"201901"
-        },
-        {
-            "branch_name":"北京分公司",
-            "co_firstmoney":"603.00",
-            "co_extmoney":"0.00",
-            "co_diffmoney":"0.00",
-            "total_money":"603.00",
-            "school_code":"103",
-            "month_stamp":"201901"
-        },
-        {
-            "branch_name":"武汉分公司",
-            "co_firstmoney":"0.00",
-            "co_extmoney":"0.00",
-            "co_diffmoney":"0.00",
-            "total_money":"0.00",
-            "school_code":"104",
-            "month_stamp":"201901"
-        },
-        {
-            "branch_name":'垃圾公司2',
-            "co_firstmoney":"0.00",
-            "co_extmoney":"0.00",
-            "co_diffmoney":"0.00",
-            "total_money":"0.00",
-            "school_code":"98",
-            "month_stamp":"201901"
-        },
-        {
-            "branch_name":"北京分公司",
-            "co_firstmoney":"603.00",
-            "co_extmoney":"0.00",
-            "co_diffmoney":"0.00",
-            "total_money":"603.00",
-            "school_code":"103",
-            "month_stamp":"201901"
-        },
-        {
-            "branch_name":"武汉分公司",
-            "co_firstmoney":"0.00",
-            "co_extmoney":"0.00",
-            "co_diffmoney":"0.00",
-            "total_money":"0.00",
-            "school_code":"104",
-            "month_stamp":"201901"
-        },
-        {
-            "branch_name":'垃圾公司3',
-            "co_firstmoney":"0.00",
-            "co_extmoney":"0.00",
-            "co_diffmoney":"0.00",
-            "total_money":"0.00",
-            "school_code":"98",
-            "month_stamp":"201901"
-        },
-        {
-            "branch_name":"北京分公司",
-            "co_firstmoney":"603.00",
-            "co_extmoney":"0.00",
-            "co_diffmoney":"0.00",
-            "total_money":"603.00",
-            "school_code":"103",
-            "month_stamp":"201901"
-        },
-        {
-            "branch_name":"武汉分公司",
-            "co_firstmoney":"0.00",
-            "co_extmoney":"0.00",
-            "co_diffmoney":"0.00",
-            "total_money":"0.00",
-            "school_code":"104",
-            "month_stamp":"201901"
-        },
-        {
-            "branch_name": '垃圾公司4',
-            "co_firstmoney":"0.00",
-            "co_extmoney":"0.00",
-            "co_diffmoney":"0.00",
-            "total_money":"0.00",
-            "school_code":"98",
-            "month_stamp":"201901"
-        },
-        {
-            "branch_name":"北京分公司",
-            "co_firstmoney":"603.00",
-            "co_extmoney":"0.00",
-            "co_diffmoney":"0.00",
-            "total_money":"603.00",
-            "school_code":"103",
-            "month_stamp":"201901"
-        },
-        {
-            "branch_name":"武汉分公司",
-            "co_firstmoney":"0.00",
-            "co_extmoney":"0.00",
-            "co_diffmoney":"0.00",
-            "total_money":"0.00",
-            "school_code":"104",
-            "month_stamp":"201901"
-        },
-        {
-            "branch_name": '垃圾公司5',
-            "co_firstmoney":"0.00",
-            "co_extmoney":"0.00",
-            "co_diffmoney":"0.00",
-            "total_money":"0.00",
-            "school_code":"98",
-            "month_stamp":"201901"
-        }
-      ],
-      preYearMoney: [ // 预算排行
-        {
-          "branch_name": "北京啄木鸟", // 学校名称
-          "preMoney": "5000", // 预结转数据
-          "completeMoney": "3000", // 完成金额
-          "proportion": "80" // 比例
-        },
-        {
-            "branch_name":"北京啄木鸟",
-            "preMoney":"5000",
-            "completeMoney":"3000",
-            "proportion":"80"
-        },
-        {
-            "branch_name":"深圳分公司",
-            "preMoney":"6000",
-            "completeMoney":"4000",
-            "proportion":"60"
-        },
-        {
-            "branch_name":"上海分公司",
-            "preMoney":"6000",
-            "completeMoney":"4000",
-            "proportion":"60"
-        },
-        {
-            "branch_name":"沈阳分公司",
-            "preMoney":"6000",
-            "completeMoney":"4000",
-            "proportion":"60"
-        },
-        {
-            "branch_name":"南京分公司",
-            "preMoney":"6000",
-            "completeMoney":"4000",
-            "proportion":"80"
-        },
-        {
-            "branch_name":"广州分公司",
-            "preMoney":"6000",
-            "completeMoney":"4000",
-            "proportion":"80"
-        },
-        {
-          "branch_name": "北京啄木鸟",
-          "preMoney": "5000",
-          "completeMoney": "3000",
-          "proportion": "80"
-        },
-        {
-          "branch_name": "北京啄木鸟",
-          "preMoney": "5000",
-          "completeMoney": "3000",
-          "proportion": "80"
-        },
-        {
-            "branch_name":"北京啄木鸟",
-            "preMoney":"5000",
-            "completeMoney":"3000",
-            "proportion":"80"
-        }
-      ],
+      carryTotalMoney: [], // 结转排行
+      preYearMoney: [], // 预算排行
       citySchoolList: [],
       consulCleanMoney: [],
       cultivateCleanMoney: [],
