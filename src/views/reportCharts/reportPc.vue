@@ -74,7 +74,7 @@
             </div>
             <div class="lpc-left-middle-right">
               <div class="lpc-carousel">
-                <p class="title">年度结转排行</p>
+                <p class="title">月结转排行</p>
                 <template>
                   <a-carousel vertical :dots="false" autoplay> <!-- autoplay -->
                       <div v-for="(item, i) in carryTotalMoney" :key="i">
@@ -89,7 +89,6 @@
                   </a-carousel>
                 </template>
               </div>
-              
             </div>
           </div>
           <div class="lpc-left-bottom">
@@ -193,12 +192,12 @@
           <div class="lpc-right-right">
             <img src="../../assets/img/borderright.png" alt="" class="rightImg">
             <img src="../../assets/img/borderleft.png" alt="" class="leftImg">
-            <pc-pie title="培训收入业务构成" :data="data.cultivateCleanMoney"/>
+            <pc-pie title="培训业务收入构成" :data="data.cultivateCleanMoney"/>
           </div>
           <div class="lpc-right-left">
             <img src="../../assets/img/borderright.png" alt="" class="rightImg">
             <img src="../../assets/img/borderleft.png" alt="" class="leftImg">
-            <pc-pie title="咨询收入业务构成" :data="data.consulCleanMoney"/>
+            <pc-pie title="咨询业务收入构成" :data="data.consulCleanMoney"/>
           </div>
           <div class="lpc-right-right">
             <img src="../../assets/img/borderright.png" alt="" class="rightImg">

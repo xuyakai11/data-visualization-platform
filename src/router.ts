@@ -20,11 +20,11 @@ export default new Router({
       name: '首页',
       component: Home,
       children: [
-        {
+        /* {
           path: '/reportScreen',
           name: '报表图形',
           component: () => import('./views/reportCharts/reportScreen.vue')
-        },
+        }, */
         {
           path: '/dataOriginManagement',
           name: '数据源管理',
