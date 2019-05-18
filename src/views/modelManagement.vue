@@ -33,13 +33,13 @@
         @ok="handleCreate"
       >
         <a-form id="collectionForm" :form="modelForm">
-          <a-form-item label='模型标识' :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
+          <!-- <a-form-item label='模型标识' :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
             <a-input
               ref="name"
               v-decorator="['name', { initialValue: editDataEcho.name, rules: [{ required: true, message: '请输入连接名' }]}]"
               placeholder="模型标识"
             />
-          </a-form-item>
+          </a-form-item> -->
           <a-form-item label='模型名称' :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
             <a-input
               ref="title"

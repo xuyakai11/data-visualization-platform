@@ -92,9 +92,9 @@
         this.generateList(this.dataSourceTree)
       }
     }
-    /* mounted () { 
-      console.log(this.dataList)
-    } */
+    // get treeListFilter () { // 过滤出不为空的值
+    //   return this.dataSourceTree.filter( (list:any) => list.children ? list.children.title !== '' : list.title !== '')
+    // }
     generateList (data:any):void { // 将数据处理成只有一个层级
       for (let i = 0; i < data.length; i++) {
         const node = data[i]

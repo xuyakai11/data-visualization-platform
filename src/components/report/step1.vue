@@ -11,10 +11,15 @@
         </a-form-item>
         <a-form-item label="数据源" :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
           <a-select
+            allowClear
+            showSearch
+            :filterOption="filterOption"
             ref="reportResourceId"
             @change="dataSourceSelectChange"
-            v-decorator="['reportResourceId', { rules: [{ required: true, message: '请选择数据源' }]}]"
+            :disabled="disabledReportResource || disabledForm"
+            v-decorator="['reportResourceId', { initialValue: reportResourceId, rules: [{ required: true, message: '请选择数据源' }]}]"
             placeholder="请选择数据源"
+            v-if="dataSourceList"
           >
             <a-select-option value="">请选择数据源</a-select-option>
             <a-select-option v-for="(item, i) in dataSourceList" :value="item.report_source_id" :key="i">{{item.link_name}}</a-select-option>
@@ -22,8 +27,11 @@
         </a-form-item>
         <a-form-item label="数据主表" :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
           <a-select
+            allowClear
+            showSearch
+            :filterOption="filterOption"
             ref="mainTableId"
-            :disabled="selectDisabled"
+            :disabled="selectDisabled || disabledForm"
             @change="mainTableIdChange"
             placeholder="数据主表"
             v-decorator="['mainTableId', { initialValue: dataSourceSelect, rules: [{ required: true, message: '请选择数据主表' }]}]"
@@ -33,11 +41,11 @@
           </a-select>
         </a-form-item>
         <a-form-item label="关联表" :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
-          <a-button type="primary" :disabled="joinBtnDis" @click="showModel" ref="joinArr"> + </a-button>
+          <a-button type="primary" :disabled="joinBtnDis || disabledForm" @click="showModel" ref="joinArr"> + </a-button>
         </a-form-item>
         <a-form-item :wrapperCol="{span: 15, offset: 5}">
           <template v-for="(item, i) in aTagDatas">
-            <a-tag :key="i" :closable="(i+1) === aTagDatas.length" :afterClose="() => aTagClose(i)" color="blue">关联表：{{item.joinTableName}}</a-tag>
+            <a-tag :key="i" :closable="(i+1) === aTagDatas.length && aTagDisabled" :afterClose="() => aTagClose(i)" color="blue">关联表：{{item.joinTableName}}</a-tag>
           </template>
         </a-form-item>
         <a-form-item :wrapperCol="{span: 15, offset: 5}">
@@ -113,7 +121,7 @@
 </template>
 
 <script lang='ts'>
-  import { Component, Prop, Vue, Emit } from 'vue-property-decorator'
+  import { Component, Prop, Vue, Emit, Watch } from 'vue-property-decorator'
   import { getQueryString } from '@/libs/util.ts'
 
   @Component
@@ -139,6 +147,11 @@
     joinMainFieldIds:Array<any> = [] // 存放关联字段、
     zbFieldIds:Array<any> = [] // 存放主表字段
     reportId:string = ''
+    reportName:string = '' // 报表名称
+    reportResourceId:string = getQueryString('reportResourceId') ? getQueryString('reportResourceId') : '' // 从数据源管理进入报表管理页面带过来的数据源id
+    disabledForm:boolean = false // 禁用表单
+    aTagDisabled:boolean = true // 禁用a-tag标签
+    disabledReportResource:boolean = false // 禁用数据源选项
     title:string = '新增关联表' // modal  title
     dataSourceSelect:string = ''
     @Emit('reportId') send (reportId:string) {} // 子传父方法
@@ -150,61 +163,79 @@
     created () {
       let id:number = getQueryString('reportId') // 获取从报表列表页带过来的id
       if (id) { // 编辑
-        (this as any).$post('custom/ReportManage/getReportMainInfo', { reportId: id }).then((res: any) => { // 请求表格数据
+        (this as any).$post('custom/ReportManage/getReportMainInfo', { reportId: id }).then((res: any) => { // 
           if (res.state === 2000) {
             this.selectDisabled = false // 将数据主表禁用放开
-            this.joinBtnDis = false; // 将关联表按钮放开
-            this.dataSourceSelect = res.data.mainTableId; // 将数据主表赋值到initialValue配置项的字段中
-            this.dataSourceSelectChange(res.data.reportResourceId);
+            this.joinBtnDis = false // 将关联表按钮放开
+            this.dataSourceSelect = res.data.mainTableId // 将数据主表赋值到initialValue配置项的字段中
+            /* this.reportName = res.data.reportName
+            this.reportResourceId = res.data.reportResourceId */
+            this.dataSourceSelectChange(res.data.reportResourceId)
             this.madinTabId = res.data.mainTableId; // 替换存放数据主表id 用于modal框中的数据主表回显
             (this as any).form.setFieldsValue({ 'reportName': res.data.reportName, 'reportResourceId': res.data.reportResourceId })
             this.aTagDatas = res.data.joinArr // 赋值关联表回显
-            this.joinArr = Object.assign(this.joinArr, res.data.joinArr); // 深度拷贝
+            this.joinArr = Object.assign(this.joinArr, res.data.joinArr) // 深度拷贝
             this.spinning = false // 关闭加载动画
           } else {
             this.spinning = false; // 关闭加载动画
-            (this as any).$message.error(res.message, 3); // 弹出错误message
+            (this as any).$message.error(res.message, 3) // 弹出错误message
           }
         }).catch((err: any) => {
           if (err.code === 'ECONNABORTED') {
-            (this as any).$message.error('请求超时', 3); // 弹出错误message
+            (this as any).$message.error('请求超时', 3) // 弹出错误message
           } else {
-            (this as any).$message.error('请求失败', 3); // 弹出错误message
+            (this as any).$message.error('请求失败', 3) // 弹出错误message
           }
-          this.spinning = false; // 关闭加载动画
-        });
+          this.spinning = false // 关闭加载动画
+        })
+        this.disabledForm = true // 禁用form
+        this.aTagDisabled = false // 禁用atag
       } else {
+        if (this.reportResourceId) {
+          (this as any).$nextTick(() => {
+            (this as any).form.setFieldsValue({ 'reportResourceId': +this.reportResourceId })
+          })
+          this.disabledReportResource = true
+          this.dataSourceSelectChange(+this.reportResourceId)
+        }
         this.spinning = false // 关闭加载动画
       }
     }
+    /* @Watch('dataSourceList', { deep: true, immediate: true }) dataWatch (newVal:Array<any>, oldVal:Array<any>) {
+      if (newVal && newVal.length) {
+        console.log(newVal);
+        this.dataSourceList = newVal
+        setTimeout(() => {
+          (this as any).form.setFieldsValue({ 'reportResourceId': this.reportResourceId })
+        }, 2000)
+        this.dataSourceSelectChange(this.reportResourceId)
+        // this.disabledReportResource = true
+      }
+    } */
     dataSourceSelectChange (val:number):void { // 数据源下拉框改变事件
       if (val) {
         (this as any).$post('custom/Modelcon/getModelBySourceId', { report_source_id: val }).then((res: any) => { // 请求表格数据
           if (res.state === 2000) {
             this.selectDisabled = false
-            // this.selectDisabled = false
             this.dataTab = res.data;
-            (this as any).modelForm.resetFields(['mainTableId']); // 重置主表字段
+            (this as any).modelForm.resetFields(['mainTableId']) // 重置主表字段
           } else {
             this.dataTab = [];
-            (this as any).$message.error(res.message, 3); // 弹出错误message
+            (this as any).$message.error(res.message, 3) // 弹出错误message
           }
         }).catch((err: any) => {
           if (err.code === 'ECONNABORTED') {
-            (this as any).$message.error('请求超时', 3); // 弹出错误message
+            (this as any).$message.error('请求超时', 3) // 弹出错误message
           } 
           this.dataTab = [];
-          (this as any).$message.error('请求失败', 3); // 弹出错误message
-        });
+          (this as any).$message.error('请求失败', 3) // 弹出错误message
+        })
       }
     }
     mainTableIdChange (val:number):void { // 数据主表下拉框改变事件
       if (val) {
         this.joinBtnDis = false
         this.madinTabId = val // 替换存放数据主表id
-        /* if (this.mainTabIdsArr.indexOf(val) === -1) { // 如果其中不包含其中选中的，则push
-          this.mainTabIdsArr.push(val)
-        } */
       } else {
         this.joinBtnDis = true
       }
@@ -215,18 +246,18 @@
           if (res.state === 2000) {
             this.joinTabFiledSelectDis = false // 解除禁用
             this.joinMainFieldIds = res.data; // 重新赋值
-            (this as any).modelForm.resetFields(['joinFieldId']); // 重置关联字段
+            (this as any).modelForm.resetFields(['joinFieldId']) // 重置关联字段
           } else {
             this.joinMainFieldIds = [];
-            (this as any).$message.error(res.message, 3); // 弹出错误message
+            (this as any).$message.error(res.message, 3) // 弹出错误message
           }
         }).catch((err: any) => {
           if (err.code === 'ECONNABORTED') {
-            (this as any).$message.error('请求超时', 3); // 弹出错误message
+            (this as any).$message.error('请求超时', 3) // 弹出错误message
           } else {
-            (this as any).$message.error('请求失败', 3); // 弹出错误message
+            (this as any).$message.error('请求失败', 3) // 弹出错误message
           }
-        });
+        })
       }
     }
     modalDataZB (val:number) { // modal中数据主表改变事件
@@ -235,25 +266,21 @@
           if (res.state === 2000) {
             this.zbFiledSelectDis = false
             this.zbFieldIds = res.data;
-            (this as any).modelForm.resetFields(['mainFieldId']); // 重置主表字段
+            (this as any).modelForm.resetFields(['mainFieldId']) // 重置主表字段
           } else {
             this.zbFieldIds = [];
-            (this as any).$message.error(res.message, 3); // 弹出错误message
+            (this as any).$message.error(res.message, 3) // 弹出错误message
           }
         }).catch((err: any) => {
           if (err.code === 'ECONNABORTED') {
-            (this as any).$message.error('请求超时', 3); // 弹出错误message
+            (this as any).$message.error('请求超时', 3) // 弹出错误message
           } else {
-            (this as any).$message.error('请求失败', 3); // 弹出错误message
+            (this as any).$message.error('请求失败', 3) // 弹出错误message
           }
-        });
+        })
       }
     }
     aTagClose (v:any):void { // 关联表tag关闭后回调
-      /* console.log(this.aTagDatas)
-      const tags = this.aTagDatas.filter((tag:any) => tag.mainTableId !== this.aTagDatas[v].mainTableId)
-      console.log(tags)
-      this.aTagDatas = tags; */
       this.aTagDatas.splice(v, 1); // 关闭则删除指定位置的数据
       this.joinArr.pop() // 删掉最后一个
     }
@@ -274,13 +301,13 @@
                 this.$emit('nextStep')
               // }, 100)
             } else {
-              (this as any).$message.error(res.message, 3); // 弹出错误message
+              (this as any).$message.error(res.message, 3) // 弹出错误message
             }
           }).catch((err: any) => {
             if (err.code === 'ECONNABORTED') {
-              (this as any).$message.error('请求超时', 3); // 弹出错误message
+              (this as any).$message.error('请求超时', 3) // 弹出错误message
             } else {
-              (this as any).$message.error('请求失败', 3); // 弹出错误message
+              (this as any).$message.error('请求失败', 3) // 弹出错误message
             }
           });
         }
@@ -297,10 +324,10 @@
       })
     }
     handleCancel ():void {
-      this.visible = false;
-      this.joinTabFiledSelectDis = true; // 将关联字段选择重置为不可选
+      this.visible = false
+      this.joinTabFiledSelectDis = true // 将关联字段选择重置为不可选
       this.zbFiledSelectDis = true; // 将主表字段充值为不可选
-      (this as any).modelForm.resetFields(); // 重置输入控件的值
+      (this as any).modelForm.resetFields() // 重置输入控件的值
     }
     handleCreate (e: any):void { // 模态框点击确认
       e.preventDefault();
@@ -312,12 +339,12 @@
             if (tableId === item.id) {
               // _thisValues.title = item.title
              let _thisValues = Object.assign({ joinTableName: item.title }, values)
-             this.aTagDatas.push(_thisValues); // 存放进要回显的
+             this.aTagDatas.push(_thisValues) // 存放进要回显的
             }
           })
-          this.joinTabFiledSelectDis = true; // 将关联字段选择重置为不可选
+          this.joinTabFiledSelectDis = true // 将关联字段选择重置为不可选
           this.zbFiledSelectDis = true; // 将主表字段选择重置为不可选
-          (this as any).modelForm.resetFields(); // 重置表单
+          (this as any).modelForm.resetFields() // 重置表单
           this.visible = false
         }
       })

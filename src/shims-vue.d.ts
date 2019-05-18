@@ -14,10 +14,10 @@ declare module 'echarts' {
   const echarts: any;
   export default echarts;
 }
-declare module 'v-charts' {
+/* declare module 'v-charts' {
   const vCharts: any;
   export default vCharts;
-}
+} */
 declare module 'ant-design-vue' {
   const antDesignVue: any;
   export default antDesignVue;

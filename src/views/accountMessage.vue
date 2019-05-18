@@ -58,7 +58,7 @@
                 </a-input>
               </a-form-item>
             </a-col>
-          </a-row> -->
+          </a-row>
           <a-row :gutter="22">
             <a-col :span="8">
               <a-form-item v-bind="formInputSelectlayout" label="手机号码">
@@ -68,14 +68,14 @@
                 </a-input>
               </a-form-item>
             </a-col>
-            <!-- <a-col :span="7">
+            <a-col :span="7">
               <a-form-item v-bind="formInputSelectlayout" label="微信号码">
                 <a-input v-decorator="['wechat', { initialValue: data.userInfo.Wechat, rules: [{ required: false, message: '请输入微信号码' }] }]"
                   :disabled="commonDisabled"
                   placeholder="微信号码">
                 </a-input>
               </a-form-item>
-            </a-col> -->
+            </a-col>
           </a-row>
           <a-row :gutter="22">
             <a-col :span="8">
@@ -85,7 +85,7 @@
                   v-decorator="[ 'departmentCode', { initialValue: data.userInfo.department_code, rules: [{ required: true, message: '请选择所属部门' }] }]"
                   placeholder="请选择所属部门">
                   <a-select-option value="">所属部门</a-select-option>
-                  <a-select-option :value="item.Code" v-for="(item, i) in data.department">
+                  <a-select-option :value="item.Code" v-for="(item, i) in data.department" :key="i">
                     {{item.Name}}
                   </a-select-option>
                 </a-select>
@@ -98,7 +98,7 @@
                   v-decorator="[ 'areaId', { initialValue: data.userInfo.area_code, rules: [{ required: false, message: '请选择所属校区,不能为空' }] }]"
                   placeholder="请选择所属校区">
                   <a-select-option value="">所属校区</a-select-option>
-                  <a-select-option :value="list.Code" v-for="(list, index) in data.areaList">
+                  <a-select-option :value="list.Code" v-for="(list, index) in data.areaList" :key="index">
                     {{list.Name}}
                   </a-select-option>
                 </a-select>
@@ -109,7 +109,7 @@
                 <a-date-picker :disabled="commonDisabled" format="YYYY-MM-DD" v-decorator="[ 'hireDate', { initialValue: data.userInfo.hire_date, rules: [{ required: true, message: '请选择入职时间' }] }]" style="100%"/>
              </a-form-item>
             </a-col>
-          </a-row>
+          </a-row> -->
 
           <a-form-item v-bind="formItemLayout" label="系统角色">
             <a-checkbox-group
@@ -117,7 +117,7 @@
               v-decorator="['roleId', { initialValue: roleInfoDealWith, rules: [{ required: true, message: '请选择系统角色' }]  }]"
               style="width: 100%;" >
               <a-row>
-                <a-col :span="4" v-for="(item, index) in data.roleList">
+                <a-col :span="4" v-for="(item, index) in data.roleList" :key="index">
                   <a-checkbox :value="item.id">
                     <a-tooltip placement="topLeft" :title="item.name" arrowPointAtCenter>
                       {{item.name}}
@@ -340,9 +340,6 @@
     mounted () {
       this.title = this.type === 'edit' ? '编辑账号信息' : '查看账号信息'
       this.type === 'look' ? this.allDisabled = true : this.allDisabled = false
-      // this.initDataFun({ userId: this.userId })
-      // console.log(moment('20190423').format('YYYY-MM-DD'))
-      // console.log(moment('20190423', 'YYYY-MM-DD'))
     }
     initDataFun (params:any):void {
       (this as any).$post('/custom/UserManage/getEditUserInfo', params).then((res: any) => { // 请求页面数据
@@ -353,9 +350,7 @@
           }) : []
           /* this.data.userInfo.business_line_codes ? this.data.userInfo.business_line_codes.split(',') : this.data.userInfo.business_line_codes = []
           this.data.userInfo.position_role_codes ? this.data.userInfo.position_role_codes.split(',') : this.data.userInfo.position_role_codes = [] */
-          console.log(this.data)
-          // this.data.userInfo.hire_date = this.data.userInfo.hire_date ? this.data.userInfo.hire_date = null : moment(this.data.userInfo.hire_date, 'YYYY-MM-DD')
-          this.data.userInfo.hire_date = (this as any).moment('20190423', 'YYYY-MM-DD')
+          this.data.userInfo.hire_date = this.data.userInfo.hire_date ? this.data.userInfo.hire_date = null : (this as any).moment(this.data.userInfo.hire_date, 'YYYY-MM-DD')
           this.data.userInfo.gender = this.data.userInfo.gender.toString() // 将返回过来的性别字段转为字符串格式
           /* this.checkedList = this.data.areaInfo // 赋值默认选中的校区权限
           this.areaList = this.data.areaList.length ? this.data.areaList.map((v:any, i:number) => {
@@ -402,9 +397,7 @@
     handleSubmit (e:any):void { // 提交方法
       e.preventDefault();
       (this as any).form.validateFieldsAndScroll((err: any, values: any) => {
-        
         if (!err) {
-          console.log(values)
           values.businessLineCodes = values.businessLineCodes.join(',')
           values.positionRoleCode = values.positionRoleCode.join(',')
           values.roleId = values.roleId.join(',')
@@ -435,14 +428,13 @@
               (this as any).$message.error('请求失败', 3) // 弹出错误message
             }
           })
-          console.log(params)
         }
       })
     }
   }
 </script>
 
-<style lang='scss' scoped rel='stylesheet/scss'>
+<style lang='less' scoped>
 .accountMessage {
   margin: 10px;
   background: #fbfbfb;

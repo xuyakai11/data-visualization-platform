@@ -72,18 +72,18 @@
   initDataFun ():void {
     (this as any).$post('custom/Datasmanage/getAllSourrceList').then((res: any) => { // 请求表格数据
       if (res.state === 2000) {
-        this.dataSourceList = res.data;
+        this.dataSourceList = res.data
       } else {
-        (this as any).$message.error(res.message, 3); // 弹出错误message
+        (this as any).$message.error(res.message, 3) // 弹出错误message
       }
     }).catch((err: any) => {
       if (err.code === 'ECONNABORTED') {
-        (this as any).$message.error('请求超时', 3); // 弹出错误message
+        (this as any).$message.error('请求超时', 3) // 弹出错误message
       } else {
-        (this as any).$message.error('请求失败', 3); // 弹出错误message
+        (this as any).$message.error('请求失败', 3) // 弹出错误message
       }
-      this.dataSourceList = [];
-    });
+      this.dataSourceList = []
+    })
   }
  }
 </script>

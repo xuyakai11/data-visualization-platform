@@ -32,7 +32,7 @@
               v-decorator="['roleName', { initialValue: '', rules: [{ required: false, message: '请输入系统角色' }]}]"
               placeholder="系统角色"/>
           </a-form-item>
-          <a-form-item>
+          <!-- <a-form-item>
             <a-select
               style="width: 171px;"
               placeholder="岗位角色"
@@ -71,7 +71,7 @@
               <a-select-option value="">编制</a-select-option>
               <a-select-option v-for="(item, i) in stuffType" :value="i" :key="i">{{item}}</a-select-option>
             </a-select>
-          </a-form-item>
+          </a-form-item> -->
           <a-form-item>
             <a-button type="primary" @click="handleSearch" :loading="searchLoading">搜索</a-button>
           </a-form-item>
@@ -122,9 +122,9 @@
       { title: '手机', dataIndex: 'mobile', key: '' },
       { title: '固定电话', dataIndex: 'phone', key: '' },
       { title: '学校', dataIndex: 'school_name', key: '' },
-      { title: '部门', dataIndex: 'departName', key: '' },
+      /* { title: '部门', dataIndex: 'departName', key: '' }, */
       { title: '校区', dataIndex: 'area_name', key: '' },
-      { title: '编制', dataIndex: 'stufftxt', key: '' },
+      /* { title: '编制', dataIndex: 'stufftxt', key: '' }, */
       { title: '停用日期', dataIndex: 'modify_times', key: '', width: '110px' },
       { title: '状态', dataIndex: 'statetxt', key: '' },
       { title: '操作', dataIndex: '', key: '', width: '20%', scopedSlots: { customRender: 'action'} } // scopedSlots配置操作列
@@ -158,16 +158,16 @@
           this.stuffType = res.data.stuffType
         } else {
           this.spinning = false;
-          (this as any).$message.error(res.message, 3); // 弹出错误message
+          (this as any).$message.error(res.message, 3) // 弹出错误message
         }
       }).catch((err: any) => {
         if (err.code === 'ECONNABORTED') {
-          (this as any).$message.error('请求超时', 3); // 弹出错误message
+          (this as any).$message.error('请求超时', 3) // 弹出错误message
         } else {
-          (this as any).$message.error('请求失败', 3); // 弹出错误message
+          (this as any).$message.error('请求失败', 3) // 弹出错误message
         }
-        this.spinning = false;
-        this.data = [];
+        this.spinning = false
+        this.data = []
       })
     }
     initDataFun (params:any):void {
@@ -205,9 +205,7 @@
         if (err) {
           (this as any).$message.error('表单信息有误', 3) // 弹出错误message
         }
-        console.log('sdfsfsdf')
         let obj = { nowpage: pagination.current, pageSize: pagination.pageSize, ...values }
-        console.log(obj)
         this.initDataFun(obj)
       })
     }

@@ -5,15 +5,15 @@
     <a-form layout='inline' class="ant-advanced-search-from" :form="form">
       <a-form-item :span="24">
         <a-input
-          ref="sourceName"
-          v-decorator="['sourceName']"
-          placeholder="连接名" />
-      </a-form-item>
-      <a-form-item :span="24">
-        <a-input
           ref="reportName"
           v-decorator="['reportName']"
           placeholder="报表名称" />
+      </a-form-item>
+      <a-form-item :span="24">
+        <a-input
+          ref="sourceName"
+          v-decorator="['sourceName']"
+          placeholder="数据源名称" />
       </a-form-item>
       <a-form-item>
         <a-button type="primary" @click="handleSearch" :loading="searchLoading">搜索</a-button>
@@ -132,27 +132,27 @@
     e.preventDefault();
     let reportId = record ? record.report_id : '' // 报表id
     // 打开报表制作
-    window.open(window.location.origin + '/statementMake?reportId=' + reportId); // _target 表示只打开一个，重复点击会回到第一个打开的窗口
+    window.open(window.location.origin + '/statementMake?reportId=' + reportId + '&reportResourceId=' + this.reportResourceId) // _target 表示只打开一个，重复点击会回到第一个打开的窗口
   }
   look (e:any, record:any):void { // 查看
     e.preventDefault();
     let reportId = record ? record.report_id : '' // 报表id
     // 打开报表详情
-    window.open(window.location.origin + '/reportTable?reportId=' + reportId); // _target 表示只打开一个，重复点击会回到第一个打开的窗口
+    window.open(window.location.origin + '/reportTable?reportId=' + reportId) // _target 表示只打开一个，重复点击会回到第一个打开的窗口
   }
   onChange (pagination: any) {
-    const pager:any = { ...this.pagination };
-    pager.current = pagination.current;
+    const pager:any = { ...this.pagination }
+    pager.current = pagination.current
     this.pagination = pager
-    let sourceName:string = (this as any).$refs.sourceName.value || ''; // 连接名
-    let reportName:string = (this as any).$refs.reportName.value || ''; // 报表名
+    let sourceName:string = (this as any).$refs.sourceName.value || '' // 连接名
+    let reportName:string = (this as any).$refs.reportName.value || '' // 报表名
     let params:any = { reportResourceId: this.reportResourceId, reportName: reportName, sourceName: sourceName, nowpage: pagination.current, pageSize: pagination.pageSize }
     this.initDataFun(params); // 请求表格数据
   }
   deleteFun (e:any, record:any):void {
     e.preventDefault();
     this.delBtnLoading = !this.delBtnLoading
-    let params: object = { reportId: record.report_id };
+    let params: object = { reportId: record.report_id }
     this.showConfirm('提示', '确认要删除该报表么？', params)
   }
   showConfirm (title: string, content: string, params: any) { // 弹出确认对话框
@@ -174,28 +174,28 @@
   delFieldFun (params:any):void {
     (this as any).$post('custom/ReportManage/delReport', params).then((res: any) => { // 删除表格数据
       if (res.state === 2000) {
-        let sourceName:string = (this as any).$refs.sourceName.value || ''; // 连接名
-        let reportName:string = (this as any).$refs.reportName.value || ''; // 报表名
+        let sourceName:string = (this as any).$refs.sourceName.value || '' // 连接名
+        let reportName:string = (this as any).$refs.reportName.value || '' // 报表名
         let params:any = { reportResourceId: this.reportResourceId, reportName: reportName, sourceName: sourceName, pageSize: 10, nowpage: 1 }
         this.initDataFun(params); // 请求表格数据
-        (this as any).$message.success(res.message, 3);
-        this.delBtnLoading = !this.delBtnLoading;
+        (this as any).$message.success(res.message, 3)
+        this.delBtnLoading = !this.delBtnLoading
       } else {
         this.delBtnLoading = !this.delBtnLoading;
-        (this as any).$message.error(res.message, 3); // 弹出错误message
+        (this as any).$message.error(res.message, 3) // 弹出错误message
       }
     }).catch((err:any) => {
       if (err.code === 'ECONNABORTED') {
-        (this as any).$message.error('请求超时', 3); // 弹出错误message
+        (this as any).$message.error('请求超时', 3) // 弹出错误message
       } else {
-        (this as any).$message.error('删除失败', 3);
+        (this as any).$message.error('删除失败', 3)
       }
-      this.delBtnLoading = !this.delBtnLoading;
-    });
+      this.delBtnLoading = !this.delBtnLoading
+    })
   }
  }
 </script>
-<style lang='scss' scoped>
+<style lang='less' scoped>
 .ant-card-head-title {
   font-weight: bolder;
 }

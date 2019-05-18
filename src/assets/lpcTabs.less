@@ -50,6 +50,8 @@
       height: .42rem;
       line-height: .42rem;
       padding: 0 8px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       // display: flex;
       span:nth-child(1) {
         // flex: 0 0 20px;
@@ -64,10 +66,11 @@
       }
       span:nth-child(2) {
         display:inline-block;
-        width: 1.5rem;
+        /* width: 1.5rem; */
       }
       span:nth-child(3) {
-        text-align: left;
+        /* text-align: left; */
+        float: right;
       }
     }
     li:nth-of-type(odd) {

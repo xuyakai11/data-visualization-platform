@@ -7,7 +7,7 @@
         <a-input
           ref="searchLinkName"
           v-decorator="['searchLinkName']"
-          placeholder="搜索条件" />
+          placeholder="链接名" />
       </a-form-item>
       <a-form-item>
         <a-button type="primary" @click="handleSearch" :loading="searchLoading">搜索</a-button>
@@ -82,6 +82,7 @@
           <a-form-item label='密码' :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
             <a-input
               ref="dbPassword"
+              type="password"
               v-decorator="['dbPassword', { initialValue: modelFormDatas.db_password, rules: [{ required: true, message: '请输入数据库密码' }]}]"
               placeholder="密码"
             />
@@ -227,27 +228,26 @@
     })
   }
   editFun (event: any, record: any): void { // 编辑方法
-    this.tabload = true;
-    console.log(record)
+    this.tabload = true
     this.modelTitle = '编辑数据源'
-    this.visible = true; // 将模态框显示
-    this.modelFormDatas = record;
-    this.editBtnReportId = record.report_source_id;
-    this.tabload = false;
+    this.visible = true // 将模态框显示
+    this.modelFormDatas = record
+    this.editBtnReportId = record.report_source_id
+    this.tabload = false
   }
   go (e: any, record: any, num: string): void {
-    e.preventDefault();
-    let reportId: string = record.report_source_id;
+    e.preventDefault()
+    let reportId: string = record.report_source_id
     if (num === '2') { // 报表管理
-      window.open(window.location.origin + '/statementManagement?reportResourceId=' + reportId); // _target 表示只打开一个，重复点击会回到第一个打开的窗口
+      window.open(window.location.origin + '/statementManagement?reportResourceId=' + reportId) // _target 表示只打开一个，重复点击会回到第一个打开的窗口
     } else { // 模型管理
-      window.open(window.location.origin + '/modelManagement?reportId=' + reportId); // _target 表示只打开一个，重复点击会回到第一个打开的窗口
+      window.open(window.location.origin + '/modelManagement?reportId=' + reportId) // _target 表示只打开一个，重复点击会回到第一个打开的窗口
     }
   }
   addEditFun (testConnectDatas: object): void { // 新增/编辑方法
     (this as any).$post('custom/Datasmanage/subDataSource', testConnectDatas).then((res: any) => {
       if (res.state === 2000) {
-        this.addLoading = false;
+        this.addLoading = false
         this.editBtnReportId = '' // 将判断id重置为空
         this.modelFormDatas = {}; // 回显信息置空
         (this as any).modelForm.resetFields(); // 清空表单

@@ -6,10 +6,11 @@
 <script lang='ts'>
   import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
   import echarts from 'echarts'
-  import 'echarts/lib/chart/map';
-  import 'echarts/map/js/china.js';
-  import 'echarts/lib/component/title';
+  import 'echarts/lib/chart/map'
+  import 'echarts/map/js/china.js'
+  import 'echarts/lib/component/title'
   import 'echarts/lib/component/tooltip'
+  import 'echarts/lib/component/visualMap'
 
   @Component({
     components: {}
@@ -250,7 +251,7 @@
       if (newVal !== oldVal && newVal.length) {
         this.data = []
         newVal.map((v:any, i:number) => {
-         this.data.push({ name: v.city_name, value: v.total, schoolList: v.schoolList })
+         this.data.push({ name: v.city_name, value: 50000, schoolList: v.schoolList }) // v.total
         })
        this.initEchartsFun()
       }
@@ -277,7 +278,7 @@
     }
     initEchartsFun () {
       const myChart = echarts.init(this.$refs.echartGeo as HTMLDivElement)
-       myChart.clear()
+      myChart.clear()
       let _this = this
       let max:number = this.data[0].value
       let min:number = this.data[0].value // 假设第一个为最大或者最小
@@ -286,141 +287,27 @@
         cur > max ? max = cur : null
         cur < min ? min = cur : null
       })
-      /* myChart.setOption({
-        tooltip: {
-          trigger: 'item'
-        },
-        visualMap: {
-          show: false, // 左下角小柱子
-          // min: min,
-          // max: max,
-          // left: '30%',
-          // top: 'bottom',
-          // text: ['High', 'Low'], // 左下角柱子两端的文本
-          textStyle: {
-            color: '#fff'
-          },
-          seriesIndex: [2],
-          calculable: true, // 是否拖拽
-          inRange: { // 设置颜色
-            color: ['rgba(63, 155, 255, .5)', 'rgba(63, 155, 255, 1)']
-          }
-        },
-        geo: {
-          map: 'china',
-          roam: true,
-          left: '30%',
-          top: '2%',
-          scaleLimit: { // 规模限制
-            min: 1,
-            max: 4
-          },
-          label: {
-            normal: {
-              show: true, // 是否显示地区文本
-              textStyle: {
-                color: '#fff'
-              }
-            }
-          },
-          emphasis: { // 高亮时样式
-            label: {
-              show: true,
-              textStyle: {
-                color: '#FFF'
-              }
-            }
-          },
-          itemStyle: {
-            normal: {
-              show: true,
-              color: '#1B3B75',
-              borderColor: '#80b3dc'
-            },
-            emphasis: {
-              color: null,
-              shadowOffsetX: 0,
-              shadowOffsetY: 0,
-              shadowBlur: 0,
-              borderWidth: 0
-            }
-          }
-        },
-        series: [
-          {
-            name: '啄木鸟教育运营',
-            type: 'scatter',
-            coordinateSystem: 'geo',
-            data: _this.convertData(this.data),
-            symbolSize: function (val:any) {
-              console.log(val)
-              return val[2] / 10;
-            },
-            label: {
-              normal: {
-                formatter: '{b}', // 地名
-                position: 'right',
-                show: true
-              },
-              emphasis: {
-                show: true
-              }
-            },
-            itemStyle: {
-              normal: {
-                color: '#FFEA00'
-              }
-            }
-          },
-          {
-            name: 'Top 5',
-            type: 'effectScatter',
-            coordinateSystem: 'geo',
-            data: _this.convertData(_this.data.sort(function (a, b) {
-              return b.value - a.value;
-            }).slice(0, 6)), // 提取出最大的5个显示波纹动画
-            symbolSize: function (val:any) {
-              return val[2] / 10;
-            },
-            showEffectOn: 'render',
-            rippleEffect: {
-              brushType: 'stroke'
-            },
-            hoverAnimation: true,
-            label: {
-              normal: {
-                formatter: '{b}',
-                position: 'right',
-                show: true
-              }
-            },
-            itemStyle: {
-              normal: {
-                color: '#FFEA00',
-                shadowBlur: 10,
-                shadowColor: '#333'
-              }
-            },
-            zlevel: 1
-          }
-        ]
-      }) */
+      /* for (var i = 0; i < this.provinceMap.length; i++) {
+        for (var j = 0; j < this.data.length; j++) {
+
+        }
+      }; */
       myChart.setOption({
         tooltip: { show: true },
         visualMap: {
-          show: false,
-          // min: min,
-          // max: max,
+          show: true,
+          min: 0,
+          max: 50000,
           // left: '30%',
           // top: 'bottom',
           // text: ['High','Low'],
           textStyle: {
             color: '#fff'
           },
-          seriesIndex: [2],
+          seriesIndex: [1],
           calculable: true, // 是否拖拽
           inRange: { // 设置颜色
-            color: ['rgba(63, 155, 255, .5)', 'rgba(63, 155, 255, 1)']
+            color: ['rgba(63, 155, 255, .3)', 'rgba(63, 155, 255, 1)']
           }
         },
         geo: {
@@ -428,7 +315,7 @@
           roam: true,
           left: '30%',
           top: '2%',
-          scaleLimit: { // 规模限制
+          /* scaleLimit: { // 规模限制
             min: 1,
             max: 4
           },
@@ -451,7 +338,7 @@
           itemStyle: {
             normal: {
               show: true,
-              color: '#1B3B75', // 地图颜色
+              // color: '#1B3B75', // 地图颜色
               borderColor: '#80b3dc'
             },
             emphasis: {
@@ -461,7 +348,7 @@
               shadowBlur: 0,
               borderWidth: 0
             }
-          }
+          } */
         },
         series: [
           { // 配置点
@@ -509,7 +396,7 @@
             },
             zlevel: 1
           },
-          { // 配置提取前5名用波纹提示
+          /* { // 配置提取前5名用波纹提示
             name: '',
             type: 'effectScatter', // 配置波纹
             coordinateSystem: 'geo',
@@ -593,7 +480,7 @@
               }
             },
             zlevel: 3
-          }
+          } */
         ]
       }, true)
     }

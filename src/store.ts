@@ -8,7 +8,7 @@ export default new Vuex.Store({
     openKeys: '',
     theme: 'light',
     themeColor: (localStorage as any).getItem('themeColor') || '#1890ff',
-    domain: location.href.indexOf('test') !== -1 ? 'http://test.report.pxjy.com' : 'http://report.staff.pxjy.com',
+    domain: location.href.indexOf('localhost') !== -1 ? 'http://test.report.pxjy.com' : 'http://report.staff.pxjy.com',
     menu: JSON.parse((localStorage as any).getItem('menu'))
   },
   getters: {

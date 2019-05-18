@@ -120,7 +120,7 @@
 </template>
 
 <script lang='ts'>
-  import  { Component, Prop, Vue } from 'vue-property-decorator'
+  import { Component, Prop, Vue } from 'vue-property-decorator'
   import leftTree from '@/components/menumanage/leftTree.vue'
    /* eslint-disable */
   interface treeObject {
@@ -378,7 +378,7 @@
       });      
     }
     showdelConfirm (title: string, content: string , params: any, callback:any) {
-        let _this:any = this;
+      let _this:any = this;
       (this as any).$confirm({
         title: title,
         content: content,
@@ -424,7 +424,7 @@
   .menuleft{
     .ant-card-body{
         height: calc(100vh - 144px - 70px);
-        overflow-y: scroll;
+        overflow-y: auto;
         &::-webkit-scrollbar {
             width: 6px;
         }
@@ -444,7 +444,7 @@
   }
   .menuright{
     height:calc(100vh - 88px - 70px);
-    overflow-y: scroll;
+    overflow-y: auto;
     &::-webkit-scrollbar {
         width: 6px;
     }

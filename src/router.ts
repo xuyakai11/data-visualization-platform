@@ -15,11 +15,16 @@ export default new Router({
       name: '报表驾驶舱',
       component: () => import('./views/reportCharts/reportPc.vue')
     },
-    /* {
+    {
       path: '/reportScreen',
       name: '报表图形',
       component: () => import('./views/reportCharts/reportScreen.vue')
-    }, */
+    },
+    {
+      path: '/customConfigReport',
+      name: '自定义配置报表',
+      component: () => import('./views/reportCharts/customConfigReport.vue')
+    },
     {
       path: '/home',
       name: '首页',

@@ -2,6 +2,17 @@
 <div>
   <a-card title="模型管理/字段管理" :bordered="false"></a-card>
   <div class="dataOrigin" id="components-form-demo-advanced-search">
+    <a-form layout='inline' class="ant-advanced-search-from" :form="form">
+      <a-form-item>
+        <a-input
+          ref="fieldName"
+          v-decorator="['fieldName']"
+          placeholder="字段名称" />
+      </a-form-item>
+      <a-form-item>
+        <a-button type="primary" @click="handleSearch" :loading="searchLoading">搜索</a-button>
+      </a-form-item>
+    </a-form>
     <div class="operation">
       <a-row>
         <a-col :span="24" :style="{ textAling: 'right'}">
@@ -83,6 +94,7 @@
   @Prop() private msg!: string;
 
   loading:boolean = true
+  searchLoading:boolean = false // 搜索按钮加载效果
   visible:boolean = false // 控制模态框
   modelCol: object = {
     label: {span: 8},
@@ -112,13 +124,20 @@
   }
 
   beforeCreate () { // 挂载前创建ant form
-    (this as any).modelForm = (this as any).$form.createForm(this); // 定义modalform
+    (this as any).form = (this as any).$form.createForm(this); // 定义form
+    (this as any).modelForm = (this as any).$form.createForm(this) // 定义modalform
   }
   mounted () {
     this.model_id = (this as any).$route.query.model_id
     let params: any = { model_id: this.model_id, pageSize: 10, nowpage: 1 }
     this.initDataFun(params) // 请求表格数据
     this.initFieldTypeFun() // 请求字段类型列表
+  }
+  handleSearch (e: any):void { // 搜索方法
+    e.preventDefault();
+    let fieldName:string = (this as any).$refs.fieldName.value || '';
+    let params:any = { fieldName: fieldName, model_id: this.model_id, pageSize: 10, nowpage: 1 }
+    this.initDataFun(params);
   }
   initDataFun (params:any):void { // 初始化请求列表
     this.loading = true;

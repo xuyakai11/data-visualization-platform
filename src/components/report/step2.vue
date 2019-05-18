@@ -39,8 +39,8 @@
                       <a-select-option :disabled="list.children ? true : false" :value="list.id" v-for="(list, index) in treeListFilter" :key="index" :class="list.children ? 'disabled' : ''"><a-icon type="smile" theme="twoTone" v-if="list.children"/>{{list.title}}</a-select-option>
                     </a-select>
                     <div class="task-content">
-                      <draggable class="hang"> <!-- :options="dragOptions" @end="onEndHang" @update="onUpdateHang" -->
-                        <p class="task-item" type="inner" v-for="(item, i) in aTagDatasH" :key="i" :title="item.text">
+                      <draggable class="hang" v-model="hangData" :options="dragOptions" @update="onEndHang"> <!-- :options="dragOptions" @end="onEndHang" @update="onUpdateHang" -->
+                        <p class="task-item" type="inner" v-for="(item, i) in hangData" :key="'hang' + i" :title="item.text">
                           <span v-if="item.title.length > 15">{{item.title.substr(0, 15)}}...</span>
                           <span v-else>{{item.title}}</span>
                           <a-tooltip placement="right">
@@ -66,7 +66,7 @@
                         <!-- <a-menu-item key="0">
                           <a href="javascript:void(0)">添加存储器列</a>
                         </a-menu-item> -->
-                        <a-menu-item key="1" :disabled="!aTagDatasH.length" @click="showFormulaModel"> <!-- 当组行为空时不能选 -->
+                        <a-menu-item key="1" :disabled="!hangData.length" @click="showFormulaModel"> <!-- 当组行为空时不能选 -->
                           <a href="javascript:void(0)">添加汇总公式</a>
                         </a-menu-item>
                         <a-menu-divider />
@@ -90,8 +90,8 @@
                     </a-select-opt-group> -->
                   </a-select>
                   <div class="task-content">
-                    <draggable class="lie"> <!--  :options="dragOptions" @end="onEndLie" @update="onUpdateLie" -->
-                      <p class="task-item" type="inner" v-for="(item, i) in aTagDatasL" :key="i">
+                    <draggable class="lie" v-model="lieData" :options="dragOptions" @update="onEndLie"> <!--  :options="dragOptions" @end="onEndLie" @update="onUpdateLie" -->
+                      <p class="task-item" type="inner" v-for="(item, i) in lieData" :key="'lie' + i">
                         <span v-if="item.title.length > 15">{{item.title.substr(0, 15)}}...</span>
                         <span v-else>{{item.title}}</span>
                         <a-tooltip placement="right">
@@ -102,6 +102,46 @@
                         </a-tooltip>
                       </p>
                     </draggable>
+                  </div>
+                </div>
+                <a-divider />
+                <div class="tab1-top">
+                  <div class="tab1-top-header">
+                    <h4>排序</h4>
+                    <a-tooltip placement="top">
+                      <template slot="title">
+                        <span>删除所有排序</span>
+                      </template>
+                      <a-icon type="delete" @click.stop="deleteAllGroup('sort')"/>
+                    </a-tooltip>
+                  </div>
+                  <div class="tab1-top-content">
+                    <!-- <h4>组行</h4> -->
+                    <a-select
+                      showSearch
+                      allowClear
+                      placeholder="添加排序"
+                      ref="handleChangeSort"
+                      style="width: 100%"
+                      @change="handleChangeSort"
+                      v-if="!spinning"
+                      :filterOption="filterOption"><!-- showSearch  -->
+                      <a-select-option :disabled="list.children ? true : false" :value="list.id" v-for="(list, index) in treeListFilter" :key="index" :class="list.children ? 'disabled' : ''"><a-icon type="smile" theme="twoTone" v-if="list.children"/>{{list.title}}</a-select-option>
+                    </a-select>
+                    <div class="task-content">
+                      <draggable class="sort" v-model="sortData" :options="dragOptions" @update="onEndSort"> <!-- :options="dragOptions" @end="onEndHang" @update="onUpdateHang" -->
+                        <p class="task-item" type="inner" v-for="(item, i) in sortData" :key="'sort' + i" :title="item.text">
+                          <span v-if="item.title.length > 15">{{item.title.substr(0, 15)}}...</span>
+                          <span v-else>{{item.title}}</span>
+                          <a-tooltip placement="right">
+                            <template slot="title">
+                              <span>删除</span>
+                            </template>
+                            <a-icon type="close" @click.stop="deleteGroupSort(item, i)"/>
+                          </a-tooltip>
+                        </p>
+                      </draggable>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -141,122 +181,124 @@
                   </a-select-opt-group> -->
                 </a-select>
                 <div class="screening-content">
-                  <a-popover arrowPointAtCenter placement="right" @visibleChange="visibleChangeFun" title="编辑筛选器" trigger="click" v-model="item.popover" :visible="item.popover" v-for="(item, i) in aTagDatasF" :key="i">
-                    <div slot="content">
-                      <p>{{item.title}}</p>
-                      <div v-if="item.field_type == 'data'">
-                        <a-form :form="dataForm">
-                          <a-form-item label="时间范围">
-                            <a-range-picker size="small" format="YYYY-MM-DD" v-decorator="['search_param', { initialValue: item.search_param, rules: [{ type: 'array', required: true, message: '请选择时间！' }]}]"/>
-                          </a-form-item>
-                        </a-form>
+                  <draggable class="fixSearch" v-model="fixSearchData" :options="dragOptions" @update="onEndFixSearch">
+                    <a-popover arrowPointAtCenter placement="right" @visibleChange="visibleChangeFun" title="编辑筛选器" trigger="click" v-model="item.popover" :visible="item.popover" v-for="(item, i) in fixSearchData" :key="'fixSearch' + i">
+                      <div slot="content">
+                        <p>{{item.title}}</p>
+                        <div v-if="item.field_type == 'date'">
+                          <a-form :form="dataForm">
+                            <a-form-item label="时间范围">
+                              <a-range-picker size="small" format="YYYY-MM-DD" v-decorator="['search_param', { initialValue: item.search_param, rules: [{ type: 'array', required: true, message: '请选择时间！' }]}]"/>
+                            </a-form-item>
+                          </a-form>
+                        </div>
+                        <div v-if="item.field_type == 'datetime'">
+                          <a-form :form="datetimeForm">
+                            <a-form-item label="时间范围">
+                              <a-range-picker size="small" :showTime="{ format: 'HH:mm' }" format="YYYY-MM-DD HH:mm" v-decorator="['search_param', { initialValue: item.search_param, rules: [{ type: 'array', required: true, message: '请选择时间！' }]}]"/>
+                            </a-form-item>
+                          </a-form>
+                        </div>
+                        <div v-if="item.field_type == 'num'">
+                          <a-form :form="numberForm">
+                            <a-form-item label="运算符">
+                              <a-select labelInValue v-decorator="['search_logic', { initialValue: item.search_logic, rules: [{ required: false }]}]">
+                                <a-select-option value="=">等于</a-select-option>
+                                <a-select-option value="!=">不等于</a-select-option>
+                                <a-select-option value="<">小于</a-select-option>
+                                <a-select-option value=">">大于</a-select-option>
+                                <a-select-option value="<=">小于等于</a-select-option>
+                                <a-select-option value=">=">大于等于</a-select-option>
+                              </a-select>
+                            </a-form-item>
+                            <a-form-item >
+                              <a-input v-decorator="['search_param', { initialValue: item.search_param, rules: [{ required: false, message: '请输入数字！' }]}]"/>
+                            </a-form-item>
+                          </a-form>
+                        </div>
+                        <div v-if="item.field_type == 'string'">
+                          <a-form :form="stringForm">
+                            <a-form-item label="运算符">
+                              <a-select labelInValue v-decorator="['search_logic', { initialValue: item.search_logic, rules: [{ required: false }]}]">
+                                <a-select-option value="=">等于</a-select-option>
+                                <a-select-option value="!=">不等于</a-select-option>
+                                <a-select-option value="like">包含</a-select-option>
+                                <a-select-option value="not like">不包含</a-select-option>
+                              </a-select>
+                            </a-form-item>
+                            <a-form-item >
+                              <a-input v-decorator="['search_param', { initialValue: item.search_param, rules: [{ required: false, message: '请输入字符串！' }]}]"/>
+                            </a-form-item>
+                          </a-form>
+                        </div>
+                        <div v-if="item.field_type == 'select'"> <!-- 单选 -->
+                          <a-form :form="selectForm">
+                            <a-form-item label="运算符">
+                              <a-select labelInValue style="width: 250px" v-decorator="['search_logic', { initialValue: item.search_logic, rules: [{ required: false }]}]">
+                                <a-select-option value="=">等于</a-select-option>
+                                <a-select-option value="!=">不等于</a-select-option>
+                              </a-select>
+                            </a-form-item>
+                            <a-form-item label="值">
+                              <a-select labelInValue style="width: 250px" v-decorator="['search_param', { initialValue: item.search_param, rules: [{ required: false, message: '请选择值！' }]}]"
+                                showSearch
+                                allowClear
+                                :filterOption="filterOption">
+                                <a-select-option value="0">同步中</a-select-option>
+                                <a-select-option value="1">不同</a-select-option>
+                                <a-select-option value="2">已审核</a-select-option>
+                                <a-select-option value="3">未找到</a-select-option>
+                                <a-select-option value="4">未启用</a-select-option>
+                                <a-select-option value="5">未比较</a-select-option>
+                                <a-select-option value="">无选择</a-select-option>
+                              </a-select>
+                            </a-form-item>
+                          </a-form>
+                        </div>
+                        <div v-if="item.field_type == 'checkbox'"> <!-- 多选 -->
+                          <a-form :form="checkboxForm">
+                            <a-form-item label="运算符">
+                              <a-select labelInValue style="width: 250px" v-decorator="['search_logic', { initialValue: item.search_logic, rules: [{ required: false }]}]">
+                                <a-select-option value="in">等于</a-select-option>
+                                <a-select-option value="not in">不等于</a-select-option>
+                              </a-select>
+                            </a-form-item>
+                            <a-form-item label="值">
+                              <a-select labelInValue mode="multiple" v-decorator="['search_param', { initialValue: item.search_param,  rules: [{ required: false, message: '请选择值！' }]}]"
+                                showSearch
+                                allowClear
+                                style="width: 250px"
+                                :filterOption="filterOption">
+                                <a-select-option value="0">同步中</a-select-option>
+                                <a-select-option value="1">不同</a-select-option>
+                                <a-select-option value="2">已审核</a-select-option>
+                                <a-select-option value="3">未找到</a-select-option>
+                                <a-select-option value="4">未启用</a-select-option>
+                                <a-select-option value="5">未比较</a-select-option>
+                                <!-- <a-select-option value="">无选择</a-select-option> -->
+                              </a-select>
+                            </a-form-item>
+                          </a-form>
+                        </div>
+                        <div class="content-footer">
+                          <a-button size="small" @click="hidePopover(item, i, 'F')">取消</a-button>
+                          <a-button size="small" type="primary" @click="enterPopover(item, 'F')">应用</a-button>
+                        </div>
                       </div>
-                      <div v-if="item.field_type == 'datetime'">
-                        <a-form :form="datetimeForm">
-                          <a-form-item label="时间范围">
-                            <a-range-picker size="small" :showTime="{ format: 'HH:mm' }" format="YYYY-MM-DD HH:mm" v-decorator="['search_param', { initialValue: item.search_param, rules: [{ type: 'array', required: true, message: '请选择时间！' }]}]"/>
-                          </a-form-item>
-                        </a-form>
+                      <div class="screening-item" :class="{ 'active_item': item.popover }">
+                        <div class="lpc-fixed-text">
+                          <p class="title">{{item.title}}</p>
+                          <p class="text">{{item.extra}}</p>
+                        </div>
+                        <a-tooltip placement="right"> <!-- 判断固定项不显示删除按钮 -->
+                          <template slot="title">
+                            <span>删除</span>
+                          </template>
+                          <a-icon type="close" @click.stop="deleteSearch(i, 'F')"/>
+                        </a-tooltip>
                       </div>
-                      <div v-if="item.field_type == 'num'">
-                        <a-form :form="numberForm">
-                          <a-form-item label="运算符">
-                            <a-select labelInValue v-decorator="['search_logic', { initialValue: item.search_logic, rules: [{ required: false }]}]">
-                              <a-select-option value="=">等于</a-select-option>
-                              <a-select-option value="!=">不等于</a-select-option>
-                              <a-select-option value="<">小于</a-select-option>
-                              <a-select-option value=">">大于</a-select-option>
-                              <a-select-option value="<=">小于等于</a-select-option>
-                              <a-select-option value=">=">大于等于</a-select-option>
-                            </a-select>
-                          </a-form-item>
-                          <a-form-item >
-                            <a-input v-decorator="['search_param', { initialValue: item.search_param, rules: [{ required: false, message: '请输入数字！' }]}]"/>
-                          </a-form-item>
-                        </a-form>
-                      </div>
-                      <div v-if="item.field_type == 'string'">
-                        <a-form :form="stringForm">
-                          <a-form-item label="运算符">
-                            <a-select labelInValue v-decorator="['search_logic', { initialValue: item.search_logic, rules: [{ required: false }]}]">
-                              <a-select-option value="=">等于</a-select-option>
-                              <a-select-option value="!=">不等于</a-select-option>
-                              <a-select-option value="like">包含</a-select-option>
-                              <a-select-option value="not like">不包含</a-select-option>
-                            </a-select>
-                          </a-form-item>
-                          <a-form-item >
-                            <a-input v-decorator="['search_param', { initialValue: item.search_param, rules: [{ required: false, message: '请输入字符串！' }]}]"/>
-                          </a-form-item>
-                        </a-form>
-                      </div>
-                      <div v-if="item.field_type == 'select'"> <!-- 单选 -->
-                        <a-form :form="selectForm">
-                          <a-form-item label="运算符">
-                            <a-select labelInValue style="width: 250px" v-decorator="['search_logic', { initialValue: item.search_logic, rules: [{ required: false }]}]">
-                              <a-select-option value="=">等于</a-select-option>
-                              <a-select-option value="!=">不等于</a-select-option>
-                            </a-select>
-                          </a-form-item>
-                          <a-form-item label="值">
-                            <a-select labelInValue style="width: 250px" v-decorator="['search_param', { initialValue: item.search_param, rules: [{ required: false, message: '请选择值！' }]}]"
-                              showSearch
-                              allowClear
-                              :filterOption="filterOption">
-                              <a-select-option value="0">同步中</a-select-option>
-                              <a-select-option value="1">不同</a-select-option>
-                              <a-select-option value="2">已审核</a-select-option>
-                              <a-select-option value="3">未找到</a-select-option>
-                              <a-select-option value="4">未启用</a-select-option>
-                              <a-select-option value="5">未比较</a-select-option>
-                              <a-select-option value="">无选择</a-select-option>
-                            </a-select>
-                          </a-form-item>
-                        </a-form>
-                      </div>
-                      <div v-if="item.field_type == 'checkbox'"> <!-- 多选 -->
-                        <a-form :form="checkboxForm">
-                          <a-form-item label="运算符">
-                            <a-select labelInValue style="width: 250px" v-decorator="['search_logic', {initialValue: item.search_logic, rules: [{ required: false }]}]">
-                              <a-select-option value="in">等于</a-select-option>
-                              <a-select-option value="not in">不等于</a-select-option>
-                            </a-select>
-                          </a-form-item>
-                          <a-form-item label="值">
-                            <a-select labelInValue mode="multiple" v-decorator="['search_param', {initialValue: item.search_param,  rules: [{ required: false, message: '请选择值！' }]}]"
-                              showSearch
-                              allowClear
-                              style="width: 250px"
-                              :filterOption="filterOption">
-                              <a-select-option value="0">同步中</a-select-option>
-                              <a-select-option value="1">不同</a-select-option>
-                              <a-select-option value="2">已审核</a-select-option>
-                              <a-select-option value="3">未找到</a-select-option>
-                              <a-select-option value="4">未启用</a-select-option>
-                              <a-select-option value="5">未比较</a-select-option>
-                              <!-- <a-select-option value="">无选择</a-select-option> -->
-                            </a-select>
-                          </a-form-item>
-                        </a-form>
-                      </div>
-                      <div class="content-footer">
-                        <a-button size="small" @click="hidePopover(item, i, 'F')">取消</a-button>
-                        <a-button size="small" type="primary" @click="enterPopover(item, 'F')">应用</a-button>
-                      </div>
-                    </div>
-                    <div class="screening-item" :class="{ 'active_item': item.popover }">
-                      <div class="lpc-fixed-text">
-                        <p class="title">{{item.title}}</p>
-                        <p class="text">{{item.extra}}</p>
-                      </div>
-                      <a-tooltip placement="right"> <!-- 判断固定项不显示删除按钮 -->
-                        <template slot="title">
-                          <span>删除</span>
-                        </template>
-                        <a-icon type="close" @click.stop="deleteSearch(i, 'F')"/>
-                      </a-tooltip>
-                    </div>
-                  </a-popover>
+                    </a-popover>
+                  </draggable>
                 </div>
                 <a-divider />
                 <div class="tab2-top-header">
@@ -278,16 +320,18 @@
                   </a-select-opt-group> -->
                 </a-select>
                 <div class="According-content">
-                  <p class="task-item" type="inner" v-for="(item, i) in aTagDatasX" :key="i">
-                    <span v-if="item.title.length > 15">{{item.title.substr(0, 15)}}...</span>
-                    <span v-else>{{item.title}}</span>
-                    <a-tooltip placement="right">
-                      <template slot="title">
-                        <span>删除</span>
-                      </template>
-                      <a-icon type="close" @click.stop="deleteSearch(i, 'X')"/>
-                    </a-tooltip>
-                  </p>
+                  <draggable class="showSearch" v-model="showSearchData" :options="dragOptions" @update="onEndShowSearch">
+                    <p class="task-item" type="inner" v-for="(item, i) in showSearchData" :key="i">
+                      <span v-if="item.title.length > 15">{{item.title.substr(0, 15)}}...</span>
+                      <span v-else>{{item.title}}</span>
+                      <a-tooltip placement="right">
+                        <template slot="title">
+                          <span>删除</span>
+                        </template>
+                        <a-icon type="close" @click.stop="deleteSearch(i, 'X')"/>
+                      </a-tooltip>
+                    </p>
+                  </draggable>
                 </div>
               </div>
             </a-tab-pane>
@@ -356,11 +400,6 @@
                       :showTime="{ format: 'HH:mm' }" format="YYYY-MM-DD HH:mm"/>
                   </a-form-item>
                 </a-col>
-                <!-- <a-col :span="12" v-for="(item, ind) in search">
-                  <a-form-item :label="item.showTitle">
-                  
-                  </a-form-item>
-                </a-col> -->
               </a-row>
               <a-row>
                 <a-col :span="24" :style="{ textAlign: 'right' }">
@@ -546,7 +585,6 @@
               </a-tab-pane>
             </a-tabs>
             <!-- <a-form :form="modalForm">
-          
             </a-form> -->
           </div>
         </div>
@@ -559,7 +597,7 @@
   import leftMenu from '@/components/report/step2LeftMenu.vue'
   import Draggable from 'vuedraggable'
   import formulaModal from '@/components/report/formulaModal.vue'
-  import { getTextareaCursor, setTextareaCursor, addTextareaCursor } from '@/libs/util'
+  import { getTextareaCursor, setTextareaCursor, addTextareaCursor, getQueryString } from '@/libs/util'
   import moment from 'moment'
 
   /* eslint-disable */
@@ -601,7 +639,7 @@
     formulaCreateLoading = false // 添加公式列弹框确定按钮
     dragOptions: object = { // 拖拽组件相关配置
       sort: true, // 定义是否拖拽
-      group: 'task', // string or array分组用的，同一组的不同的list可以相互拖拽
+      // group: 'task', // string or array分组用的，同一组的不同的list可以相互拖拽
       scroll: true, // 拖放可以引起区域滚动
       scrollSpeed: 2, // 滚动速度
       animation: 150, // 动画时间
@@ -612,7 +650,7 @@
     titleName:string = '报表名称'
     titleNameEdit:boolean = false // 配置报表名称修改
     cancelTitleNameFlag:string = '' // 用于取消还原修改
-    
+    editReportId:string = getQueryString('reportId') // 判断是否是编辑字段
     screenWidth: object = { x: 100, y: 400 }
     // tableWidth:number = 10
     // screenWidth:any = document.body.clientWidth
@@ -683,20 +721,14 @@
     formulaTextarea:string = '' // 编辑列公式弹框 公式内容
 
     treeList:Array<any> = [] // 存放将dataSourceTree处理成一层之后的数据
-    fieldIdArrLie:Array<number> = [] // 存放选择过的fieldId（表头列字段）
-    fieldIdArrHang:Array<number> = [] // 存放选择过的fieldId（表头行字段）
-    aTagDatasH:Array<any> = [] // 组行显示文字
-    aTagDatasL:Array<any> = [] // 组列显示文字
-    colColId:Array<number> = [] // 组列新增后返回的id，删除用
-    rowGroupId:Array<number> = [] // 组行新增后返回ID，删除用
+    
+    hangData:Array<any> = [] // 行data
+    lieData:Array<any> = [] // 列data
+    sortData:Array<any> = [] // 排序data
+    fixSearchData:Array<any> = [] // 固定筛选data
+    showSearchData:Array<any> = [] // 显示筛选data
 
     screeningFlag:boolean = true // 固定筛选为true，显示筛选为false，用于visibleChange  Popover显示隐藏判断
-    fixedScreening:Array<number> = [] // 存放固定筛选选中字段
-    aTagDatasF:Array<any> = [] // 固定筛选回显信息
-    accordScreening:Array<number> = [] // 存放显示筛选选中字段
-    aTagDatasX:Array<any> = [] // 显示筛选回显信息
-    searchIdF:Array<number> = [] // 存放新增后返回的筛选器id
-    searchIdX:Array<number> = [] // 存放新增后返回的筛选器id
 
     columns:Array<object> = [] // 表格表头数据
     data:Array<object> = [] // 表格数据
@@ -717,11 +749,19 @@
     }
     searchParam:Array<searchParam> = [] // 定义请求报表详情search参数
     reportParams:any = {}
+    checkboxData: Array<any>= [ // chekcbox类型回显使用
+      { 'key': 0, 'label': '同步中'},
+      { 'key': 1, 'label': '不同'},
+      { 'key': 2, 'label': '已审核'},
+      { 'key': 3, 'label': '未找到'},
+      { 'key': 4, 'label': '未启用'},
+      { 'key': 5, 'label': '未比较'},
+    ]
 
     moment () {}
-    treeMsg (e:number):void { // 接收子组件的值 的方法
+    treeMsg (e:string):void { // 接收子组件的值 的方法
       console.log('父组件接收' + e)
-      if (this.fieldIdArrLie.indexOf(e) === -1) {
+      if (JSON.stringify(this.lieData).indexOf(e) === -1) {
         // this.fieldIdArrLie.push(e); // 将接收到的子组件传过来的值push到列数中
         this.treeList.map((v:any, i:number) => {
           if (v.id === e) {
@@ -730,6 +770,8 @@
             this.addReportColsFun(url, v, type)
           }
         })
+      } else {
+        (this as any).$message.error('已有该选项', 3)
       }
     }
     beforeCreate () { // 挂载前创建ant form
@@ -744,13 +786,11 @@
       (this as any).formatForm = (this as any).$form.createForm(this); // 定义添加公式 formatForm
       (this as any).form = (this as any).$form.createForm(this); // 定义添加公式 form
     }
-    get aTagDatasFcomput () { // computed计算属性， 过滤出visible为true的对象来渲染，因为当 v-if 与 v-for 一起使用时，v-for 具有比 v-if 更高的优先级，这意味着 v-if 将分别重复运行于每个 v-for 循环中
-      return this.aTagDatasF.filter(item => item.visible)
-    }
     get treeListFilter () { // 过滤出不为空的值
-      return this.treeList.filter(list => list.title !== "")
+      return this.treeList.filter(list => list.title !== '')
     }
     created () {
+      console.log(this.reportId);
       (this as any).$post('custom/ReportManageDetail/getAllFields', { reportId: this.reportId }).then((res: any) => { // 请求报表所有表的所有字段
         if (res.state === 2000) {
           this.dataSourceTree = res.data
@@ -759,31 +799,97 @@
           this.spinning = false
         } else {
           this.spinning = false;
-          (this as any).$message.error(res.message, 3); // 弹出错误message
+          (this as any).$message.error(res.message, 3) // 弹出错误message
         }
       }).catch((err: any) => {
         if (err.code === 'ECONNABORTED') {
-          (this as any).$message.error('请求超时', 3); // 弹出错误message
+          (this as any).$message.error('请求超时', 3) // 弹出错误message
         } else {
-          (this as any).$message.error('获取报表所有表的所有字段失败', 3); // 弹出错误message
+          (this as any).$message.error('获取报表所有表的所有字段失败', 3) // 弹出错误message
         }
-        this.spinning = false;
-      });
-    }
-    mounted () {
-      const that:any = this;
-      window.onresize = () => {
-        return (() => {
-          // const elHeightValue: any = that.$refs.tableContent.offsetHeight - 64
-          // that.tableWidth = {x: 1000, y: elHeightValue}
-          // console.log(elWidthValue)
-          // console.log(that.screenWidth)
-        })()
+        this.spinning = false
+      })
+      if (this.editReportId) { // 判断是否是编辑
+        (this as any).$post('custom/ReportManage/getReportDetailInfo', { reportId: this.editReportId }).then((res: any) => { // 请求报表所有表的所有字段
+          if (res.state === 2000) {
+            res.data.fields.map((v:any, i:number) => {
+              this.lieData.push({ 'colId': v.colId, 'title': v.title, 'fieldId': v.fieldId })
+            })
+            res.data.group.map((v:any, i:number) => {
+              this.hangData.push({ 'fieldId': v.fieldId, 'title': v.field_title, 'groupId': v.groupId })
+            })
+            res.data.sort.map((v:any, i:number) => {
+              this.sortData.push({ 'fieldId': v.fieldId, 'title': v.field_title, 'sortId': v.sortId })
+            })
+            // this.fixSearchData = res.data.fixSearch
+            // this.showSearchData = res.data.showSearch
+            res.data.fixSearch.map((v:any, i:number) => { // 固定筛选
+              let search_param:any // v.search_param.split(',')[0] v.search_param.split(',')[1]
+              let extra:any = v.logic.label
+              if (v.searchType === 'date' || v.searchType === 'datetime' ) {
+                search_param = [moment(v.search_param.split(',')[0], 'YYYY-MM-DD'), moment(v.search_param.split(',')[1], 'YYYY-MM-DD')]
+                extra += '  ' + v.search_param.split(',')[0] + ' ～ ' + v.search_param.split(',')[1]
+              } else if (v.searchType === 'checkbox') {
+                let searchParam = v.search_param.split(',')
+                extra += '  '
+                search_param = []
+                for (let ind = 0; ind < searchParam.length; ind++) {
+                  search_param.push(this.checkboxData[+searchParam[ind]])
+                  extra += this.checkboxData[searchParam[ind]].label + '  '
+                }
+              } else if (v.searchType === 'select') {
+                let searchParam = v.search_param.split(',')
+                extra += '  '
+                search_param = []
+                for (let ind = 0; ind < searchParam.length; ind++) {
+                  if (searchParam[ind]) {
+                    search_param.push(this.checkboxData[+searchParam[ind]])
+                    extra += this.checkboxData[searchParam[ind]].label + '  " "'
+                  } else {
+                    search_param = { 'key': '', 'label': '无选择'}
+                  }
+                }
+              }else {
+                search_param = v.search_param
+                extra += '  ' + v.search_param
+              }
+              this.fixSearchData.push({ 
+                'fieldId': v.fieldId,
+                'search_logic': v.logic,
+                'searchId': v.searchId,
+                'field_type': v.searchType,
+                'title': v.showTitle,
+                'search_param': search_param,
+                'extra': extra })
+            })
+            res.data.showSearch.map((v:any, i:number) => { // 显示筛选
+              this.showSearchData.push({ 'fieldId': v.fieldId, 'title': v.showTitle, 'searchId': v.searchId })
+            })
+            console.log(this.hangData)
+            this.getReportDetail(); // 请求table表格
+            this.spinning = false
+          } else {
+            this.spinning = false;
+            (this as any).$message.error(res.message, 3) // 弹出错误message
+          }
+        }).catch((err: any) => {
+          console.log(err)
+          if (err.code === 'ECONNABORTED') {
+            (this as any).$message.error('请求超时', 3) // 弹出错误message
+          } else {
+            (this as any).$message.error('获取报表所有表的所有字段失败', 3) // 弹出错误message
+          }
+          this.spinning = false
+        })
       }
     }
     getReportDetail(searchParam?:any) { // 获取报表table数据
-      this.tableLoading = true;
-      let searchPar:any;
+      this.tableLoading = true
+      if (!this.lieData.length) { // 当列为空时则不请求
+        this.tableLoading = false
+        return false
+      }
+      let searchPar:any
       if (searchParam) {
         searchPar = searchParam
       } else {
@@ -803,52 +909,50 @@
           this.columns.map((v:any,i:number) => {
             v.width = v.title.length * 15
           })
-          this.tableLoading = false;
+          this.tableLoading = false
           const pagination = { ...this.pagination }
-          pagination.total = res.data.count;
+          pagination.total = res.data.count
           this.pagination = pagination
           // (this as any).$message.success(res.message, 3); // 弹出成功message
         } else {
-          this.tableLoading = false;
+          this.tableLoading = false
           this.data = [];
-          (this as any).$message.error(res.message, 3); // 弹出错误message
+          (this as any).$message.error(res.message, 3) // 弹出错误message
         }
       }).catch((err: any) => {
         if (err.code === 'ECONNABORTED') {
-          (this as any).$message.error('请求超时', 3); // 弹出错误message
+          (this as any).$message.error('请求超时', 3) // 弹出错误message
         } else {
-          (this as any).$message.error('请求表格失败', 3); // 弹出错误message
+          (this as any).$message.error('请求表格失败', 3) // 弹出错误message
         }
-        this.tableLoading = false;
-      });
+        this.tableLoading = false
+      })
     }
     addReportColsFun (url:string, v:any, type:string) { // 增加报表表头列方法
       this.spinning = true;
       (this as any).$post(url, { reportId: this.reportId, fieldId: v.id }).then((res: any) => { // 请求新增字段
         if (res.state === 2000) {
           if (type === 'lie') {
-            this.fieldIdArrLie.push(v.id) // push 选中的fieldId
-            this.aTagDatasL.push(v) // push 选中的回显的文字
-            this.colColId.push(res.data.colId) // 存放新增后返回id
+            this.lieData.push({ 'fieldId': v.id, 'title': v.title, 'colId': res.data.colId })
           } else if (type === 'hang') {
-            this.fieldIdArrHang.push(v.id) // push 选中的fieldId
-            this.aTagDatasH.push(v) // push 选中的回显的文字
-            this.rowGroupId.push(res.data.groupId) // 存放新增后返回id
+            this.hangData.push({ 'fieldId': v.id, 'title': v.title, 'groupId': res.data.groupId })
+          } else if (type === 'sort') {
+            this.sortData.push({ 'fieldId': v.id, 'title': v.title, 'sortId': res.data.sortId })
           }
           this.getReportDetail() // 请求table表格
           this.spinning = false
         } else {
           this.spinning = false;
-          (this as any).$message.error(res.message, 3); // 弹出错误message
+          (this as any).$message.error(res.message, 3) // 弹出错误message
         }
       }).catch((err: any) => {
         if (err.code === 'ECONNABORTED') {
-          (this as any).$message.error('请求超时', 3); // 弹出错误message
+          (this as any).$message.error('请求超时', 3) // 弹出错误message
         } else {
-          (this as any).$message.error('新增字段失败', 3); // 弹出错误message
+          (this as any).$message.error('新增字段失败', 3) // 弹出错误message
         }
-        this.spinning = false;
-      });
+        this.spinning = false
+      })
     }
     treeListFun (data:any):void { // 将datasourceTree处理成一层
       for (let i = 0; i < data.length; i++) {
@@ -871,12 +975,12 @@
       this.$emit('prevStep')
     }
     /* 报表设置 start */
-    handleChangeH (value:number):void { // 报表设置栏 组行 搜索框下拉选择方法
-      if (!this.aTagDatasL.length) {
-        (this as any).$message.error('请先添加列', 3); // 弹出成功message
+    handleChangeH (value:string):void { // 报表设置栏 组行 搜索框下拉选择方法
+      if (!this.lieData.length) {
+        (this as any).$message.error('请先添加列', 3) // 弹出成功message
       } else {
         if (value) {
-          if (this.fieldIdArrHang.indexOf(value) === -1) {
+          if (JSON.stringify(this.hangData).indexOf(value) === -1) {
             this.treeList.map((v:any, i:number) => {
               if (v.id === value) {
                 const url:string = 'custom/ReportManageDetail/addGroupRow'
@@ -885,12 +989,14 @@
               }
             })
           }
+        } else {
+          (this as any).$message.error('已有该选项', 3)
         }
       }
     }
-    handleChangeL (value:number):void { // 报表设置栏 列数 搜索框下拉选择方法
+    handleChangeL (value:string):void { // 报表设置栏 列数 搜索框下拉选择方法
       if (value) {
-        if (this.fieldIdArrLie.indexOf(value) === -1) {
+        if (JSON.stringify(this.lieData).indexOf(value) === -1) {
           this.treeList.map((v:any, i:number) => {
             if (v.id === value) {
               const url: string = 'custom/ReportManageDetail/addReportCols'
@@ -898,67 +1004,124 @@
               this.addReportColsFun(url, v, type)
             }
           })
+        } else {
+          (this as any).$message.error('已有该选项', 3)
+        }
+      }
+    }
+    handleChangeSort (value:string):void { // 报表设置栏 排序 搜索框下拉选择方法
+      if (!this.lieData.length) {
+        (this as any).$message.error('请先添加列', 3) // 弹出成功message
+      } else {
+        if (value) {
+          if (JSON.stringify(this.sortData).indexOf(value) === -1) {
+            this.treeList.map((v:any, i:number) => {
+              if (v.id === value) {
+                const url: string = 'custom/ReportManageDetail/addReportSort'
+                const type:string = 'sort'
+                this.addReportColsFun(url, v, type)
+              }
+            })
+          }
+        } else {
+          (this as any).$message.error('已有该选项', 3)
         }
       }
     }
     deleteGroupH (item:any, index:number):void { // 删除组行方法
-      this.aTagDatasH.splice(index, 1) // 删除回显文字
-      this.fieldIdArrHang.splice(index, 1) // 删除选中id
-      let delRow:Array<number> = this.rowGroupId.slice(index, 1) // 获取要删除的那个id
-      this.rowGroupId.splice(index, 1) // 删除新增返回id
+      let delRow:Array<any> = this.hangData.slice(index, index + 1) // 获取要删除的那个id
       const type:string = 'hang'
       const URL: string = 'custom/ReportManageDetail/delGroupRow'
-      let param:any = { groupId: delRow.toString() }
-      this.deleteGroupFun(URL, type, param) // 调用删除组行 列 方法
+      let param:any = { 'groupId': delRow[0].groupId }
+      this.deleteGroupFun(URL, type, param, 'one', index) // 调用删除组行 列 方法
     }
     deleteGroupL (item:any, index:number):void { // 删除列数方法
-      this.aTagDatasL.splice(index, 1) // 删除回显文字
-      this.fieldIdArrLie.splice(index, 1) // 删除选中id
-      console.log(this.colColId)
-      let delCol:Array<number> = this.colColId.slice(index, 1) // 获取要删除的那个id
-      this.colColId.splice(index, 1) // 删除新增返回id
+      let delCol:Array<any> = this.lieData.slice(index, index + 1) // 获取要删除的那个id
       const type:string = 'lie'
       const URL: string = 'custom/ReportManageDetail/delReportCols'
-      let param:any = { colId: delCol.toString() }
-      this.deleteGroupFun(URL, type, param) // 调用删除组行 列 方法
+      let param:any = { 'colId': delCol[0].colId }
+      this.deleteGroupFun(URL, type, param, 'one',index) // 调用删除组行 列 方法
     }
-    deleteAllGroup (type:string):void { // 删除所有组行、组列
+    deleteGroupSort (item:any, index:number):void { // 删除排序方法
+      let delSort:Array<any> = this.sortData.slice(index, index + 1) // 获取要删除的那个id
+      const type:string = 'sort'
+      const URL: string = 'custom/ReportManageDetail/delReportSort'
+      let param:any = { 'sortId': delSort[0].sortId }
+      this.deleteGroupFun(URL, type, param, 'one', index) // 调用删除组行 列 方法
+    }
+    deleteAllGroup (type:string):void { // 删除所有组行、组列、排序
       let url:string
       let param:any
+      let all:string = 'all'
       if (type === 'hang') {
         url = 'custom/ReportManageDetail/delGroupRow'
-        param = { colId: this.rowGroupId.toString() }
-        this.deleteGroupFun(url, type, param) // 调用删除组行 列 方法
+        let groupId:Array<number> = []
+        this.hangData.map((v:any, i:number) => {
+          groupId.push(v.groupId)
+        })
+        param = { 'groupId': groupId.toString() }
+        this.deleteGroupFun(url, type, param, all) // 调用删除组行 列 方法
       } else if (type === 'lie') {
         url = 'custom/ReportManageDetail/delReportCols'
-        param = { colId: this.colColId.toString() }
-        this.deleteGroupFun(url, type, param) // 调用删除组行 列 方法
+        let colId:Array<number> = []
+        this.lieData.map((v:any, i:number) => {
+          colId.push(v.colId)
+        })
+        param = { 'colId': colId.toString() }
+        this.deleteGroupFun(url, type, param, all) // 调用删除组行 列 方法
+      } else if (type === 'sort') {
+        url = 'custom/ReportManageDetail/delReportSort'
+        let sortId:Array<number> = []
+        this.sortData.map((v:any, i:number) => {
+          sortId.push(v.sortId)
+        })
+        param = { sortId: sortId.toString() }
+        this.deleteGroupFun(url, type, param, all) // 调用删除组行 列、排序 方法
       }
     }
-    deleteGroupFun (URL:string, type:string, param:any) { // 删除组行 列 方法
+    deleteGroupFun (URL:string, type:string, param:any, all:string, index?:number) { // 删除组行 列、排序 方法
       (this as any).$post(URL, param).then((res: any) => { // 请求报表所有表的所有字段
         if (res.state === 2000) {
+          if (index !== undefined) { // 判断参数是否存在
+            if (type === 'hang') {
+              this.hangData.splice(index, 1)
+            } else if (type === 'lie') {
+              this.lieData.splice(index, 1)
+            } else if (type === 'sort') {
+              this.sortData.splice(index, 1)
+            }
+          }
+          if (all === 'all') {
+            if (type === 'hang') {
+              this.hangData = []
+            } else if (type === 'lie') {
+              this.lieData = []
+            } else if (type === 'sort') {
+              this.sortData = []
+            }
+          }
+          (this as any).$message.success('删除成功', 3)
           this.getReportDetail() // 请求table表格
         } else {
-          (this as any).$message.error(res.message, 3); // 弹出message
+          (this as any).$message.error(res.message, 3) // 弹出message
         }
       }).catch((err: any) => {
         if (err.code === 'ECONNABORTED') {
-          (this as any).$message.error('请求超时', 3); // 弹出错误message
+          (this as any).$message.error('请求超时', 3) // 弹出错误message
         } else {
-          (this as any).$message.error('删除失败', 3); // 弹出错误message
+          (this as any).$message.error('删除失败', 3) // 弹出错误message
         }
-      });
+      })
     }
     /* 报表设置 end */
 
     /* 筛选 start */
     handleChangeF (value:any):void { // 固定筛选改变事件
-      if (!this.aTagDatasL.length) {
+      if (!this.lieData.length) {
         (this as any).$message.error('请先添加列', 3); // 弹出成功message
       } else {
         if (value) {
-          if (this.fixedScreening.indexOf(value) === -1) {
+          if (JSON.stringify(this.fixSearchData).indexOf(value) === -1) {
             this.dataSourceTree.map((val:any, ind:number) => {
               val.children.map((v:any, i:number) => {
                 if (v.id === value) {
@@ -966,47 +1129,52 @@
                   a.popover = true
                   a.new = true // 用来判断是否是第一次
                   a.tableId = val.id
+                  a.fieldId = value // 添加选中的fieldId
                   // console.log(v)
-                  // a.field_type = 'data'
+                  // a.field_type = 'checkbox'
                   if (a.field_type === 'checkbox') {
-                    a.search_logic = { key:'in', label: '等于' }
+                    a.search_logic = { key: 'in', label: '等于' }
                     a.search_param = []
                   } else if (a.field_type === 'select') {
-                    a.search_logic = { key:'=', label: '等于' }
+                    a.search_logic = { key: '=', label: '等于' }
                     a.search_param = {}
                   } else if (a.field_type === 'string' || a.field_type === 'num') {
-                    a.search_logic = { key:'=', label: '等于' }
+                    a.search_logic = { key: '=', label: '等于' }
                     a.search_param = ''
                   } else if (a.field_type === 'datetime') {
                     a.search_param = []
-                  } else if (a.field_type === 'data') {
+                  } else if (a.field_type === 'date') {
                     a.search_param = []
                   }
-                  this.fixedScreening.push(value) // push 选中的fieldId
-                  this.aTagDatasF.push(a) // push 选中的回显的信息
+                  this.fixSearchData.push(a) // push 选中的回显的信息
                   this.screeningFlag = true // 固定筛选为true，显示筛选为false，用于visibleChange  Popover显示隐藏判断
                 }
               })
             })
+          } else {
+            (this as any).$message.error('已有该选项', 3)
           }
         }
       }
     }
     handleChangeX (value:any):void { // 显示筛选改变事件
-      if (!this.aTagDatasL.length) {
+      if (!this.lieData.length) {
         (this as any).$message.error('请先添加列', 3); // 弹出成功message
       } else {
         if (value) {
-          if (this.accordScreening.indexOf(value) === -1) { // 判断是否存在
+          if (JSON.stringify(this.showSearchData).indexOf(value) === -1) { // 判断是否存在
             this.dataSourceTree.map((val:any, ind:number) => {
               val.children.map((v:any, i:number) => {
                 if (v.id === value) {
                   let a:any = Object.assign({}, v)
                   a.tableId = val.id // 父节点id
+                  a.fieldId = value
                   this.xianshifilterFun(a) // 调用增加显示筛选器方法
                 }
               })
             })
+          } else {
+            (this as any).$message.error('已有该选项', 3)
           }
         }
       }
@@ -1015,61 +1183,67 @@
       this.spinning = true;
       (this as any).$post('custom/ReportManageDetail/addReportShowSearch', { reportId: this.reportId, tableId: a.tableId, fieldId: a.id }).then((res: any) => { // 请求新增字段
         if (res.state === 2000) {
-          this.spinning = false;
-          this.accordScreening.push(a.id) // push 选中的fieldId
-          this.aTagDatasX.push(a) // push 选中的回显的信息
-          this.searchIdX.push(res.data.searchId); // 存放筛选器id
+          this.spinning = false
+          this.showSearchData.push({ 'title': a.title, 'fieldId': a.fieldId, 'searchId': res.data.searchId })  // push 选中的回显的信息
           this.getReportDetail(); // 请求table表格
-          (this as any).$message.success(res.message, 3); // 弹出成功message
+          (this as any).$message.success(res.message, 3) // 弹出成功message
         } else {
           this.spinning = false;
-          (this as any).$message.error(res.message, 3); // 弹出错误message
+          (this as any).$message.error(res.message, 3) // 弹出错误message
         }
       }).catch((err: any) => {
         if (err.code === 'ECONNABORTED') {
-          (this as any).$message.error('请求超时', 3); // 弹出错误message
+          (this as any).$message.error('请求超时', 3) // 弹出错误message
         } else {
-          (this as any).$message.error('请求新增显示筛选器失败', 3); // 弹出错误message
+          (this as any).$message.error('请求新增显示筛选器失败', 3) // 弹出错误message
         }
         this.spinning = false;
       });
     }
     filterOption (input:any, option:any):any { // 搜索框输入搜索 过滤方法
-      console.log(option)
-      console.log(this.dataSourceTree)
-      console.log(option.componentOptions.children[1].text.toLowerCase().indexOf(input.toLowerCase()) >= 0)
       return option.componentOptions.children[1].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
     }
     deleteSearch (index: number, type:string):void { // 删除筛选器方法
       let searchId
       if (type === 'F') { // 配置固定与显示筛选 参数
-        searchId = +(this.searchIdF.slice(index, 1).toString())
+        let delFix:Array<any> = this.fixSearchData.slice(index, index + 1)
+        searchId = delFix[0].searchId
       } else if (type === 'X') {
-        searchId = +(this.searchIdX.slice(index, 1).toString())
+        let delShow:Array<any> = this.showSearchData.slice(index, index + 1)
+        searchId = delShow[0].searchId
       }
       this.delReportSearch(searchId, index, type)
     }
     hidePopover (e:any, index:number, type:string):void { // 取消关闭气泡框
-      if (e.new) {
-        this.fixedScreening.splice(index, 1)
-        this.aTagDatasF.splice(index, 1)
+      if (e.new) { // 判断是否是新增加的项
+        this.fixSearchData.splice(index, 1)
       }
       e.popover = false
     }
     enterPopover (e:any, type:string):void { // 固定筛选确认应用关闭气泡框
-      const that = this;
+      const that = this
       if (e.new) { // 如果是第一次点击
         e.new = false
       }
-      if (type === 'F') { // 配置固定与显示筛选 参数
+      if (type === 'F') { // 配置固定与显示筛选 要传给后台的参数
         e.search_type = 1
       } else if (type === 'X') {
         e.search_type = 2
       }
-      if (e.field_type === 'data') { // 日期
+      if (e.field_type === 'date') { // 日期
         (this as any).dataForm.validateFields((err: any, values: any) => {
+          const subData:subData = {
+            reportId: this.reportId,
+            tableId: e.tableId,
+            fieldId: e.id,
+            search_logic: 'between', // 时间类：固定传 between
+            search_type: e.search_type,
+            search_name: e.title,
+            search_param: ''
+          }
           if (values['search_param']) {
             if (!err) {
+              console.log(values['search_param'])
               const rangeValue:any = values['search_param']
               /* const subData:any = {
                 ...values,
@@ -1078,24 +1252,16 @@
               // console.log(subData)
               e.extra = rangeValue[0].format('YYYY-MM-DD') + ' ～' + rangeValue[1].format('YYYY-MM-DD')
               e.search_param = values.search_param
-              e.popover = false;
-              const subData:subData = {
-                reportId: this.reportId,
-                tableId: e.tableId,
-                fieldId: e.id,
-                search_logic: 'between',
-                search_type: e.search_type,
-                search_name: e.title,
-                search_param: rangeValue[0].format('YYYY-MM-DD') + ',' + rangeValue[1].format('YYYY-MM-DD')
-              };
-              this.subDataSearch(subData); // 调用增加报表筛选器接口
-              (this as any).dataForm.resetFields(); // 重置输入控件的值
+              e.popover = false
+              subData.search_param = rangeValue[0].format('YYYY-MM-DD') + ',' + rangeValue[1].format('YYYY-MM-DD')
             }
           } else {
             e.extra = '所有时间'
             e.popover = false;
-            (this as any).dataForm.resetFields(); // 重置输入控件的值
+            (this as any).dataForm.resetFields() // 重置输入控件的值
           }
+          this.subDataSearch(subData, e.field_type, e.extra, values.search_logic); // 调用增加报表筛选器接口
+          (this as any).dataForm.resetFields() // 重置输入控件的值
         })
       } else if (e.field_type === 'datetime') { // 时间
         (this as any).datetimeForm.validateFields((err:any, values:any) => {
@@ -1107,18 +1273,18 @@
             } */
             e.extra = rangeValue[0].format('YYYY-MM-DD HH:mm') + ' ～' + rangeValue[1].format('YYYY-MM-DD HH:mm')
             e.search_param = values.search_param
-            e.popover = false;
+            e.popover = false
             const subData:subData = {
               reportId: this.reportId,
               tableId: e.tableId,
               fieldId: e.id,
-              search_logic: 'between',
+              search_logic: 'between', // 时间类：固定传 between
               search_type: e.search_type,
               search_name: e.title,
               search_param: rangeValue[0].format('YYYY-MM-DD HH:mm') + ',' + rangeValue[1].format('YYYY-MM-DD HH:mm')
-            };
-            this.subDataSearch(subData); // 调用增加报表筛选器接口
-            (this as any).datetimeForm.resetFields(); // 重置输入控件的值
+            }
+            this.subDataSearch(subData, e.field_type, e.extra, values.search_logic); // 调用增加报表筛选器接口
+            (this as any).datetimeForm.resetFields() // 重置输入控件的值
           }
         })
       } else if (e.field_type === 'num') { // 数字
@@ -1126,7 +1292,7 @@
             if (!err) {
               e.extra = values.search_logic.label + '  '
               e.extra += values.search_param ? values.search_param : '  " "'
-              e.popover = false;
+              e.popover = false
               e.search_logic = values.search_logic
               e.search_param = values.search_param
               const subData:subData = {
@@ -1137,9 +1303,9 @@
                 search_type: e.search_type,
                 search_name: e.title,
                 search_param: values.search_param
-              };
-              this.subDataSearch(subData); // 调用增加报表筛选器接口
-              (this as any).numberForm.resetFields(); // 重置输入控件
+              }
+              this.subDataSearch(subData, e.field_type, e.extra, values.search_logic); // 调用增加报表筛选器接口
+              (this as any).numberForm.resetFields() // 重置输入控件
             }
         })
       } else if (e.field_type === 'string') { // 字符串
@@ -1149,7 +1315,7 @@
             e.extra += values.search_param ? values.search_param : '  " "'
             e.search_logic = values.search_logic
             e.search_param = values.search_param
-            e.popover = false;
+            e.popover = false
             const subData:subData = {
               reportId: this.reportId,
               tableId: e.tableId,
@@ -1159,8 +1325,8 @@
               search_name: e.title,
               search_param: values.search_param
             };
-            this.subDataSearch(subData); // 调用增加报表筛选器接口
-            (this as any).stringForm.resetFields(); // 重置输入控件
+            this.subDataSearch(subData, e.field_type, e.extra, values.search_logic); // 调用增加报表筛选器接口
+            (this as any).stringForm.resetFields() // 重置输入控件
           }
         })
       } else if (e.field_type === 'select') { // 单选
@@ -1168,7 +1334,7 @@
           if (!err) {
             e.extra = values.search_logic.label + '  '
             e.extra += values.search_param ? values.search_param.label : '  " "'
-            e.popover = false;
+            e.popover = false
             e.search_logic = values.search_logic
             e.search_param = values.search_param
             const subData:subData = {
@@ -1179,9 +1345,9 @@
               search_type: e.search_type,
               search_name: e.title,
               search_param: values.search_param.key
-            };
-            this.subDataSearch(subData); // 调用增加报表筛选器接口
-            (this as any).selectForm.resetFields(); // 重置输入控件
+            }
+            this.subDataSearch(subData, e.field_type, e.extra, values.search_logic); // 调用增加报表筛选器接口
+            (this as any).selectForm.resetFields() // 重置输入控件
           }
         })
       } else if (e.field_type === 'checkbox') { // 复选框
@@ -1190,19 +1356,20 @@
             let search_param:Array<string> = []
             let extra:Array<string> = []
             if(!values.search_param) {
-              e.extra = values.search_logic.label + '  '+ '  " "'
+              e.extra = values.search_logic.label + '  ' + '  " "'
             } else {
               values.search_param.forEach((val:any, i:number) => {
                 // e.extra += val.label+','
                 // search_param += val.key+','
                 extra.push(val.label)
                 search_param.push(val.key)
-              });
+              })
               e.extra = values.search_logic.label + '  ' + extra.join()
             }
-            e.popover = false;
+            e.popover = false
             e.search_logic = values.search_logic
             e.search_param = values.search_param
+            console.log(values.search_param)
             const subData:subData = {
               reportId: this.reportId,
               tableId: e.tableId,
@@ -1211,112 +1378,140 @@
               search_type: e.search_type,
               search_name: e.title,
               search_param: search_param.join()
-            };
-            this.subDataSearch(subData); // 调用增加报表筛选器接口
-            (this as any).checkboxForm.resetFields(); // 重置输入控件
+            }
+            this.subDataSearch(subData, e.field_type, e.extra, values.search_logic); // 调用增加报表筛选器接口
+            (this as any).checkboxForm.resetFields() // 重置输入控件
           }
         })
       }
     }
-    subDataSearch (subData:subData):void { // 固定筛选器确认提交方法
+    subDataSearch (subData:subData, field_type:string, extra:string, search_logic:any):void { // 固定筛选器确认提交方法 extra为footer显示的文本
       this.spinning = true;
       (this as any).$post('custom/ReportManageDetail/addReportSearch', subData).then((res: any) => { // 请求新增字段
         if (res.state === 2000) {
-          this.spinning = false;
-          this.searchIdF.push(res.data.searchId); // 存放筛选器id
+          this.spinning = false
+          this.fixSearchData.splice(this.fixSearchData.length - 1, 1, { 
+            'searchId': res.data.searchId, 
+            'fieldId': subData.fieldId, 
+            'field_type': field_type, 
+            'title': subData.search_name,
+            'search_logic': search_logic,
+            'search_param': subData.search_param,
+            'extra': extra 
+          }) // 替换最后一个元素，（位置，个数，要插入的元素)
           this.getReportDetail(); // 请求table表格
-          (this as any).$message.success(res.message, 3); // 弹出成功message
+          (this as any).$message.success(res.message, 3) // 弹出成功message
         } else {
           this.spinning = false;
-          (this as any).$message.error(res.message, 3); // 弹出错误message
+          (this as any).$message.error(res.message, 3) // 弹出错误message
         }
       }).catch((err: any) => {
         if (err.code === 'ECONNABORTED') {
-          (this as any).$message.error('请求超时', 3); // 弹出错误message
+          (this as any).$message.error('请求超时', 3) // 弹出错误message
         } else {
-          (this as any).$message.error('新增固定筛选器失败', 3); // 弹出错误message
+          (this as any).$message.error('新增固定筛选器失败', 3) // 弹出错误message
         }
-        this.spinning = false;
-      });
+        this.spinning = false
+      })
     }
     delReportSearch (searchId:any, index:number, type:string):void { // 筛选器删除请求方法
       this.spinning = true;
       (this as any).$post('custom/ReportManageDetail/delReportSearch', { searchId }).then((res: any) => { // 请求新增字段
         if (res.state === 2000) {
-          this.spinning = false;
+          this.spinning = false
           if (type === 'F') { // 配置固定与显示筛选 参数
-            this.searchIdF.splice(index, 1)
-            this.fixedScreening.splice(index, 1)
-            this.aTagDatasF.splice(index, 1)
+            this.fixSearchData.splice(index, 1)
           } else if (type === 'X') {
-            this.searchIdX.splice(index, 1)
-            this.accordScreening.splice(index, 1)
-            this.aTagDatasX.splice(index, 1)
+            this.showSearchData.splice(index, 1)
           }
           this.getReportDetail(); // 请求table表格
-          (this as any).$message.success(res.message, 3); // 弹出成功message
+          (this as any).$message.success(res.message, 3) // 弹出成功message
         } else {
           this.spinning = false;
-          (this as any).$message.error(res.message, 3); // 弹出错误message
+          (this as any).$message.error(res.message, 3) // 弹出错误message
         }
       }).catch((err: any) => {
         if (err.code === 'ECONNABORTED') {
-          (this as any).$message.error('请求超时', 3); // 弹出错误message
+          (this as any).$message.error('请求超时', 3) // 弹出错误message
         } else {
-          (this as any).$message.error('删除筛选器失败', 3); // 弹出错误message
+          (this as any).$message.error('删除筛选器失败', 3) // 弹出错误message
         }
-        this.spinning = false;
-      });
+        this.spinning = false
+      })
     }
     visibleChangeFun (visible:any):void { // popover 显示隐藏的回调
       if (this.screeningFlag) {
-        let aTagFLast:any = this.aTagDatasF[this.aTagDatasF.length -1] // 获取固定筛选数组最后一个
+        let aTagFLast:any = this.fixSearchData[this.fixSearchData.length -1] // 获取固定筛选数组最后一个
         if (aTagFLast.new) { // 如果是第一次选中未点击确认按钮的情况下
-          this.fixedScreening.pop()
-          this.aTagDatasF.pop()
+          this.fixSearchData.pop()
         }
       } else {
-        let aTagXLast:any = this.aTagDatasX[this.aTagDatasX.length -1] // 获取显示筛选数组最后一个
+        let aTagXLast:any = this.showSearchData[this.showSearchData.length -1] // 获取显示筛选数组最后一个
         if (aTagXLast.new) { // 如果是第一次选中未点击确认按钮的情况下
-          this.accordScreening.pop()
-          this.aTagDatasX.pop()
+          this.showSearchData.pop()
         }
       }
-      console.log(visible)
     }
     /* 筛选 end */
-    /* 组行、组列拖拽系列方法 start */
-      onEndHang (ev:any):void { // 组行拖拽移动
-        // console.log(this.aTagDatasH)
-        if (ev.to.className === 'lie') {
-          // console.log(ev.oldIndex)
-          // console.log(this.aTagDatasH[ev.oldIndex])
-          // this.aTagDatasL.splice(ev.newIndex, 0, this.aTagDatasH[ev.oldIndex]) // 往列中添加数据
-          // this.aTagDatasH.splice(ev.oldIndex, 1) // 删除行中的数据
+
+    /* 报表设置 拖拽 strat */
+    onEndHang (event:any):void { // 组行 拖拽排序发生变化时事件
+      let ids:Array<number> = []
+      this.hangData.map((v:any, i:number) => {
+        ids.push(v.groupId)
+      })
+      this.draggableEndSubFun('group', ids.toString())
+    }
+    onEndLie (event:any):void { // 组列 拖拽排序发生变化时事件
+      let ids:Array<number> = []
+      this.lieData.map((v:any, i:number) => {
+        ids.push(v.fieldId)
+      })
+      this.draggableEndSubFun('field', ids.toString())
+    }
+    onEndSort (event:any):void { // 排序 拖拽排序发生变化事件
+      let ids:Array<number> = []
+      this.sortData.map((v:any, i:number) => {
+        ids.push(v.sortId)
+      })
+      this.draggableEndSubFun('sort', ids.toString())
+    }
+    onEndFixSearch (event:any):void { // 固定筛选器 拖拽排序发生变化事件
+      let ids:Array<number> = []
+      this.fixSearchData.map((v:any, i:number) => {
+        ids.push(v.searchId)
+      })
+      this.draggableEndSubFun('fixSearch', ids.toString())
+    }
+    onEndShowSearch (event:any):void { // 显示筛选器 拖拽排序发生变化事件
+      let ids:Array<number> = []
+      this.showSearchData.map((v:any, i:number) => {
+        ids.push(v.searchId)
+      })
+      this.draggableEndSubFun('showSearch', ids.toString())
+    }
+    draggableEndSubFun (type: string, ids:string):void {
+      this.spinning = true;
+      (this as any).$post('custom/ReportManageDetail/changeParamSort', { type, ids }).then((res: any) => { // 请求新增字段
+        if (res.state === 2000) {
+          this.getReportDetail(); // 请求table表格
+          this.spinning = false;
+          (this as any).$message.success(res.message, 3); // 弹出成功message
+        } else {
+          this.spinning = false;
+          (this as any).$message.error(res.message, 3) // 弹出错误message
         }
-        // console.log(this.aTagDatasL)
-      }
-      // to:移动到的列表的容器, from:来源列表容器, item:被移动的单元, clone:副本的单元, oldIndex:移动前的序号(从0开始), newIndex:移动后的序号
-      onEndLie (ev:any):void { // 组列拖拽移动结束
-        // console.log(ev)
-        if (ev.to.className === 'hang') {
-          // this.aTagDatasL.splice(ev.oldIndex, 1) // 
+      }).catch((err: any) => {
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3) // 弹出错误message
+        } else {
+          (this as any).$message.error('排序失败', 3) // 弹出错误message
         }
-      }
-      // deep: 深度监听， immediate代表声明监听后立即执行方法
-      @Watch('aTagDatasH', { deep: true, immediate: true }) onAtagDatasHChangeFun (newVal:string, oldVal:string) { 
-        // console.log(newVal)
-        // console.log(oldVal)
-      }
-      onUpdateHang (ev:any):void { // 拖拽行移动排序发生变化时
-        // console.log(ev)
-        // console.log(this.aTagDatasL)
-      }
-      onUpdateLie (ev:any):void { // 拖拽列
-        // console.log(ev)
-        // console.log(this.aTagDatasL)
-      }
-     /* 拖拽end */
+        this.spinning = false
+      })
+    }
+
+    /* 报表设置 拖拽 end */
 
     /* 报表名称 修改方法 start */
     titleNameEditFun (e:string) { // 报表名称修改方法
@@ -1347,16 +1542,16 @@
           // (this as any).$message.success(res.message, 3); // 弹出成功message
         } else {
           this.systeming = false;
-          (this as any).$message.error(res.message, 3); // 弹出错误message
+          (this as any).$message.error(res.message, 3) // 弹出错误message
         }
       }).catch((err: any) => {
         if (err.code === 'ECONNABORTED') {
-          (this as any).$message.error('请求超时', 3); // 弹出错误message
+          (this as any).$message.error('请求超时', 3) // 弹出错误message
         } else {
-          (this as any).$message.error('删除筛选器失败', 3); // 弹出错误message
+          (this as any).$message.error('删除筛选器失败', 3) // 弹出错误message
         }
-        this.systeming = false;
-      });
+        this.systeming = false
+      })
     }
     formulaCreate ():void { // 模态框确认方法
       this.formulaCreateLoading = true // 打开动画
@@ -1374,21 +1569,19 @@
               this.getReportDetail(); // 调用请求表格方法
               (this as any).messageForm.resetFields(); // 重置输入控件
               (this as any).formatForm.resetFields(); // 重置输入控件
-              this.showFormulaFlag = false;
-              this.fieldIdArrLie.push(res.data.colId) // push 标识
-              this.aTagDatasL.push({ title: params.col_title}) // push 选中的回显的文字
-              this.colColId.push(res.data.colId) // 存放新增后返回列id
+              this.showFormulaFlag = false
+              this.lieData.push({ 'fieldId': res.data.colId, 'title': params.col_title, 'colId': res.data.colId })
             } else {
-              (this as any).$message.error(res.message, 3); // 弹出错误message
+              (this as any).$message.error(res.message, 3) // 弹出错误message
             }
           }).catch((err: any) => {
             if (err.code === 'ECONNABORTED') {
-              (this as any).$message.error('请求超时', 3); // 弹出错误message
+              (this as any).$message.error('请求超时', 3) // 弹出错误message
             } else {
-              (this as any).$message.error('添加公式列失败', 3); // 弹出错误message
+              (this as any).$message.error('添加公式列失败', 3) // 弹出错误message
             }
             this.formulaCreateLoading = false
-          });
+          })
         } else {
           this.formulaCreateLoading = false
         }
@@ -1592,13 +1785,14 @@
       let _this = this
       setTimeout(() => {
         _this.runLoading = false;
-        (this as any).$router.push({ path: '/reportTable', query: { reportId: this.reportId }}) // 报表表格 
+         window.open(window.location.origin + '/reportTable?reportId=' + this.reportId) // _target 表示只打开一个，重复点击会回到第一个打开的窗口
+        // (this as any).$router.push({ path: '/reportTable', query: { reportId: this.reportId }}) // 报表表格 
       }, 200)
     } 
  }
 </script>
 
-<style lang='scss' rel='stylesheet/scss'>
+<style lang='less'>
 .spin-content{
   border: 1px solid #91d5ff;
   background-color: #e6f7ff;
