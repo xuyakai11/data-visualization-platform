@@ -283,28 +283,33 @@
       let max:number = this.data[0].value
       let min:number = this.data[0].value // 假设第一个为最大或者最小
       this.data.map((v:any, i:number) => {
-        let cur:number = v.value
-        cur > max ? max = cur : null
+        let cur:number = +v.value;
+        cur > max ? max = cur : null;
         cur < min ? min = cur : null
       })
+      console.log(JSON.stringify(this.data))
       /* for (var i = 0; i < this.provinceMap.length; i++) {
         for (var j = 0; j < this.data.length; j++) {
-
+          if (this.provinceMap[i].name === this.data[j].name) {
+            this.provinceMap[i].value = this.data[j].value
+          }
         }
-      }; */
+      } */
       myChart.setOption({
         tooltip: { show: true },
         visualMap: {
+          // type: 'continuous',
           show: true,
           min: 0,
-          max: 50000,
-          // left: '30%',
-          // top: 'bottom',
-          // text: ['High','Low'],
+          max: max,
+          left: '30%',
+          top: 'bottom',
+          text: ['High', 'Low'],
           textStyle: {
             color: '#fff'
           },
-          seriesIndex: [1],
+          seriesIndex: [0],
+          // realtime: false,
           calculable: true, // 是否拖拽
           inRange: { // 设置颜色
             color: ['rgba(63, 155, 255, .3)', 'rgba(63, 155, 255, 1)']
@@ -315,7 +320,8 @@
           roam: true,
           left: '30%',
           top: '2%',
-          /* scaleLimit: { // 规模限制
+          show: true,
+          scaleLimit: { // 规模限制
             min: 1,
             max: 4
           },
@@ -329,7 +335,7 @@
           },
           emphasis: { // 高亮时样式
             label: {
-              show: true,
+              show: false,
               textStyle: {
                 color: '#FFF'
               }
@@ -338,7 +344,7 @@
           itemStyle: {
             normal: {
               show: true,
-              // color: '#1B3B75', // 地图颜色
+              color: '#1B3B75', // 地图颜色
               borderColor: '#80b3dc'
             },
             emphasis: {
@@ -348,9 +354,24 @@
               shadowBlur: 0,
               borderWidth: 0
             }
-          } */
+          }
         },
         series: [
+          /* {
+            name: '',
+            type: 'map',
+            mapType: 'china',
+            roam: true,
+            geoIndex: 0,
+            tooltip: { show: false },
+            itemStyle: {
+              emphasis: {
+                label: { show: false }
+              }
+            },
+            zlevel: 0,
+            data: [{ name: '北京', value: 21423 }, { name: '湖北', value: 23411 }]
+          }, */
           { // 配置点
             type: 'scatter',
             coordinateSystem: 'geo',
@@ -359,6 +380,7 @@
               max: 1
             },
             data: this.convertData(this.data),
+            
             symbolSize: function (val:any) {
               if (+val[2]<0) val[2] = 0;
               var key:number = Math.abs(val[2]) / 100;
@@ -396,7 +418,7 @@
             },
             zlevel: 1
           },
-          /* { // 配置提取前5名用波纹提示
+         { // 配置提取前5名用波纹提示
             name: '',
             type: 'effectScatter', // 配置波纹
             coordinateSystem: 'geo',
@@ -450,7 +472,7 @@
             })), // 提取出最大的5个显示波纹动画
             symbolSize: function (val:any) {
               let key:number = Math.abs(val[2]) / 100;
-              return Math.sqrt(key/Math.PI);
+              return Math.sqrt(key/Math.PI)
             },
             tooltip: {
               trigger: 'item',
@@ -477,10 +499,13 @@
                 color: 'rgba(255, 5, 5, .5)',
                 shadowBlur: 10,
                 shadowColor: '#333'
+              },
+              emphasis: {
+                show: false
               }
             },
             zlevel: 3
-          } */
+          }
         ]
       }, true)
     }

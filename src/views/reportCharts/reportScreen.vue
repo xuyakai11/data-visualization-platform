@@ -149,6 +149,23 @@
         </div>
       </a-col>
     </a-row>
+    <!-- <a-row>
+      <a-col>
+        <template>
+          <a-carousel vertical :dots="false" autoplay :autoplaySpeed="6000">
+              <div v-for="(item, i) in weekIncomeMoney" :key="i">
+                <ul class="lpc-carUl" :class="i ? '': 'one'">
+                  <li v-for="(list, index) in item" :key="index">
+                    <span class="badge">{{list.num + 1}}</span>
+                    <span>{{list.branch_name}}</span>
+                    <span>{{list.co_firstmoney}}</span>
+                  </li>
+                </ul>
+              </div>
+          </a-carousel>
+        </template>
+      </a-col>
+    </a-row> -->
   </div>
 </template>
 
@@ -174,6 +191,144 @@
     title3:string = '月收入客户类型'
     title4:string = '咨询收入占比'
     rankList:Array<any> = []
+    weekIncomeMoney:Array<any> =[]
+    carryTotalMoney:Array<any> = [ // 结转排行
+      {
+          "branch_name":"北京分公司",
+          "co_firstmoney":"603.00",
+          "co_extmoney":"0.00",
+          "co_diffmoney":"0.00",
+          "total_money":"603.00",
+          "school_code":"103",
+          "month_stamp":"201901"
+      },
+      {
+          "branch_name":"武汉分公司",
+          "co_firstmoney":"0.00",
+          "co_extmoney":"0.00",
+          "co_diffmoney":"0.00",
+          "total_money":"0.00",
+          "school_code":"104",
+          "month_stamp":"201901"
+      },
+      {
+          "branch_name": '垃圾公司1',
+          "co_firstmoney":"0.00",
+          "co_extmoney":"0.00",
+          "co_diffmoney":"0.00",
+          "total_money":"0.00",
+          "school_code":"98",
+          "month_stamp":"201901"
+      },
+      {
+          "branch_name":"北京分公司",
+          "co_firstmoney":"603.00",
+          "co_extmoney":"0.00",
+          "co_diffmoney":"0.00",
+          "total_money":"603.00",
+          "school_code":"103",
+          "month_stamp":"201901"
+      },
+      {
+          "branch_name":"武汉分公司",
+          "co_firstmoney":"0.00",
+          "co_extmoney":"0.00",
+          "co_diffmoney":"0.00",
+          "total_money":"0.00",
+          "school_code":"104",
+          "month_stamp":"201901"
+      },
+      {
+          "branch_name":'垃圾公司2',
+          "co_firstmoney":"0.00",
+          "co_extmoney":"0.00",
+          "co_diffmoney":"0.00",
+          "total_money":"0.00",
+          "school_code":"98",
+          "month_stamp":"201901"
+      },
+      {
+          "branch_name":"北京分公司",
+          "co_firstmoney":"603.00",
+          "co_extmoney":"0.00",
+          "co_diffmoney":"0.00",
+          "total_money":"603.00",
+          "school_code":"103",
+          "month_stamp":"201901"
+      },
+      {
+          "branch_name":"武汉分公司",
+          "co_firstmoney":"0.00",
+          "co_extmoney":"0.00",
+          "co_diffmoney":"0.00",
+          "total_money":"0.00",
+          "school_code":"104",
+          "month_stamp":"201901"
+      },
+      {
+          "branch_name":'垃圾公司3',
+          "co_firstmoney":"0.00",
+          "co_extmoney":"0.00",
+          "co_diffmoney":"0.00",
+          "total_money":"0.00",
+          "school_code":"98",
+          "month_stamp":"201901"
+      },
+      {
+          "branch_name":"北京分公司",
+          "co_firstmoney":"603.00",
+          "co_extmoney":"0.00",
+          "co_diffmoney":"0.00",
+          "total_money":"603.00",
+          "school_code":"103",
+          "month_stamp":"201901"
+      },
+      {
+          "branch_name":"武汉分公司",
+          "co_firstmoney":"0.00",
+          "co_extmoney":"0.00",
+          "co_diffmoney":"0.00",
+          "total_money":"0.00",
+          "school_code":"104",
+          "month_stamp":"201901"
+      },
+      {
+          "branch_name": '垃圾公司4',
+          "co_firstmoney":"0.00",
+          "co_extmoney":"0.00",
+          "co_diffmoney":"0.00",
+          "total_money":"0.00",
+          "school_code":"98",
+          "month_stamp":"201901"
+      },
+      {
+          "branch_name":"北京分公司",
+          "co_firstmoney":"603.00",
+          "co_extmoney":"0.00",
+          "co_diffmoney":"0.00",
+          "total_money":"603.00",
+          "school_code":"103",
+          "month_stamp":"201901"
+      },
+      {
+          "branch_name":"武汉分公司",
+          "co_firstmoney":"0.00",
+          "co_extmoney":"0.00",
+          "co_diffmoney":"0.00",
+          "total_money":"0.00",
+          "school_code":"104",
+          "month_stamp":"201901"
+      },
+      {
+          "branch_name": '垃圾公司5',
+          "co_firstmoney":"0.00",
+          "co_extmoney":"0.00",
+          "co_diffmoney":"0.00",
+          "total_money":"0.00",
+          "school_code":"98",
+          "month_stamp":"201901"
+      }
+    ]
 
     chartMapData:any = {
           columns: ['位置', '税收', '人口', '面积'],
@@ -220,6 +375,20 @@
           name: '桃源村' + i + '号店',
           total: (1234.56 - i * 100).toFixed(2)
         })
+      }
+      this.splitObjFun(this.carryTotalMoney, 5, 'week') // 处理周收款
+    }
+    splitObjFun (obj:Array<any>, sliceNum:number, type:string):void { // 将数组切割成每5or8个一组
+      let arr:Array<any> = []
+      obj.map((v:any, i:number) => {
+        v.proportion = +v.proportion
+        v.num = i
+      })
+      for (let i = 0; i < obj.length / sliceNum; i++) {
+        arr.push(obj.slice(i * sliceNum, (i+1) * sliceNum))
+      }
+      if (type === 'week') {
+        this.weekIncomeMoney = arr
       }
     }
   }
