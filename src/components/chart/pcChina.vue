@@ -313,7 +313,7 @@
           realtime: false,
           calculable: true, // 是否拖拽
           inRange: { // 设置颜色
-            color: ['rgb(27, 59, 117)', 'rgba(63, 155, 255, .1)']
+            color: ['rgb(27, 59, 117)', 'rgba(63, 155, 255, 1)']
           }
         },
         geo: {
