@@ -227,7 +227,7 @@
 
   interface data {
     carryTotalMoney:Array<any>,
-    citySchoolList:Array<any>,
+    citySchoolList:any,
     consulCleanMoney:Array<any>,
     cultivateCleanMoney:Array<any>,
     monthAmongMoney:Array<any>,
@@ -278,7 +278,7 @@
       },
       carryTotalMoney: [], // 结转排行
       preYearMoney: [], // 预算排行
-      citySchoolList: [],
+      citySchoolList: {},
       consulCleanMoney: [],
       cultivateCleanMoney: [],
       monthAmongMoney: [], // 月收款
@@ -418,6 +418,7 @@
       (this as any).$post('/custom/PresidentScreen/getPreSidentScreen').then((res: any) => {
         if (res.state === 2000) {
           _this.data = res.data
+          console.log(res.data)
           // this.dayIncomeMoney = toThousands(_this.data.totalIncomeMoney.dayIncomeMoney) // 转换今日收款
           this.splitObjFun(this.data.weekIncomeMoney, 5, 'week') // 处理周收款
           this.splitObjFun(this.data.monthAmongMoney, 5, 'month') // 处理月收款

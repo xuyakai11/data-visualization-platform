@@ -247,11 +247,13 @@
       {name: '澳门', value: 0 }
     ]
     data: Array<any> = []
-    @Watch('datas', { deep: true, immediate: true }) datasWatch (newVal:Array<any>, oldVal:Array<any>) {
-      if (newVal !== oldVal && newVal.length) {
+    visualData: Array<any> = []
+    @Watch('datas', { deep: true, immediate: true }) datasWatch (newVal:any, oldVal:any) {
+      if (newVal && JSON.stringify(newVal) !== '{}') {
         this.data = []
-        newVal.map((v:any, i:number) => {
-         this.data.push({ name: v.city_name, value: 50000, schoolList: v.schoolList }) // v.total
+        this.visualData = newVal.provinceData
+        newVal.cityData.map((v:any, i:number) => {
+         this.data.push({ name: v.city_name, value: v.total, schoolList: v.schoolList }) // v.total
         })
        this.initEchartsFun()
       }
@@ -264,55 +266,54 @@
     }
     
     convertData (data:Array<any>) {
-      var res = [];
+      var res = []
       for (var i = 0; i < data.length; i++) {
         var geoCoord = this.geoCoordMap[data[i].name];
         if (geoCoord) {
           res.push({
             name: data[i].name,
             value: geoCoord.concat(data[i].value, JSON.stringify(data[i].schoolList))
-          });
+          })
         }
       }
-      return res;
+      return res
     }
     initEchartsFun () {
       const myChart = echarts.init(this.$refs.echartGeo as HTMLDivElement)
       myChart.clear()
       let _this = this
-      let max:number = this.data[0].value
-      let min:number = this.data[0].value // 假设第一个为最大或者最小
+      let max:number = 0
+      let min:number = 0 // 假设第一个为最大或者最小
       this.data.map((v:any, i:number) => {
-        let cur:number = +v.value;
-        cur > max ? max = cur : null;
+        let cur:number = +v.value
+        cur > max ? max = cur : null
         cur < min ? min = cur : null
       })
-      console.log(JSON.stringify(this.data))
-      /* for (var i = 0; i < this.provinceMap.length; i++) {
-        for (var j = 0; j < this.data.length; j++) {
-          if (this.provinceMap[i].name === this.data[j].name) {
-            this.provinceMap[i].value = this.data[j].value
+      for (var i = 0; i < this.provinceMap.length; i++) {
+        for (var j = 0; j < this.visualData.length; j++) {
+          if (this.provinceMap[i].name === this.visualData[j].province_name) {
+            this.provinceMap[i].value = this.visualData[j].total
           }
         }
-      } */
+      }
       myChart.setOption({
         tooltip: { show: true },
-        visualMap: {
+        visualMap: { // 配置有值视图
           // type: 'continuous',
-          show: true,
-          min: 0,
+          show: false,
+          min: min,
           max: max,
-          left: '30%',
-          top: 'bottom',
-          text: ['High', 'Low'],
-          textStyle: {
-            color: '#fff'
-          },
-          seriesIndex: [0],
-          // realtime: false,
+          // left: '30%',
+          // top: 'bottom',
+          // text: ['High', 'Low'],
+          // textStyle: {
+          //   color: '#fff'
+          // },
+          seriesIndex: [0], // 获取数据
+          realtime: false,
           calculable: true, // 是否拖拽
           inRange: { // 设置颜色
-            color: ['rgba(63, 155, 255, .3)', 'rgba(63, 155, 255, 1)']
+            color: ['rgb(27, 59, 117)', 'rgba(63, 155, 255, .1)']
           }
         },
         geo: {
@@ -344,7 +345,7 @@
           itemStyle: {
             normal: {
               show: true,
-              color: '#1B3B75', // 地图颜色
+              color: 'rgb(27, 59, 117)', // 地图颜色
               borderColor: '#80b3dc'
             },
             emphasis: {
@@ -357,11 +358,9 @@
           }
         },
         series: [
-          /* {
-            name: '',
+          { // 配置有值的地图高亮
             type: 'map',
-            mapType: 'china',
-            roam: true,
+            roam: false,
             geoIndex: 0,
             tooltip: { show: false },
             itemStyle: {
@@ -369,9 +368,8 @@
                 label: { show: false }
               }
             },
-            zlevel: 0,
-            data: [{ name: '北京', value: 21423 }, { name: '湖北', value: 23411 }]
-          }, */
+            data: this.provinceMap // 有值对应数据
+          },
           { // 配置点
             type: 'scatter',
             coordinateSystem: 'geo',

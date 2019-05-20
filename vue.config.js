@@ -3,6 +3,13 @@ module.exports = {
   baseUrl: process.env.NODE_ENV === 'production'
     ? '/static/custom/'
     : './',
+  devServer: { // 设置端口
+    port: 8080
+  },
+  // pages: { // 配置多页面入口
+  //   index: 'src/project/index/main.ts',
+  //   report: 'src/project/admin/main.ts'
+  // },
   productionSourceMap: false,
   chainWebpack: config => {
     config.plugins.delete('pwa')

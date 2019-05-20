@@ -1922,7 +1922,7 @@
           white-space: nowrap;
           cursor: move;
           .anticon-close {
-            display: inline-block;
+            // display: inline-block;
             float: right;
             margin-top: 5px;
             color: rgb(176, 173, 171);
@@ -2031,7 +2031,7 @@
           white-space: nowrap;
           cursor: move;
           .anticon-close {
-            display: inline-block;
+            // display: inline-block;
             float: right;
             margin-top: 5px;
             color: rgb(176, 173, 171);

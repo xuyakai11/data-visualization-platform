@@ -1,6 +1,7 @@
 <template>
   <div>
-    
+    askldjfl lsdkjlf 
+    <router-view></router-view>
   </div>
 </template>
 

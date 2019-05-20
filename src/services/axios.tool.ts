@@ -1,7 +1,7 @@
-import Vue from 'vue';
-import router from '../router';
-import axios from 'axios';
-import qs from 'qs';
+import Vue from 'vue'
+import router from '../router'
+import axios from 'axios'
+import qs from 'qs'
 import store from '../store'
 
 // 设置默认请求头

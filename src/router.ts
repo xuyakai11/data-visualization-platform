@@ -21,9 +21,16 @@ export default new Router({
       component: () => import('./views/reportCharts/reportScreen.vue')
     },
     {
-      path: '/customConfigReport',
+      path: '/config',
       name: '自定义配置报表',
-      component: () => import('./views/reportCharts/customConfigReport.vue')
+      component: () => import('./views/reportConfig/customConfigReport.vue'),
+      // children: [
+      //   {
+      //     path: '/dataOriginManagement11',
+      //     name: '数据源管理',
+      //     component: () => import('./views/dataOriginManagement.vue')
+      //   }
+      // ]
     },
     {
       path: '/home',
