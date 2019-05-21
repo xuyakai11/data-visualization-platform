@@ -108,12 +108,30 @@
                 <div class="tab1-top">
                   <div class="tab1-top-header">
                     <h4>排序</h4>
-                    <a-tooltip placement="top">
+                    <a-dropdown :trigger="['click']">
+                      <a class="ant-dropdown-link" href="#">
+                        <a-icon type="down-square" />
+                      </a>
+                      <a-menu slot="overlay">
+                        <!-- <a-menu-item key="0">
+                          <a href="javascript:void(0)">添加存储器列</a>
+                        </a-menu-item> -->
+                        <a-menu-item key="1" :disabled="!sortData.length" @click="sortingFun('asc')">
+                          <a href="javascript:void(0)">升序</a>
+                        </a-menu-item>
+                        <a-menu-item key="2" :disabled="!sortData.length" @click="sortingFun('desc')">
+                          <a href="javascript:void(0)">降序</a>
+                        </a-menu-item>
+                        <a-menu-divider />
+                        <a-menu-item key="3" @click="deleteAllGroup('sort')">删除所有排序</a-menu-item>
+                      </a-menu>
+                    </a-dropdown>
+                    <!-- <a-tooltip placement="top">
                       <template slot="title">
                         <span>删除所有排序</span>
                       </template>
                       <a-icon type="delete" @click.stop="deleteAllGroup('sort')"/>
-                    </a-tooltip>
+                    </a-tooltip> -->
                   </div>
                   <div class="tab1-top-content">
                     <!-- <h4>组行</h4> -->
@@ -131,6 +149,12 @@
                     <div class="task-content">
                       <draggable class="sort" v-model="sortData" :options="dragOptions" @update="onEndSort"> <!-- :options="dragOptions" @end="onEndHang" @update="onUpdateHang" -->
                         <p class="task-item" type="inner" v-for="(item, i) in sortData" :key="'sort' + i" :title="item.text">
+                          <a-tooltip placement="right">
+                            <template slot="title">
+                              <span v-if="item.sortType === 'asc'">正序</span><span v-else="item.sortType === 'desc'">倒叙</span>
+                            </template>
+                            <a-icon :type="item.sortType === 'asc' ? 'arrow-up' : 'arrow-down'" :class="{ 'asc': item.sortType === 'asc', 'desc': item.sortType === 'desc' }" @click.stop="sortingToggleFun(item, i)"/>
+                          </a-tooltip>
                           <span v-if="item.title.length > 15">{{item.title.substr(0, 15)}}...</span>
                           <span v-else>{{item.title}}</span>
                           <a-tooltip placement="right">
@@ -760,7 +784,6 @@
 
     moment () {}
     treeMsg (e:string):void { // 接收子组件的值 的方法
-      console.log('父组件接收' + e)
       if (JSON.stringify(this.lieData).indexOf(e) === -1) {
         // this.fieldIdArrLie.push(e); // 将接收到的子组件传过来的值push到列数中
         this.treeList.map((v:any, i:number) => {
@@ -790,7 +813,6 @@
       return this.treeList.filter(list => list.title !== '')
     }
     created () {
-      console.log(this.reportId);
       (this as any).$post('custom/ReportManageDetail/getAllFields', { reportId: this.reportId }).then((res: any) => { // 请求报表所有表的所有字段
         if (res.state === 2000) {
           this.dataSourceTree = res.data
@@ -819,7 +841,7 @@
               this.hangData.push({ 'fieldId': v.fieldId, 'title': v.field_title, 'groupId': v.groupId })
             })
             res.data.sort.map((v:any, i:number) => {
-              this.sortData.push({ 'fieldId': v.fieldId, 'title': v.field_title, 'sortId': v.sortId })
+              this.sortData.push({ 'fieldId': v.fieldId, 'title': v.field_title, 'sortId': v.sortId, 'sortType': v.sortType })
             })
             // this.fixSearchData = res.data.fixSearch
             // this.showSearchData = res.data.showSearch
@@ -865,7 +887,6 @@
             res.data.showSearch.map((v:any, i:number) => { // 显示筛选
               this.showSearchData.push({ 'fieldId': v.fieldId, 'title': v.showTitle, 'searchId': v.searchId })
             })
-            console.log(this.hangData)
             this.getReportDetail(); // 请求table表格
             this.spinning = false
           } else {
@@ -885,10 +906,10 @@
     }
     getReportDetail(searchParam?:any) { // 获取报表table数据
       this.tableLoading = true
-      if (!this.lieData.length) { // 当列为空时则不请求
-        this.tableLoading = false
-        return false
-      }
+      // if (!this.lieData.length) { // 当列为空时则不请求
+      //   this.tableLoading = false
+      //   return false
+      // }
       let searchPar:any
       if (searchParam) {
         searchPar = searchParam
@@ -916,7 +937,9 @@
           // (this as any).$message.success(res.message, 3); // 弹出成功message
         } else {
           this.tableLoading = false
-          this.data = [];
+          this.data = []
+          this.search = []
+          this.columns = [];
           (this as any).$message.error(res.message, 3) // 弹出错误message
         }
       }).catch((err: any) => {
@@ -937,7 +960,7 @@
           } else if (type === 'hang') {
             this.hangData.push({ 'fieldId': v.id, 'title': v.title, 'groupId': res.data.groupId })
           } else if (type === 'sort') {
-            this.sortData.push({ 'fieldId': v.id, 'title': v.title, 'sortId': res.data.sortId })
+            this.sortData.push({ 'fieldId': v.id, 'title': v.title, 'sortId': res.data.sortId, 'sortType': 'asc' }) // 新增时默认升序
           }
           this.getReportDetail() // 请求table表格
           this.spinning = false
@@ -1029,24 +1052,24 @@
       }
     }
     deleteGroupH (item:any, index:number):void { // 删除组行方法
-      let delRow:Array<any> = this.hangData.slice(index, index + 1) // 获取要删除的那个id
+      // let delRow:Array<any> = this.hangData.slice(index, index + 1) // 获取要删除的那个id
       const type:string = 'hang'
       const URL: string = 'custom/ReportManageDetail/delGroupRow'
-      let param:any = { 'groupId': delRow[0].groupId }
+      let param:any = { 'groupId': item.groupId } // delRow[0].groupId 
       this.deleteGroupFun(URL, type, param, 'one', index) // 调用删除组行 列 方法
     }
     deleteGroupL (item:any, index:number):void { // 删除列数方法
-      let delCol:Array<any> = this.lieData.slice(index, index + 1) // 获取要删除的那个id
+      // let delCol:Array<any> = this.lieData.slice(index, index + 1) // 获取要删除的那个id
       const type:string = 'lie'
       const URL: string = 'custom/ReportManageDetail/delReportCols'
-      let param:any = { 'colId': delCol[0].colId }
+      let param:any = { 'colId': item.colId }
       this.deleteGroupFun(URL, type, param, 'one',index) // 调用删除组行 列 方法
     }
     deleteGroupSort (item:any, index:number):void { // 删除排序方法
-      let delSort:Array<any> = this.sortData.slice(index, index + 1) // 获取要删除的那个id
+      // let delSort:Array<any> = this.sortData.slice(index, index + 1) // 获取要删除的那个数据
       const type:string = 'sort'
       const URL: string = 'custom/ReportManageDetail/delReportSort'
-      let param:any = { 'sortId': delSort[0].sortId }
+      let param:any = { 'sortId': item.sortId }
       this.deleteGroupFun(URL, type, param, 'one', index) // 调用删除组行 列 方法
     }
     deleteAllGroup (type:string):void { // 删除所有组行、组列、排序
@@ -1110,6 +1133,46 @@
           (this as any).$message.error('请求超时', 3) // 弹出错误message
         } else {
           (this as any).$message.error('删除失败', 3) // 弹出错误message
+        }
+      })
+    }
+    sortingToggleFun (item:any, index:number):void { // 单个排序 升序 降序切换
+      // let sorting:Array<any> = this.sortData.slice(index, index + 1) // 获取要更改的数据
+      // item.sortType === 'asc' ? item.sortType = 'desc' : item.sortType = 'asc' // 前端将其改变 // 然后获取改变之后的值传给后台（需要变更的值）
+      let sortType:string = item.sortType === 'asc' ? 'desc' : 'asc' // 如果当前为升序，则传降序，反之同理
+      let sortId:number = item.sortId
+      let param:any = { sortType, sortId }
+      this.sortingSubmitFun(param, index)
+    }
+    sortingFun (sortType:string):void { // 排序 升序 降序切换
+      let sortId:Array<string> = []
+      this.sortData.map((v:any, i:number) => {
+        // v.sortType = sortType // 将其变成升序或降序
+        sortId.push(v.sortId)
+      })
+      let param:any = { sortType, 'sortId': sortId.join(',') }
+      this.sortingSubmitFun(param)
+    }
+    sortingSubmitFun (param:any, index?:number):void {
+      (this as any).$post('custom/ReportManageDetail/changeSortType', param).then((res: any) => { // 请求报表所有表的所有字段
+        if (res.state === 2000) {
+          if (index !== undefined) { // 可选参数存在
+            this.sortData[index].sortType = param.sortType === 'asc' ? 'desc' : 'asc'
+          } else {
+            this.sortData.map((v:any, i:number) => {
+              v.sortType = param.sortType // 将其变成升序或降序
+            })
+          }
+          (this as any).$message.success('变更排序成功', 3)
+          this.getReportDetail() // 请求table表格
+        } else {
+          (this as any).$message.error(res.message, 3) // 弹出message
+        }
+      }).catch((err: any) => {
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3) // 弹出错误message
+        } else {
+          (this as any).$message.error('变更排序失败', 3) // 弹出错误message
         }
       })
     }
@@ -1243,7 +1306,7 @@
           }
           if (values['search_param']) {
             if (!err) {
-              console.log(values['search_param'])
+              // console.log(values['search_param'])
               const rangeValue:any = values['search_param']
               /* const subData:any = {
                 ...values,
@@ -1369,7 +1432,6 @@
             e.popover = false
             e.search_logic = values.search_logic
             e.search_param = values.search_param
-            console.log(values.search_param)
             const subData:subData = {
               reportId: this.reportId,
               tableId: e.tableId,
@@ -1588,7 +1650,6 @@
       });
     }
     textareaChange (e:any):void { // textarea change事件
-      console.log(e.target.value)
       this.formula = e.target.value
     }
     formulaCancel ():void { // 模态框取消关闭方法
@@ -1707,12 +1768,10 @@
       }
     }
     checkGrammar ():void { // 模态框 检查语法方法
-      console.log(this.formula)
       if (this.formula) {
         this.checkFormulaLoading = true;
         (this as any).$post('custom/Formula/checkFormula', { reportId: this.reportId, formula: this.formula }).then((res: any) => { // 请求新增字段
           if (res.state === 2000) {
-            console.log(res);
             this.checkFormulaLoading = false // 加载动画
             this.grammarSuccess = false // 按钮
             this.checkFormulaSuccess = true // 成功提示
@@ -1723,7 +1782,7 @@
             this.errMsgFlag = true  // 提示信息
           }
         }).catch((err: any) => {
-          console.log(err);
+          console.log(err)
           this.errMsg = '请求失败'
           this.errMsgFlag = true  // 提示信息
           this.checkFormulaLoading = false;
@@ -1861,7 +1920,18 @@
             text-overflow: ellipsis;
             white-space: nowrap;
           }
-          
+          .task-item {
+            i.asc {
+              cursor: pointer;
+              color: #52c41a;
+              margin-right: 10px;
+            }
+            i.desc {
+              cursor: pointer;
+              color: #f50;
+              margin-right: 10px;
+            }
+          }
         }
       }
       .tab1-bottom {

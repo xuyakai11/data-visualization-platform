@@ -1,6 +1,14 @@
 <template>
   <div>
+    <a-spin :spinning="spinning" delayTime="500">
+    <header>
+      <div>
+        <a-tag color="#108ee9">添加组件</a-tag>
+        <a-tag color="#87d068">完成</a-tag>
+      </div>
+    </header>
     <!-- <router-view></router-view> -->
+    </a-spin>
   </div>
 </template>
 
@@ -9,9 +17,14 @@
 
   @Component
   export default class customConfigReport extends Vue {
-    @Prop() private msg!: string;
+    spinning:boolean = true
     created () {
 
+    }
+    mounted () {
+      setTimeout(() => {
+        this.spinning = false
+      }, 1000)
     }
   }
 </script>
