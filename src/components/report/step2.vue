@@ -151,7 +151,7 @@
                         <p class="task-item" type="inner" v-for="(item, i) in sortData" :key="'sort' + i" :title="item.text">
                           <a-tooltip placement="right">
                             <template slot="title">
-                              <span v-if="item.sortType === 'asc'">正序</span><span v-else="item.sortType === 'desc'">倒叙</span>
+                              <span v-if="item.sortType === 'asc'">正序</span><span v-else="item.sortType === 'desc'">倒序</span>
                             </template>
                             <a-icon :type="item.sortType === 'asc' ? 'arrow-up' : 'arrow-down'" :class="{ 'asc': item.sortType === 'asc', 'desc': item.sortType === 'desc' }" @click.stop="sortingToggleFun(item, i)"/>
                           </a-tooltip>
@@ -365,7 +365,7 @@
         <div class="lpc-rightTable">
           <div class="table-header">
             <div class="table-header-left">
-          <!-- <a-input ref="titleName" v-if="titleNameEdit" :value="titleName" @change="e => titleNameEditFun(e.target.value)" style="width: 200px;"/>
+              <!-- <a-input ref="titleName" v-if="titleNameEdit" :value="titleName" @change="e => titleNameEditFun(e.target.value)" style="width: 200px;"/>
               <template v-else>{{titleName}}</template>
               <div v-if="!titleNameEdit" class="header-icon">
                 <a-icon type="edit" @click="editTitleName"></a-icon>
@@ -1157,7 +1157,7 @@
       (this as any).$post('custom/ReportManageDetail/changeSortType', param).then((res: any) => { // 请求报表所有表的所有字段
         if (res.state === 2000) {
           if (index !== undefined) { // 可选参数存在
-            this.sortData[index].sortType = param.sortType === 'asc' ? 'desc' : 'asc'
+            this.sortData[index].sortType = param.sortType // param.sortType这个值是已经想要变成的值
           } else {
             this.sortData.map((v:any, i:number) => {
               v.sortType = param.sortType // 将其变成升序或降序
