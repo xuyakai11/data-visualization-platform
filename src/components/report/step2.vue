@@ -1527,7 +1527,7 @@
     onEndLie (event:any):void { // 组列 拖拽排序发生变化时事件
       let ids:Array<number> = []
       this.lieData.map((v:any, i:number) => {
-        ids.push(v.fieldId)
+        ids.push(v.colId)
       })
       this.draggableEndSubFun('field', ids.toString())
     }
