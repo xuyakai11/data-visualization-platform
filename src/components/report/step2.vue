@@ -448,6 +448,7 @@
         <a-form-item>
           <!-- <a-button :loading="loading" type="primary" @click="nextStep">提交</a-button> -->
           <a-button style="margin-left: 8px" @click="prevStep">上一步</a-button>
+          <a-button type="primary" class="successBtn" @click="success">完成</a-button>
         </a-form-item>
       </a-form>
     </a-spin>
@@ -996,6 +997,13 @@
     }
     prevStep ():void { // 上一步
       this.$emit('prevStep')
+    }
+    success ():void { // 完成
+      if (!this.lieData.length) {
+        (this as any).$message.error('请先添加列', 3) // 弹出成功message
+      } else {
+        (this as any).$router.push({ path: '/statementManagement' }) // 报表管理
+      }
     }
     /* 报表设置 start */
     handleChangeH (value:string):void { // 报表设置栏 组行 搜索框下拉选择方法
@@ -2150,7 +2158,7 @@
         .runBtn {
           margin-left: 10px;
           background-color: #1dd9e2c7;
-          border: #1dd9e2c7
+          border: #1dd9e2c7;
         }
       }
     }
@@ -2196,6 +2204,11 @@
   text-align: center;
   .ant-form-item {
     margin: 12px 0;
+    .successBtn {
+      margin-left: 10px;
+      background-color: #2de00d9e;
+      border: #2de00d9e;
+    }
   }
 }
 .ant-popover { // 筛选器弹框样式

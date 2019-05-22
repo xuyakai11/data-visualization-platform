@@ -23,14 +23,12 @@ export default new Router({
     {
       path: '/config',
       name: '自定义配置报表',
-      component: () => import('./views/reportConfig/customConfigReport.vue'),
-      // children: [
-      //   {
-      //     path: '/dataOriginManagement11',
-      //     name: '数据源管理',
-      //     component: () => import('./views/dataOriginManagement.vue')
-      //   }
-      // ]
+      component: () => import('./views/reportConfig/customConfigReport.vue')
+    },
+    {
+      path: '/configReport',
+      name: '图形自定义配置',
+      component: () => import('./views/reportConfig/configReport.vue')
     },
     {
       path: '/home',
