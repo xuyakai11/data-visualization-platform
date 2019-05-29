@@ -151,7 +151,7 @@
                         <p class="task-item" type="inner" v-for="(item, i) in sortData" :key="'sort' + i" :title="item.text">
                           <a-tooltip placement="right">
                             <template slot="title">
-                              <span v-if="item.sortType === 'asc'">正序</span><span v-else="item.sortType === 'desc'">倒序</span>
+                              <span v-if="item.sortType === 'asc'">正序</span><span v-else-if="item.sortType === 'desc'">倒序</span>
                             </template>
                             <a-icon :type="item.sortType === 'asc' ? 'arrow-up' : 'arrow-down'" :class="{ 'asc': item.sortType === 'asc', 'desc': item.sortType === 'desc' }" @click.stop="sortingToggleFun(item, i)"/>
                           </a-tooltip>

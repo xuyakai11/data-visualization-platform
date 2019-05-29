@@ -92,33 +92,33 @@
   mounted () {
     /* let testConnectDatas:any = (this as any).form.getFieldsValue();
     console.log(testConnectDatas) */
-    this.reportResourceId = getQueryString('reportResourceId') || ''; // 获取url中的数据源id，用来区分是否是由数据源管理中跳转过来
-    let sourceName:string = (this as any).$refs.sourceName.value || ''; // 连接名
-    let reportName:string = (this as any).$refs.reportName.value || ''; // 报表名
+    this.reportResourceId = getQueryString('reportResourceId') || '' // 获取url中的数据源id，用来区分是否是由数据源管理中跳转过来
+    let sourceName:string = (this as any).$refs.sourceName.value || '' // 连接名
+    let reportName:string = (this as any).$refs.reportName.value || '' // 报表名
     let params:any = { reportResourceId: this.reportResourceId, reportName: reportName, sourceName: sourceName, pageSize: 10, nowpage: 1 }
-    this.initDataFun(params); // 请求表格数据
+    this.initDataFun(params) // 请求表格数据
   }
   initDataFun (params:any):void { // 初始化查询数据表方法
     (this as any).$post('custom/ReportManage/getReportList', params).then((res: any) => { // 请求表格数据
       if (res.state === 2000) {
         const pagination = { ...this.pagination }
         this.loading = false // 关闭加载动画
-        pagination.total = res.data.count;
-        this.data = res.data.data;
+        pagination.total = res.data.count
+        this.data = res.data.data
         this.pagination = pagination
       } else {
         this.loading = false;
-        (this as any).$message.error(res.message, 3); // 弹出错误message
+        (this as any).$message.error(res.message, 3) // 弹出错误message
       }
     }).catch((err: any) => {
       if (err.code === 'ECONNABORTED') {
-        (this as any).$message.error('请求超时', 3); // 弹出错误message
+        (this as any).$message.error('请求超时', 3) // 弹出错误message
       } else {
-        (this as any).$message.error('请求失败', 3); // 弹出错误message
+        (this as any).$message.error('请求失败', 3) // 弹出错误message
       }
-      this.loading = false;
-      this.data = [];
-    });
+      this.loading = false
+      this.data = []
+    })
   }
   handleSearch (e: any):void { // 搜索方法
     e.preventDefault();

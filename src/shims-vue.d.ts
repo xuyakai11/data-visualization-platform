@@ -30,6 +30,10 @@ declare module 'vuedraggable' {
   const vuedraggable: any;
   export default vuedraggable;
 }
+declare module 'vue-grid-layout' {
+  const vuegridlayout: any;
+  export default vuegridlayout;
+}
 /* declare module 'vue-nestable' {
   const vuenestable: any;
   export default vuenestable;
