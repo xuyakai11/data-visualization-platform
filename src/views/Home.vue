@@ -27,7 +27,7 @@
         </div>
       </a-layout-header>
       <a-layout-content>
-        <router-view></router-view>
+        <router-view :key="$route.fullPath"></router-view>
       </a-layout-content>
       <a-layout-footer :style="{ textAlign: 'center' }">
         朴新前端研发团队 ©2019

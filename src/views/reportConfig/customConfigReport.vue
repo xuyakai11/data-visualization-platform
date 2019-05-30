@@ -40,7 +40,7 @@
               </a-row>
             </div>
             <div class="lpc-canvas">
-              <div class="lpc-report">
+              <div class="lpc-report"><!-- manyIndex -->
                 <config-report :paintingReports="paintingReport" @allChartsData="editChartData" @howMany="manyIndex"></config-report>
               </div>
             </div>
@@ -106,7 +106,10 @@
           <a-spin :spinning="addOrEditModalSpinning" delayTime="500">
             <a-form :form="reportModalForm" layout="vertical">
               <a-form-item label="报表">
-                <a-input placeholder="报表名称" v-decorator="['report_name', { initialValue: selectedRows.report_name, rules: [{ required: false, message: '请输入报表名称' }]}]"/>
+                <!--  <a-input placeholder="报表名称" v-decorator="['report_name', { initialValue: selectedRows.report_name, rules: [{ required: false, message: '请输入报表名称' }]}]"/> -->                
+                <a-input-search placeholder="报表名称" readOnly v-decorator="['report_name', { initialValue: selectedRows.report_name }]" @search="resetReport" >
+                  <a-button slot="enterButton">重选</a-button>
+                </a-input-search>
               </a-form-item>
               <a-form-item label="显示方式">
                 <div class="modalImg" v-for="(item, index) in modalImg" :key="index" @click="modalImgToggle(item.type, index)">
@@ -294,14 +297,17 @@
 
     paintingReport:any = {}
     chartId:string = '0' // 添加的每个内容的id
-    editIndex:number = 0 // 编辑哪一个下标
+    
+    chartEditFlag:boolean = false // 编辑判断字段
+    editData:any = {} // 保存当前编辑的数据
+    editDataIndex:number = 0 // 保存当前编辑的数据的下标
+
 
     beforeCreate () {
       (this as any).modelForm = (this as any).$form.createForm(this); // 定义modelform
       (this as any).reportModalForm = (this as any).$form.createForm(this) // 定义modelform
     }
-    created () {
-    }
+    created () {}
     mounted () {
       let clientHeight:number = document.body.offsetHeight - 49
       this.row = Math.ceil(clientHeight / 30) // 向上取整
@@ -319,7 +325,12 @@
     /* modal 弹窗start */
     addReportModal ():void { // 添加组件 弹出modal方法
       this.addReportModalVisible = true
+      this.addOrEditTitle = '添加组件'
+      this.chartEditFlag = false // 添加时将编辑判断字段置为空
       this.addReportId = [] // 重置选中报表id
+      this.reportTitle = '测试报表' // 报表标题
+      this.reportViceTitle = '副标题' // 报表副标题
+      this.reportFooterTitle = '页脚哦' // 报表页脚
       this.$nextTick(() => {
         let sourceName:string = (this as any).$refs.sourceName.value || '' // 连接名
         let reportName:string = (this as any).$refs.reportName.value || '' // 报表名
@@ -335,10 +346,14 @@
     }
     handleCreate ():void { // 选择报表modal确认按钮
       this.addReportModalVisible = false
-      this.addOrEditVisible = true
-      // this.selectChartsType = 'xBar' // 选中的图表类型 默认为xBar
       this.modalImgToggle('xBar', 0) // 重置
-      console.log(this.selectChartsType)
+      this.addOrEditVisible = true
+      console.log(this.addReportId) // 选中的报表id
+      if (this.addOrEditTitle === '编辑组件') {
+        this.editData.selectedRows = this.selectedRows
+      }
+      // this.selectChartsType = 'xBar' // 选中的图表类型 默认为xBar
+      
       setTimeout(() => {
         this.addOrEditModalSpinning = false
       }, 600)
@@ -389,31 +404,52 @@
       this.addOrEditVisible = false
     }
     addOrEditModalOk ():void { // 添加or编辑组件弹窗确认事件
-      this.addOrEditVisible = false
-      this.paintingReport = { 
-        'x': 0,
-        'y': 0,
-        'w': 4,
-        'h': 7,
-        'i': this.chartId,
-        'selectedRows': this.selectedRows,
-        'reportTitle': this.reportTitle,
-        'reportViceTitle': this.reportViceTitle,
-        'selectChartsType': this.selectChartsType,
-        'reportFooterTitle': this.reportFooterTitle
-      } // 每次添加默认宽度为4高度为7
+      if (this.addOrEditTitle === '编辑组件') {
+        console.log(this.editData)
+        this.paintingReport = {
+          'x': this.editData.x,
+          'y': this.editData.y,
+          'w': this.editData.w,
+          'h': this.editData.h,
+          'i': this.editData.i,
+          'selectedRows': this.editData.selectedRows,
+          'reportTitle': this.reportTitle,
+          'reportViceTitle': this.reportViceTitle,
+          'selectChartsType': this.selectChartsType,
+          'reportFooterTitle': this.reportFooterTitle,
+          'index': this.editData.index, // 当前编辑的数据的下标
+          'editType': true // 是否是编辑判断字段
+        }
+      } else {
+        this.paintingReport = { // 新增添加的
+          'x': 0,
+          'y': 0,
+          'w': 4,
+          'h': 7,
+          'i': this.chartId,
+          'selectedRows': this.selectedRows,
+          'reportTitle': this.reportTitle,
+          'reportViceTitle': this.reportViceTitle,
+          'selectChartsType': this.selectChartsType,
+          'reportFooterTitle': this.reportFooterTitle
+        } // 每次添加默认宽度为4高度为7
+      }
+      
       /* selectedRows: this.selectedRows, // 选中的report表数据
       reportTitle: this.reportTitle, // 报表标题
       reportViceTitle: this.reportViceTitle, // 报表副标题
       selectChartsType: this.selectChartsType // 图表类型 */
 
+      this.addOrEditVisible = false
       this.chartId = (Number(this.chartId) + 1).toString()
       this.$nextTick(() => {
-        // console.log(document.getElementsByClassName('layout-container')[0].scrollHeight)
         let clientHeight:number = document.getElementsByClassName('layout-container')[0].scrollHeight
-        // console.log(clientHeight / 30);
         this.row = Math.ceil(clientHeight / 30) // 向上取整
       })
+    }
+    resetReport ():void { // 重新选择报表
+      this.addReportModalVisible = true
+      this.addOrEditVisible = false
     }
     modalImgToggle (type:string, index:number):void { // 添加or编辑组件弹窗 显示方式img切换事件
       console.log(type) // 选中的图表类型
@@ -458,16 +494,26 @@
     /* 报表名称 修改方法 end */
 
     /* 编辑操作start */
-    manyIndex (index:number):void {
-      console.log(index)
-      this.editIndex = index
+    manyIndex (id:string):void {
+      // this.chartId = id
+      +id ? this.chartId = (+id + 1).toString() : this.chartId = id
     }
-    editChartData (item:any):void { // 子组件传递过来的删除后余下的最大id，用于接下来添加新模块id累加
-      console.log(item)
-      console.log(this.editIndex)
+    editChartData (item:any):void { // 点击图编辑按钮 子组件传递过来的当前编辑的项的数据及当前所编辑的第几个
+      this.chartEditFlag = true // 编辑判断字段
       this.addOrEditVisible = true
+      this.addOrEditTitle = '编辑组件'
+      this.editData = item // 保存当前编辑的数据
+      console.log(this.editData)
       // this.selectChartsType = 'xBar' // 选中的图表类型 默认为xBar
-      this.modalImgToggle('xBar', 0) // 重置
+      this.modalImg.map((v:any, i:number) => {
+        if (v.type === item.selectChartsType) {
+          this.modalImgToggle(item.selectChartsType, i) // 选中回显
+        }
+      })
+      this.reportTitle = item.reportTitle // 报表标题
+      this.reportViceTitle = item.reportViceTitle // 报表副标题
+      this.reportFooterTitle = item.reportFooterTitle // 报表页脚
+
       console.log(this.selectChartsType)
       setTimeout(() => {
         this.addOrEditModalSpinning = false

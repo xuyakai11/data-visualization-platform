@@ -114,12 +114,11 @@
       widthSpan: 8
     }
     parentStyle:any = {}
-    howManyIndex:number = 0 // 当前选中的下标
 
-    @Emit('allChartsData') send (allChartsData:any) {}
-    @Emit('howMany') howMany (index:number) {}
+    @Emit('allChartsData') send (item:any) {}
+    @Emit('howMany') howMany (chartid:string) {}
     // 监听paintingReport 是因为如果其变化则显示验证公式按钮 deep: true, immediate: true
-    @Watch('paintingReports') patintingWatch (newVal:string, oldVal:string) {
+    @Watch('paintingReports') patintingWatch (newVal:any, oldVal:any) {
       // if (JSON.stringify(oldVal) == '{}') {
       //   this.parentStyle = {
       //     'parentWidth': 1,
@@ -127,10 +126,18 @@
       //   }
       // }
       if (newVal && JSON.stringify(newVal) !== '{}') {
-        console.log(newVal)
-        this.$nextTick(() => {
-          this.allChartsData.push(newVal)
-        })
+        if (newVal.editType) { // 判断它是否有edit编辑标识
+          delete newVal.editType
+          this.$nextTick(() => {
+            this.allChartsData[newVal.index] = newVal
+            // this.allChartsData.splice(newVal.index, 1, newVal)
+          })
+          console.log(this.allChartsData)
+        } else {
+          this.$nextTick(() => {
+            this.allChartsData.push(newVal)
+          })
+        }
       }
     }
     created () {
@@ -167,7 +174,7 @@
       }
     }
     moveEvent (i:number, newX:number, newY:number) { // 拖拽时
-      console.log('MOVE i=' + i + ', X=' + newX + ', Y=' + newY);
+      // console.log('MOVE i=' + i + ', X=' + newX + ', Y=' + newY);
     }
     movedEvent (i:number, newX:number, newY:number) { // 拖拽结束
       console.log('MOVED i=' + i + ', X=' + newX + ', Y=' + newY);
@@ -177,14 +184,20 @@
     /* 编辑等操作start */
     editChartFun (item:any, index:number):void {
       // console.log(item)
+      item.index = index // 把当前编辑的数据的下标传进去，然后修改完之后传递回来
       this.send(item) // 传递当前选中的给父组件
-      this.howManyIndex = index // 保存当前选中的下标
-      // this.howMany(index) // 传递当前选中的下标
     }
     delChartFun (item:any, index:number):void { // 删除某个报表块。传递余下最大chartId给父组件
-      this.howMany(item.i) // 传递被删除id
+      // this.howMany(item.i) // 传递被删除id
       this.allChartsData.splice(index, 1)
-      // this.howMany(index)
+      let chartId:string = '0'
+      let max:any = this.allChartsData[0]
+      this.allChartsData.map((v:any,i:number) => {
+        max = +(max.i) > +(v.i) ? max : v
+      })
+      max ? chartId = max.i : ''
+      console.log(chartId)
+      this.howMany(chartId) // 传递当前剩下的最大的i值 chart的id
       // this.send(this.allChartsData)
     }
     footerLookFun (item:any):void {

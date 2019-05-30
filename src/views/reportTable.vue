@@ -121,7 +121,7 @@
      (this as any).form = (this as any).$form.createForm(this); // 定义搜索form
    }
    created () {
-     this.reportId = (this as any).$route.query.reportId || getQueryString('reportId') // 获取传递过来的reportId
+     this.reportId = (this as any).$route.query.reportId || '' // getQueryString('reportId') // 获取传递过来的reportId
    }
    mounted () {
      let searchParam:any = { reportId: this.reportId, searchParam: '', pageSize: 10, nowpage: 1 }
