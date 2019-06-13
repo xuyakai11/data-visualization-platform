@@ -1,66 +1,109 @@
 <template>
-  <div class="config"> <!-- 饼图 -->
-    <!-- <p>{{title}}</p> -->
-    <div class="map" ref="map"></div>
+  <div class="config">
+    <a-table
+        :scroll="{ x: 1500, y: y }"
+        :columns="columns"
+        :dataSource="data"
+        :pagination="pagination"
+        @change="onChange"
+        maskClosable="false"
+        :loading="loading"
+        :rowKey="record => record.keyFlagId"
+        size="small" />
   </div>
 </template>
 
 <script lang='ts'>
   import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
+  interface pagination {
+    current:number,
+    pageSize:number,
+    total:number
+  }
   @Component({
     components: {}
   })
   export default class configTable extends Vue {
-    @Prop({}) title!:string // 接收父组件传过来的title
-    @Prop({}) data!:any // 接收父组件传过来的数据
+    @Prop({}) paramsData!:any
     @Prop({}) styles!:any
 
-    chartData:Array<any> = [
-      { 'type': 'line', 'name': '语陪', 'data': [120, 132, 101, 334, 90, 230, 1210] },
-      { 'type': 'line', 'name': '活动', 'data': [220, 182, 191, 234, 290, 330, 310] },
-      { 'type': 'line', 'name': '咨询', 'data': [150, 232, 601, 854, 190, 330, 410] },
-      { 'type': 'line', 'name': '定金', 'data': [320, 332, 301, 334, 390, 930, 320] },
-      { 'type': 'line', 'name': '订单', 'data': [820, 932, 901, 934, 1290, 1330, 1320] },
-      { 'type': 'line', 'name': '垃圾', 'data': [320, 582, 991, 434, 590, 630, 710] },
-      { 'type': 'line', 'name': '无聊', 'data': [420, 382, 291, 534, 990, 730, 810] }
+    columns: Array<object> = [ // 定义表格表头
+      /* { title: '账号', dataIndex: 'login_name', key: '', width: '120px' }, // fixed: 'left' 设置是否固定
+      { title: '姓名', dataIndex: 'name', key: '' },
+      { title: 'EHR员工编号', dataIndex: 'EHR_code', key: '', width: '120px' },
+      { title: '邮箱', dataIndex: 'email', key: '' },
+      { title: '手机', dataIndex: 'mobile', key: '' },
+      { title: '固定电话', dataIndex: 'phone', key: '', width: '180px' },
+      { title: '学校', dataIndex: 'school_name', key: '' },
+      { title: '校区', dataIndex: 'area_name', key: '' },
+      { title: '停用日期', dataIndex: 'modify_times', key: '', width: '110px' },
+      { title: '状态', dataIndex: 'statetxt', key: '' } */
     ]
+    pagination:pagination = { // 定义分页数据
+      current: 1,
+      pageSize: 10,
+      total: 1
+    }
 
-    seriesData:Array<any> = []
-    legendData:Array<string> = []
+    loading:boolean = true
+    data:Array<any> = []
+    y:number = 140
     @Watch('styles') patintingWatch (newVal:any, oldVal:any) {
-      console.log(newVal)
       if (newVal && JSON.stringify(newVal) !== '{}') {
-        console.log(1)
-      } else {
+        this.y = newVal.parentHeight - 180
       }
     }
-    /* @Watch('data', { deep: true, immediate: true }) dataWatch (newVal:Array<any>, oldVal:Array<any>) {
-      if (newVal !== oldVal && newVal.length) {
-        this.seriesData = []
-        this.legendData = []
-        newVal.map((v:any, i:number) => {
-          if (v.money_clean > 0) {
-            this.seriesData.push({ name: v.name, value: v.money_clean })
-            this.legendData.push(v.name)
-          }
-        })
-        this.initEchartsFun(this.seriesData, this.legendData)
-      }
-    } */
-    mounted () {
-      this.chartData.sort((a:any, b:any) => {
-        return a.value - b.value
-      })
-      this.chartData.map((v:any, i:number) => {
-        if (v.value > 0) {
-          this.seriesData.push({ name: v.name, value: v.value })
-          this.legendData.push(v.name)
+    @Watch('paramsData') paramsDataWatch (newVal:any, oldVal:any) {
+      if (newVal && JSON.stringify(newVal) !== '{}') {
+        console.log(newVal)
+        let params:any = {
+          'reportId': newVal.selected_rows.report_id,
+          'pageSize': 10,
+          'nowpage': 1,
+          'searchParam': ''
         }
-      })
-      // this.initEchartsFun(this.seriesData, this.legendData)
+        this.initDataFun(params)
+      }
     }
-    initEchartsFun (series:Array<any>, legendData:Array<string>) {}
+    mounted () {
+      let params:any = { 'reportId': this.paramsData.selected_rows.report_id, 'searchParam': '', pageSize: 10, nowpage: 1 }
+      this.initDataFun(params) // 请求表格数据
+    }
+    initDataFun (params:any):void {
+      (this as any).$post('custom/Report/getReportDetail', params).then((res: any) => { // 请求表格数据
+       if (res.state === 2000) {
+         this.loading = false
+         this.columns = res.data.columns
+         this.data = res.data.data
+         this.data.map((v:any, i:number) => {
+           v.keyFlagId = i
+         })
+         const pagination = { ...this.pagination }
+         pagination.total = res.data.count
+         this.pagination = pagination
+       } else {
+         this.loading = false;
+         this.data = [];
+         (this as any).$message.error(res.message, 3); // 弹出错误message
+       }
+     }).catch((err: any) => {
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3); // 弹出错误message
+        } else {
+          (this as any).$message.error('请求失败', 3); // 弹出错误message
+        }
+       this.loading = false;
+       this.data = [];
+     });
+    }
+    onChange (pagination:any):void {
+      const pager:any = { ...this.pagination }
+      pager.current = pagination.current
+      this.pagination = pager
+      let obj = { nowpage: pagination.current, pageSize: pagination.pageSize }
+      this.initDataFun(obj)
+    }
   }
 </script>
 
@@ -69,10 +112,6 @@
   height: 100%;
   width: 100%;
   padding: 10px;
-  p {
-    font-size: 14px;
-    color: #afbdd1;
-  }
   .map {
     height: 100%;
     width: 100%;

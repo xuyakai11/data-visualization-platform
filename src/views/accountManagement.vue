@@ -122,9 +122,7 @@
       { title: '手机', dataIndex: 'mobile', key: '' },
       { title: '固定电话', dataIndex: 'phone', key: '' },
       { title: '学校', dataIndex: 'school_name', key: '' },
-      /* { title: '部门', dataIndex: 'departName', key: '' }, */
       { title: '校区', dataIndex: 'area_name', key: '' },
-      /* { title: '编制', dataIndex: 'stufftxt', key: '' }, */
       { title: '停用日期', dataIndex: 'modify_times', key: '', width: '110px' },
       { title: '状态', dataIndex: 'statetxt', key: '' },
       { title: '操作', dataIndex: '', key: '', width: '20%', scopedSlots: { customRender: 'action'} } // scopedSlots配置操作列

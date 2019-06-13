@@ -1,7 +1,7 @@
 <template>
   <div class="config"> <!-- 饼图 -->
     <!-- <p>{{title}}</p> -->
-    <div class="map" ref="map"></div>
+    <div class="map" ref="map">暂无数据</div>
   </div>
 </template>
 
@@ -132,6 +132,9 @@
   .map {
     height: 100%;
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 </style>

@@ -1,64 +1,114 @@
 <template>
-  <div class="config"> <!-- 饼图 -->
-    <!-- <p>{{title}}</p> -->
-    <canvas class="map" ref="mapCanvas" width="200px" height="200px"></canvas>
+  <div class="config">
+    <div class="map" ref="map">
+      <count-to ref="totalIncomeMoney" v-if="JSON.stringify(chartData) !== '{}'" :separator="''" :suffix="preUnit" :autoplay="true" :startVal="0" :endVal="chartData.value" :duration="500"></count-to>
+    </div>
   </div>
 </template>
 
 <script lang='ts'>
   import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-  import echarts from 'echarts'
+  import countTo from 'vue-count-to'
+  
   @Component({
-    components: {}
+    components: { countTo }
   })
-  export default class configNumber extends Vue {
-    @Prop({}) title!:string // 接收父组件传过来的title
-    @Prop({}) data!:any // 接收父组件传过来的数据
-    @Prop({}) styles!:any
 
-    chartData:Array<any> = [
-      { 'name': '语陪', 'value': 510 },
-      { 'name': '活动', 'value': 498 },
-      { 'name': '咨询', 'value': 210 },
-      { 'name': '定金', 'value': 410 },
-      { 'name': '订单', 'value': 498 },
-      { 'name': '垃圾', 'value': 550 },
-      { 'name': '无聊', 'value': 498 }
-    ]
+  export default class configNumber extends Vue {
+    @Prop({}) paramsData!:any
+    @Prop({}) styles!:any
 
     seriesData:Array<any> = []
     legendData:Array<string> = []
-    @Watch('styles') patintingWatch (newVal:any, oldVal:any) {
-      console.log(newVal)
+    preUnit:string = '' // 单位
+    chartData:any = {}
+    myChart:any = ''
+    option:any = ''
+   /*  <a-select-option value="whole">全数字</a-select-option>
+                  <a-select-option value="hundres">百</a-select-option>
+                  <a-select-option value="thousands">数千</a-select-option>
+                  <a-select-option value="ten_thousands">万</a-select-option>
+                  <a-select-option value="millions">数百万</a-select-option>
+                  <a-select-option value="billions">十亿</a-select-option> */
+    preUnitData:Array<any> = [
+      { key: 'whole', unit: ''},
+      { key: 'hundres', unit: 'H'},
+      { key: 'thousands', unit: 'K'},
+      { key: 'mmillions', unit: 'M'},
+      { key: 'billions', unit: 'B'}
+    ]
+    /* @Watch('styles') patintingWatch (newVal:any, oldVal:any) {
       if (newVal && JSON.stringify(newVal) !== '{}') {
-        console.log(1)
         this.$nextTick(() => {
-          
+          // this.myChart.resize();
         })
       } else {
-        
-      }
-    }
-    /* @Watch('data', { deep: true, immediate: true }) dataWatch (newVal:Array<any>, oldVal:Array<any>) {
-      if (newVal !== oldVal && newVal.length) {
-        this.seriesData = []
-        this.legendData = []
-        newVal.map((v:any, i:number) => {
-          if (v.money_clean > 0) {
-            this.seriesData.push({ name: v.name, value: v.money_clean })
-            this.legendData.push(v.name)
-          }
+        this.$nextTick(() => {
+          // this.myChart = echarts.init(this.$refs.map as HTMLDivElement)
+          // this.myChart.clear()
+          // this.myChart.setOption(this.option, true)
         })
-        this.initEchartsFun(this.seriesData, this.legendData)
       }
     } */
-    mounted () {
-     // console.log((this.$refs.map as HTMLDivElement).style.fontSize = 100/10 + 'vh')
-     let canvas:any = this.$refs.mapCanvas as HTMLDivElement
-      if (canvas.getContext) {
-          let ctx = canvas.getContext('2d');
-          ctx.fillText('什么玩意儿', 5, 30);
+    @Watch('paramsData') paramsDataWatch (newVal:any, oldVal:any) {
+      console.log(newVal,oldVal)
+      console.log(1111)
+      if (newVal && JSON.stringify(newVal) !== '{}') {
+        console.log(newVal)
+        let params:any = {
+          'report_id': newVal.selected_rows.report_id,
+          'type': newVal.type,
+          'group_id': newVal.config_details.group_ids,
+          'field_id': newVal.config_details.field_ids,
+          'pre_unit': newVal.pre_unit.key
+        }
+        this.preUnit = newVal.pre_unit.label // 赋值单位文字
+        this.initGetChartsDataFun(params)
       }
+    }
+    mounted () {
+      console.log(this.paramsData)
+      if (JSON.stringify(this.paramsData) !== '{}') {
+        /* let params:any = {
+          'report_id': this.paramsData.selected_rows.report_id,
+          'type': this.paramsData.type,
+          'group_id': this.paramsData.config_details.group_ids,
+          'field_id': this.paramsData.config_details.field_ids,
+          'pre_unit': this.paramsData.pre_unit.key
+        } */
+        let params:any = {
+          'report_id': 130, //newVal.selected_rows.report_id,
+          'type': this.paramsData.type,
+          'group_id': 21, // newVal.config_details.group_ids,
+          'field_id': 30, // newVal.config_details.field_ids,
+          'pre_unit': this.paramsData.pre_unit.key
+        }
+        this.preUnit = this.paramsData.pre_unit.label // 赋值单位文字
+        this.initGetChartsDataFun(params)
+      }
+    }
+    initGetChartsDataFun (params:any):void { // { 'report_id': 123, 'type': 'xBar', 'group_id': '9,12', 'field_id': '5', 'pre_unit': 'whole' }?report_id=130&type=xBar&group_id=21,22&field_id=30&pre_unit=whole
+      let _this = this;
+      (this as any).$post('/custom/boardManage/generateBoardData', params).then((res: any) => {
+        if (res.state === 2000) {
+          this.chartData = res.data
+          if (JSON.stringify(this.chartData) !== '{}') {
+            this.preUnitData.map((v:any, i:number) => {
+            if (v.key === this.chartData.pre_unit) {
+                this.preUnit = v.unit
+              }
+            })
+          }
+        } else {
+          (this as any).$message.error(res.message, 3) // 弹出错误message
+        }
+      }).catch((err: any) => {
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3) // 弹出错误message
+        } else {
+          (this as any).$message.error('请求失败', 3) // 弹出错误message
+        }
+      })
     }
   }
 </script>
@@ -68,15 +118,26 @@
   height: 100%;
   width: 100%;
   padding: 10px;
-  font-size: 40px;
-  p {
-    font-size: 14px;
-    color: #afbdd1;
-  }
   .map {
     height: 100%;
     width: 100%;
-    font-size: 2em;
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 50px;
+    display: flex;
+    /* position: relative; */
+    span {
+      /* position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      display: block;
+      text-align: center; */
+      color: #00716b;
+      margin: auto;
+    }
   }
 }
 </style>

@@ -1,7 +1,6 @@
 <template>
-  <div class="config"> <!-- 饼图 -->
-    <!-- <p>{{title}}</p> -->
-    <div class="map" ref="map"></div>
+  <div class="config">
+    <div class="map" ref="map">暂无数据</div>
   </div>
 </template>
 
@@ -13,55 +12,42 @@
     components: {}
   })
   export default class configFauge extends Vue {
-    @Prop({}) title!:string // 接收父组件传过来的title
-    @Prop({}) data!:any // 接收父组件传过来的数据
+    @Prop({}) paramsData!:any
     @Prop({}) styles!:any
     myChart:any = ''
     option:any = ''
-
-    chartData:Array<any> = [
-      { 'type': 'line', 'name': '语陪', 'data': [120, 132, 101, 334, 90, 230, 1210] },
-      { 'type': 'line', 'name': '活动', 'data': [220, 182, 191, 234, 290, 330, 310] },
-      { 'type': 'line', 'name': '咨询', 'data': [150, 232, 601, 854, 190, 330, 410] },
-      { 'type': 'line', 'name': '定金', 'data': [320, 332, 301, 334, 390, 930, 320] },
-      { 'type': 'line', 'name': '订单', 'data': [820, 932, 901, 934, 1290, 1330, 1320] },
-      { 'type': 'line', 'name': '垃圾', 'data': [320, 582, 991, 434, 590, 630, 710] },
-      { 'type': 'line', 'name': '无聊', 'data': [420, 382, 291, 534, 990, 730, 810] }
-    ]
-
+    preUnit:string = ''
+    chartData:Array<any> = []
     seriesData:Array<any> = []
     legendData:Array<string> = []
 
     @Watch('styles') patintingWatch (newVal:any, oldVal:any) {
-      console.log(newVal)
       if (newVal && JSON.stringify(newVal) !== '{}') {
-        console.log(1)
         this.$nextTick(() => {
-          console.log(this.myChart)
           this.myChart.resize()
         })
       } else {
         this.myChart = echarts.init(this.$refs.map as HTMLDivElement)
-        console.log(this.myChart)
         this.myChart.clear()
         this.myChart.setOption(this.option, true)
       }
     }
-    /* @Watch('data', { deep: true, immediate: true }) dataWatch (newVal:Array<any>, oldVal:Array<any>) {
-      if (newVal !== oldVal && newVal.length) {
-        this.seriesData = []
-        this.legendData = []
-        newVal.map((v:any, i:number) => {
-          if (v.money_clean > 0) {
-            this.seriesData.push({ name: v.name, value: v.money_clean })
-            this.legendData.push(v.name)
-          }
-        })
-        this.initEchartsFun(this.seriesData, this.legendData)
+    @Watch('paramsData') paramsDataWatch (newVal:any, oldVal:any) {
+      if (newVal && JSON.stringify(newVal) !== '{}') {
+        console.log(newVal)
+        let params:any = {
+          'report_id': newVal.selected_rows.report_id,
+          'type': newVal.type,
+          'group_id': newVal.config_details.group_ids,
+          'field_id': newVal.config_details.field_ids,
+          'pre_unit': newVal.pre_unit.key
+        }
+        this.preUnit = newVal.pre_unit.label // 赋值单位文字
+        this.initGetChartsDataFun(params)
       }
-    } */
+    }
     mounted () {
-      this.chartData.sort((a:any, b:any) => {
+      /* this.chartData.sort((a:any, b:any) => {
         return a.value - b.value
       })
       this.chartData.map((v:any, i:number) => {
@@ -69,13 +55,25 @@
           this.seriesData.push({ name: v.name, value: v.value })
           this.legendData.push(v.name)
         }
-      })
-      this.$nextTick(() => {
-        this.initEchartsFun(this.seriesData, this.legendData)
-      })
+      }) */
+      if (JSON.stringify(this.paramsData) !== '{}') {
+        let params:any = {
+          'report_id': this.paramsData.selected_rows.report_id,
+          'type': this.paramsData.type,
+          'group_id': this.paramsData.config_details.group_ids,
+          'field_id': this.paramsData.config_details.field_ids,
+          'pre_unit': this.paramsData.pre_unit.key
+        }
+        this.preUnit = this.paramsData.pre_unit.label // 赋值单位文字
+        this.initGetChartsDataFun(params)
+      }
+      // this.$nextTick(() => {
+      //   this.initEchartsFun(this.seriesData, this.legendData)
+      // })
     }
 
-    initEchartsFun (series:Array<any>, legendData:Array<string>) {
+    initEchartsFun (seriesData:Array<any>) {
+      console.log(seriesData) //[{value: 50, name: '完成率'}]
       this.myChart = echarts.init(this.$refs.map as HTMLDivElement)
       this.myChart.clear()
       this.option = {
@@ -90,7 +88,7 @@
         }, */
         title: { // 标题样式
           show: true,
-          fontSize: 12,
+          fontSize: 10,
           // fontWeight: 'bolder',
           fontStyle: 'italic',
           color: '#d67e7e'
@@ -117,11 +115,35 @@
               }
             },
             detail: { formatter: '{value}%', fontSize: 14 },
-            data: [{ value: 50, name: '完成率' }]
+            data: seriesData
           }
         ]
       }
       this.myChart.setOption(this.option, true)
+    }
+    initGetChartsDataFun (params:any):void { // { 'report_id': 123, 'type': 'xBar', 'group_id': '9,12', 'field_id': '5', 'pre_unit': 'whole' }?report_id=130&type=xBar&group_id=21,22&field_id=30&pre_unit=whole
+      let _this = this;
+      (this as any).$post('/custom/boardManage/generateBoardData', params).then((res: any) => {
+        if (res.state === 2000) {
+          this.chartData = res.data
+          let arr:Array<any> = []
+          arr.push(res.data)
+          if (arr.length) {
+            this.seriesData = arr
+            _this.$nextTick(() => {
+              _this.initEchartsFun(this.seriesData)
+            })
+          }
+        } else {
+          (this as any).$message.error(res.message, 3) // 弹出错误message
+        }
+      }).catch((err: any) => {
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3) // 弹出错误message
+        } else {
+          (this as any).$message.error('请求失败', 3) // 弹出错误message
+        }
+      })
     }
   }
 </script>
@@ -138,6 +160,9 @@
   .map {
     height: 100%;
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 </style>

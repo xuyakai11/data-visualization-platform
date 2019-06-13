@@ -3,58 +3,60 @@
     <a-spin :spinning="configspinning" delayTime="500">
       <div class="configReport">
         <a-row :gutter="8" v-if="allChartsData.length" > <!-- gutter配置间隔 -->
-            <!-- <a-col class="gutter-row" v-for="(item, index) in allChartsData" :key="'chart' + index" :span="initStyle.widthSpan">
-              <div class="height-100 lpc-editbox" :style="{ height: initStyle.height }">{{ item.selectedRows.report_name }}</div>
-            </a-col> -->
-            <grid-layout
-              :layout="allChartsData"
-              :col-num="12"
-              :row-height="30"
-              :is-draggable="true"
-              :is-resizable="true"
-              :is-mirrored="false"
-              :vertical-compact="true"
-              :margin="[10, 10]"
-              :use-css-transforms="true"
-              ><!-- 
-                @layout-updated="layoutUpdatedEvent"
-              @layout-created="layoutCreatedEvent"
-              @layout-before-mount="layoutBeforeMountEvent"
-              @layout-mounted="layoutMountedEvent"
-              @layout-ready="layoutReadyEvent"
-                drag-allow-from=".vue-draggable-handle"
-                drag-ignore-from=".no-drag" -->
-              <grid-item v-for="(item, index) in allChartsData" :key="'grid' + index"
-                :x="item.x"
-                :y="item.y"
-                :w="item.w"
-                :h="item.h"
-                :i="item.i"
-                @resize="resizeEvent"
-                @move="moveEvent"
-                @resized="resizedEvent"
-                @moved="movedEvent"
-              >
-                <header class="lpc-charts-header">
-                  <p class="lpc-title-p">{{ item.reportTitle }}{{ item.selectChartsType }}<br/> <span>{{ item.reportViceTitle }}</span></p>
-                  <span class="lpc-chart-icon" v-if="!addOrEdit"><a-icon type="edit" @click.stop="editChartFun(item, index)"/><a-icon type="close" @click.stop="delChartFun(item, index)"/></span>
-                  <span class="lpc-chart-icon" v-else><a-icon type="fullscreen" /></span>
-                </header>
+          <grid-layout
+            :layout.sync="allChartsData"
+            :col-num="12"
+            :row-height="30"
+            :is-draggable="true"
+            :is-resizable="true"
+            :is-mirrored="false"
+            :vertical-compact="true"
+            :margin="[10, 10]"
+            :use-css-transforms="true"
+            @layout-updated="layoutUpdatedEvent"
+            @layout-created="layoutCreatedEvent"
+            @layout-before-mount="layoutBeforeMountEvent"
+            @layout-mounted="layoutMountedEvent"
+            @layout-ready="layoutReadyEvent"
+            ><!--
+              drag-allow-from=".vue-draggable-handle"
+              drag-ignore-from=".no-drag" -->
+            <grid-item v-for="(item, index) in allChartsData" :key="'grid' + index"
+              :x="item.x"
+              :y="item.y"
+              :w="item.w"
+              :h="item.h"
+              :i="item.i"
+              :minH="2"
+              :minW="item.type !== 'number' ? 4 : 2"
+              :dragIgnoreFrom="'canvas'"
+              @resize="resizeEvent"
+              @move="moveEvent"
+              @resized="resizedEvent"
+              @moved="movedEvent"
+            >
+              <header class="lpc-charts-header">
+                <p class="lpc-title-p">{{ item.main_board_title }}<br/> <span>{{ item.board_title }}</span></p>
+                <span class="lpc-chart-icon" v-if="viewType !== 'look'"><a-icon type="edit" @click.stop="editChartFun(item, index)"/><a-icon type="close" @click.stop="delChartFun(item, index)"/></span>
+                <span class="lpc-chart-icon" v-else><a-icon type="fullscreen" /></span>
+              </header>
+              <!-- <div ref="initStyle" > -->
                 <div class="lpc-contentReport">
-                  <configx-bar v-if="item.selectChartsType === 'xBar'" :styles="parentStyle"></configx-bar>
-                  <configy-bar v-if="item.selectChartsType === 'yBar'" :styles="parentStyle"></configy-bar>
-                  <config-pie v-if="item.selectChartsType === 'pie'" :styles="parentStyle"></config-pie>
-                  <config-line v-if="item.selectChartsType === 'line'" :styles="parentStyle"></config-line>
-                  <config-gauge v-if="item.selectChartsType === 'gauge'" :styles="parentStyle"></config-gauge>
-                  <config-funnel v-if="item.selectChartsType === 'funnel'" :styles="parentStyle"></config-funnel>
-                  <config-table v-if="item.selectChartsType === 'table'" :styles="parentStyle"></config-table>
-                  <config-number v-if="item.selectChartsType === 'number'" :styles="parentStyle"></config-number>
-                  <config-scatter v-if="item.selectChartsType === 'scatter'" :styles="parentStyle"></config-scatter>
+                  <configx-bar :paramsData="item" v-if="item.type === 'xBar'" :styles="parentStylexBar"></configx-bar>
+                  <configy-bar :paramsData="item" v-if="item.type === 'yBar'" :styles="parentStyleyBar"></configy-bar>
+                  <config-pie :paramsData="item" v-if="item.type === 'pie'" :styles="parentStylePie"></config-pie>
+                  <config-line :paramsData="item" v-if="item.type === 'line'" :styles="parentStyleLine"></config-line>
+                  <config-gauge :paramsData="item" v-if="item.type === 'gauge'" :styles="parentStyleGauge"></config-gauge>
+                  <config-funnel :paramsData="item" v-if="item.type === 'funnel'" :styles="parentStyleFunnel"></config-funnel>
+                  <config-table :paramsData="item" v-if="item.type === 'table'" :styles="parentStyleTable"></config-table>
+                  <config-number :paramsData="item" v-if="item.type === 'number'" :styles="parentStyleNumber"></config-number>
+                  <config-scatter :paramsData="item" v-if="item.type === 'scatter'" :styles="parentStyleScatter"></config-scatter>
                 </div>
-                <footer class="lpc-charts-footer">
-                  <p class="lpc-footer-p" @click="footerLookFun(item)">{{ item.reportFooterTitle }}</p>
-                </footer>
-              </grid-item>
+              <!-- </div> -->
+              <footer class="lpc-charts-footer">
+                <p class="lpc-footer-p" @click="footerLookFun(item)">查看报表({{ item.foot_page }})</p>
+              </footer>
+            </grid-item>
           </grid-layout>
         </a-row>
       </div>
@@ -92,98 +94,132 @@
   })
   export default class configReport extends Vue {
     @Prop({}) paintingReports!:any // 接收每次添加的数据
-    
+    viewType:string = '' // 判断新增or编辑or查看
+    numberTypeData:any = { 'value': 10, 'unit': 'K' }
     addOrEdit:boolean = false // 是新增false还是编辑true
     configspinning:boolean = false
+    params:any = {}
     allChartsData:Array<any> = [
-      // { 'x': 0, 'y': 0, 'w': 4, 'h': 7, 'i': '10', 'selectedRows': {}, 'reportTitle': '二狗子', 'reportViceTitle': 'ergouzi', 'selectChartsType': 'xBar' }
-       /* { 'x': 0,'y': 0,'w': 4,'h': 1,'i': '1' },
-      { 'x': 4,'y': 0,'w': 4,'h': 2,'i': '1' },
-      { 'x': 8,'y': 0,'w': 4,'h': 3,'i': '2' },
-
-      { 'x': 0,'y': 6,'w': 4,'h': 4,'i': '3' },
-      { 'x': 4,'y': 6,'w': 4,'h': 5,'i': '4' },
-      { 'x': 8,'y': 6,'w': 4,'h': 6,'i': '5' },
-
-      { 'x': 0,'y': 5,'w': 4,'h': 6,'i': '6' },
-      { 'x': 4,'y': 7,'w': 4,'h': 6,'i': '7' },
-      { 'x': 8,'y': 9,'w': 4,'h': 6,'i': '8' } */
+      /* { 'x': 0, 'y': 0, 'w': 4, 'h': 7, 'i': '5', 'select_rows': {}, 'main_board_title': '二狗子5', 'board_title': 'ergouzi', 'type': 'xBar', 'foot_page': 'ergouzi1' },
+      { 'x': 4, 'y': 0, 'w': 8, 'h': 9,  'i': '1', 'select_rows': {}, 'main_board_title': '二狗子1', 'board_title': 'ergouzi', 'type': 'xBar', 'foot_page': 'ergouzi1' },
+      { 'x': 8, 'y': 0, 'w': 4, 'h': 7, 'i': '2', 'select_rows': {}, 'main_board_title': '二狗子2', 'board_title': 'ergouzi', 'type': 'xBar', 'foot_page': 'ergouzi2' },
+      { 'x': 0, 'y': 0, 'w': 4, 'h': 7, 'i': '3', 'select_rows': {}, 'main_board_title': '二狗子3', 'board_title': 'ergouzi', 'type': 'pie', 'foot_page': 'ergouzi3' },
+      { 'x': 4, 'y': 4, 'w': 4, 'h': 7, 'i': '4', 'select_rows': {}, 'main_board_title': '二狗子4', 'board_title': 'ergouzi', 'type': 'xBar', 'foot_page': 'ergouzi1' } */
     ] // 所有内容数据
-    initStyle:any = { // 默认宽高
-      height: '235px',
-      widthSpan: 8
-    }
-    parentStyle:any = {}
+    parentStylexBar:any = {}
+    parentStyleyBar:any = {}
+    parentStylePie:any = {}
+    parentStyleLine:any = {}
+    parentStyleTable:any = {}
+    parentStyleFunnel:any = {}
+    parentStyleGauge:any = {}
+    parentStyleNumber:any = {}
+    parentStyleScatter:any = {}
 
     @Emit('allChartsData') send (item:any) {}
-    @Emit('howMany') howMany (chartid:string) {}
+    @Emit('howMany') howMany (item:any, chartid?:string) {}
     // 监听paintingReport 是因为如果其变化则显示验证公式按钮 deep: true, immediate: true
     @Watch('paintingReports') patintingWatch (newVal:any, oldVal:any) {
-      // if (JSON.stringify(oldVal) == '{}') {
-      //   this.parentStyle = {
-      //     'parentWidth': 1,
-      //     'parentHeight': 1
-      //   }
-      // }
       if (newVal && JSON.stringify(newVal) !== '{}') {
         if (newVal.editType) { // 判断它是否有edit编辑标识
           delete newVal.editType
           this.$nextTick(() => {
-            this.allChartsData[newVal.index] = newVal
-            // this.allChartsData.splice(newVal.index, 1, newVal)
+            // this.allChartsData[newVal.index] = newVal
+            this.allChartsData.splice(newVal.index, 1, newVal)
           })
-          console.log(this.allChartsData)
         } else {
           this.$nextTick(() => {
             this.allChartsData.push(newVal)
           })
         }
+        console.log(1)
+        this.howMany(this.allChartsData)
       }
     }
     created () {
-      
+      this.viewType = (this as any).$route.query.viewType
+      if (this.viewType !== 'add') {
+        this.editOrLookGetDataFun()
+      }
     }
     mounted () {
-
     }
+    editOrLookGetDataFun():void { // 编辑或查看时查询数据
+      let board_id:string = (this as any).$route.query.boardId;
+      (this as any).$post('/custom/BoardManage/getBoardData', { board_id } ).then((res: any) => {
+        if (res.state === 2000) {
+          this.allChartsData = res.data.subunitData
+          this.howMany(this.allChartsData)
+        } else {
+          (this as any).$message.error(res.message, 3) // 弹出错误message
+        }
+      }).catch((err: any) => {
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3) // 弹出错误message
+        } else {
+          (this as any).$message.error('请求失败', 3) // 弹出错误message
+        }
+      })
+    }
+
     /* 拖拽等事件start */
     layoutCreatedEvent (newLayout:any) {
-      console.log('Created layout: ', newLayout)
+      // console.log('Created layout: ', newLayout)
     }
-    /* layoutBeforeMountEvent (newLayout:any) {
-      console.log('beforeMount layout: ', newLayout)
+    layoutBeforeMountEvent (newLayout:any) {
+      // console.log('beforeMount layout: ', newLayout)
     }
     layoutMountedEvent (newLayout:any) {
-      console.log('Mounted layout: ', newLayout)
+      // console.log('Mounted layout: ', newLayout)
     }
     layoutReadyEvent (newLayout:any) {
-      console.log('Ready layout: ', newLayout)
-    } */
+      // console.log('Ready layout: ', newLayout)
+    }
     layoutUpdatedEvent (newLayout:any) { // 拖拽后更新
-      console.log('Updated layout: ', newLayout)
+      // console.log('Updated layout: ', newLayout)
+       this.howMany(newLayout) // 传递当前剩下的所有数据
     }
 
     resizeEvent (i:number, newH:number, newW:number, newHPx:number, newWPx:number) { // 改变大小时
-      console.log('RESIZE i=' + i + ', H=' + newH + ', W=' + newW + ', H(px)=' + newHPx + ', W(px)=' + newWPx);
+      // console.log('RESIZE i=' + i + ', H=' + newH + ', W=' + newW + ', H(px)=' + newHPx + ', W(px)=' + newWPx);
     }
     resizedEvent (i:number, newH:number, newW:number, newHPx:number, newWPx:number) { // 改变大小结束
-      console.log('RESIZED i=' + i + ', H=' + newH + ', W=' + newW + ', H(px)=' + newHPx + ', W(px)=' + newWPx);
-      this.parentStyle = {
-        'parentWidth': newWPx,
-        'parentHeight': newHPx
-      }
+      // console.log('RESIZED i=' + i + ', H=' + newH + ', W=' + newW + ', H(px)=' + newHPx + ', W(px)=' + newWPx);
+      this.allChartsData.map((v:any, index:number) => { // 此处分开写做判断是因为区分各表传的值，不然每次拖拽后所有的都会传值过去
+        if (v.i === i) {
+          if (v.type === 'xBar') {
+            this.parentStylexBar = { 'parentWidth': newWPx, 'parentHeight': newHPx }
+          } else if (v.type === 'yBar') {
+            this.parentStyleyBar = { 'parentWidth': newWPx, 'parentHeight': newHPx }
+          } else if (v.type === 'pie') {
+            this.parentStylePie = { 'parentWidth': newWPx, 'parentHeight': newHPx }
+          } else if (v.type === 'line') {
+            this.parentStyleLine = { 'parentWidth': newWPx, 'parentHeight': newHPx }
+          } else if (v.type === 'gauge') {
+            this.parentStyleGauge = { 'parentWidth': newWPx, 'parentHeight': newHPx }
+          } else if (v.type === 'funnel') {
+            this.parentStyleFunnel = { 'parentWidth': newWPx, 'parentHeight': newHPx }
+          } else if (v.type === 'table') {
+            this.parentStyleTable = { 'parentWidth': newWPx, 'parentHeight': newHPx }
+          } else if (v.type === 'number') {
+            this.parentStyleNumber = { 'parentWidth': newWPx, 'parentHeight': newHPx }
+          } else if (v.type === 'scatter') {
+            this.parentStyleScatter = { 'parentWidth': newWPx, 'parentHeight': newHPx }
+          }
+        }
+      })
     }
     moveEvent (i:number, newX:number, newY:number) { // 拖拽时
       // console.log('MOVE i=' + i + ', X=' + newX + ', Y=' + newY);
     }
     movedEvent (i:number, newX:number, newY:number) { // 拖拽结束
-      console.log('MOVED i=' + i + ', X=' + newX + ', Y=' + newY);
+      // console.log('MOVED i=' + i + ', X=' + newX + ', Y=' + newY);
     }
     /* 拖拽等事件end */
 
     /* 编辑等操作start */
     editChartFun (item:any, index:number):void {
-      // console.log(item)
+      console.log(item)
       item.index = index // 把当前编辑的数据的下标传进去，然后修改完之后传递回来
       this.send(item) // 传递当前选中的给父组件
     }
@@ -197,12 +233,15 @@
       })
       max ? chartId = max.i : ''
       console.log(chartId)
-      this.howMany(chartId) // 传递当前剩下的最大的i值 chart的id
+      this.howMany(this.allChartsData, chartId) // 传递当前剩下的所有数据及最大的i值 chart的id
       // this.send(this.allChartsData)
     }
-    footerLookFun (item:any):void {
-      if (this.addOrEdit) { // 判断，只有当为编辑时才能操作
+    footerLookFun (item:any):void { // 查看报表
+      console.log(item.selected_rows.report_id)
+      let reportId:number = item.selected_rows.report_id
+      if (this.viewType === 'look') { // 判断，只有当为查看时才能操作
         console.log('footerLook')
+        window.open(window.location.origin + '/reportTable?reportId=' + reportId)
       }
     }
     /* 编辑等操作end */
@@ -254,10 +293,11 @@
     }
     .lpc-contentReport {
       width: 100%;
+      /* min-width: 446px; */
       height: calc(100% - 45px - 30px);
       // margin-top: 8px;
       overflow: hidden;
-      /* border: 1px solid red; */
+      border: 1px solid red;
     }
     .lpc-charts-footer {
       width: 100%;

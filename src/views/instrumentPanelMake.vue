@@ -5,8 +5,8 @@
     <a-form layout='inline' class="ant-advanced-search-from" :form="form">
       <a-form-item :span="24">
         <a-input
-          ref="name"
-          v-decorator="['name']"
+          ref="boardName"
+          v-decorator="['boardName']"
           placeholder="仪表盘名称" />
       </a-form-item>
       <a-form-item>
@@ -21,13 +21,11 @@
       </a-row>
     </div>
     <div class="search-result-list">
-      <a-table :scroll="{x: true}" :columns="columns" :dataSource="data" bordered :pagination="pagination" @change="onChange" :loading="loading" :rowKey="record => record.report_id">
+      <a-table :scroll="{x: true}" :columns="columns" :dataSource="data" bordered :pagination="pagination" @change="onChange" :loading="loading" :rowKey="record => record.board_id">
         <span slot="action" slot-scope="text, record">
           <a-button type="primary" size="small" @click="go($event, record)">编辑</a-button>
           <a-divider type="vertical" />
           <a-button type="primary" size="small" @click="look($event, record)">查看</a-button>
-          <!-- <a-divider type="vertical" />
-          <a-button type="primary" size="small">添加到菜单</a-button> -->
           <a-divider type="vertical" />
           <a-button type="primary" size="small" :loading="delBtnLoading" @click="deleteFun($event, record)">删除</a-button>
         </span>
@@ -39,8 +37,6 @@
 
 <script lang='ts'>
   import { Component, Prop, Vue } from 'vue-property-decorator'
-  import { State, Mutation } from 'vuex-class'
-  import { getQueryString } from '@/libs/util'
 
   interface pagination {
     current:number,
@@ -55,22 +51,14 @@
 
   searchLoading:boolean = false // 搜索按钮加载效果
   loading:boolean = true // 初始化显示loading加载动画
-  visible:boolean = false // 控制模态框
-  modalBtn:boolean = true // 控制新增编辑时确认按钮
-  modelCol:object = { // 设置栅格比例
-    label: {span: 8},
-    wrapper: {span: 12}
-  }
+  
   columns: Array<object> = [ // 定义表格表头
-    {title: '仪表盘名称', dataIndex: 'report_name'}, // fixed: 'left' 设置是否固定
-    {title: '报表数据源名称', dataIndex: 'report_resource_name'},
-    {title: '数据报表名称', dataIndex: 'main_table_name'},
+    {title: '仪表盘名称', dataIndex: 'board_name'}, // fixed: 'left' 设置是否固定
+    {title: '数据源名称', dataIndex: 'resource_name'},
+    {title: '报表名称', dataIndex: 'report_name'},
     {title: '操作', dataIndex: '', width: '40%', scopedSlots: { customRender: 'action'}} // scopedSlots配置操作列
   ]
   data: Array<object> = [] // 定义表格内容
-  modelTitle: string = '新增报表'
-  modelFormDatas: object = {}
-  reportResourceId: string = '' // 数据源id
   pagination:pagination = { // 定义分页数据
     current: 1,
     pageSize: 10,
@@ -85,66 +73,67 @@
   mounted () {
     /* let testConnectDatas:any = (this as any).form.getFieldsValue();
     console.log(testConnectDatas) */
-    this.reportResourceId = getQueryString('reportResourceId') || ''; // 获取url中的数据源id，用来区分是否是由数据源管理中跳转过来
-    let reportName:string = (this as any).$refs.name.value || ''; // 报表名
-    let params:any = { reportResourceId: this.reportResourceId, reportName: reportName, pageSize: 10, nowpage: 1 }
+    let boardName:string = (this as any).$refs.boardName.value || ''; // 报表名
+    let params:any = { boardName, pageSize: 10, nowpage: 1 }
     this.initDataFun(params); // 请求表格数据
   }
   initDataFun (params:any):void { // 初始化查询数据表方法
-    (this as any).$post('custom/ReportManage/getReportList', params).then((res: any) => { // 请求表格数据
+    (this as any).$post('/custom/BoardManage/getBoardList', params).then((res: any) => { // 请求表格数据
       if (res.state === 2000) {
         const pagination = { ...this.pagination }
         this.loading = false // 关闭加载动画
-        pagination.total = res.data.count;
-        this.data = res.data.data;
+        pagination.total = res.data.count
+        this.data = res.data.data
         this.pagination = pagination
       } else {
         this.loading = false;
-        (this as any).$message.error(res.message, 3); // 弹出错误message
+        (this as any).$message.error(res.message, 3) // 弹出错误message
       }
     }).catch((err: any) => {
       if (err.code === 'ECONNABORTED') {
-        (this as any).$message.error('请求超时', 3); // 弹出错误message
+        (this as any).$message.error('请求超时', 3) // 弹出错误message
       } else {
-        (this as any).$message.error('请求失败', 3); // 弹出错误message
+        (this as any).$message.error('请求失败', 3) // 弹出错误message
       }
-      this.loading = false;
-      this.data = [];
-    });
+      this.loading = false
+      this.data = []
+    })
   }
   handleSearch (e: any):void { // 搜索方法
     e.preventDefault();
-    let sourceName:string = (this as any).$refs.sourceName.value || ''; // 连接名
-    let reportName:string = (this as any).$refs.reportName.value || ''; // 报表名
-    let params:any = { reportResourceId: this.reportResourceId, reportName: reportName, sourceName: sourceName, pageSize: 10, nowpage: 1 }
+    let boardName:string = (this as any).$refs.boardName.value || ''; // 仪表盘名称
+    let params:any = { boardName, pageSize: 10, nowpage: 1 }
     this.initDataFun(params); // 请求表格数据
   }
   
-  go (e: any, record: any): void {
+  go (e: any, record?: any): void { // 新增or编辑方法
     e.preventDefault();
-    // 打开报表制作
-    window.open(window.location.origin + '/config') // _target 表示只打开一个，重复点击会回到第一个打开的窗口
+    // 打开自定义页面
+    if (record) {
+       window.open(window.location.origin + '/config?viewType=edit&boardId=' + record.board_id)
+    } else {
+      window.open(window.location.origin + '/config?viewType=add')
+    }
+    // window.open(window.location.origin + '/config') // _target 表示只打开一个，重复点击会回到第一个打开的窗口
   }
   look (e:any, record:any):void { // 查看
     e.preventDefault();
     let reportId = record ? record.report_id : '' // 报表id
-    // 打开报表详情
-    window.open(window.location.origin + '/reportTable?reportId=' + reportId) // _target 表示只打开一个，重复点击会回到第一个打开的窗口
+    window.open(window.location.origin + '/config?viewType=look&boardId=' + record.board_id) // _target 表示只打开一个，重复点击会回到第一个打开的窗口
   }
-  onChange (pagination: any) {
+  onChange (pagination: any) { // table改变方法
     const pager:any = { ...this.pagination }
     pager.current = pagination.current
     this.pagination = pager
-    let sourceName:string = (this as any).$refs.sourceName.value || '' // 连接名
-    let reportName:string = (this as any).$refs.reportName.value || '' // 报表名
-    let params:any = { reportResourceId: this.reportResourceId, reportName: reportName, sourceName: sourceName, nowpage: pagination.current, pageSize: pagination.pageSize }
-    this.initDataFun(params); // 请求表格数据
+    let boardName:string = (this as any).$refs.boardName.value || '' // 仪表盘名称
+    let params:any = { boardName, nowpage: pagination.current, pageSize: pagination.pageSize }
+    this.initDataFun(params) // 请求表格数据
   }
-  deleteFun (e:any, record:any):void {
-    e.preventDefault();
+  deleteFun (e:any, record:any):void { // 删除方法
+    e.preventDefault()
     this.delBtnLoading = !this.delBtnLoading
-    let params: object = { reportId: record.report_id }
-    this.showConfirm('提示', '确认要删除该报表么？', params)
+    let params: object = { board_id: record.board_id }
+    this.showConfirm('提示', '确认要删除该仪表盘么？', params)
   }
   showConfirm (title: string, content: string, params: any) { // 弹出确认对话框
     let _this:any = this;
@@ -163,11 +152,10 @@
     })
   }
   delFieldFun (params:any):void {
-    (this as any).$post('custom/ReportManage/delReport', params).then((res: any) => { // 删除表格数据
-      if (res.state === 2000) {
-        let sourceName:string = (this as any).$refs.sourceName.value || '' // 连接名
-        let reportName:string = (this as any).$refs.reportName.value || '' // 报表名
-        let params:any = { reportResourceId: this.reportResourceId, reportName: reportName, sourceName: sourceName, pageSize: 10, nowpage: 1 }
+    (this as any).$post('/custom/BoardManage/delBoardInfo', params).then((res: any) => { // 删除表格数据
+      if (res.state === 2000) { // 成功之后重新请求刷新table数据
+        let boardName:string = (this as any).$refs.boardName.value || '' // 仪表盘名称
+        let params:any = { boardName, pageSize: 10, nowpage: 1 }
         this.initDataFun(params); // 请求表格数据
         (this as any).$message.success(res.message, 3)
         this.delBtnLoading = !this.delBtnLoading

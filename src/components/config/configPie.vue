@@ -1,7 +1,7 @@
 <template>
   <div class="config"> <!-- 饼图 -->
     <!-- <p>{{title}}</p> -->
-    <div class="map" ref="map"></div>
+    <div class="map" ref="map">暂无数据</div>
   </div>
 </template>
 
@@ -32,16 +32,12 @@
     seriesData:Array<any> = []
     legendData:Array<string> = []
     @Watch('styles') patintingWatch (newVal:any, oldVal:any) {
-      console.log(newVal)
       if (newVal && JSON.stringify(newVal) !== '{}') {
-        console.log(1)
         this.$nextTick(() => {
-          console.log(this.myChart)
           this.myChart.resize()
         })
       } else {
         this.myChart = echarts.init(this.$refs.map as HTMLDivElement)
-        console.log(this.myChart)
         this.myChart.clear()
         this.initEchartsFun(this.seriesData, this.legendData)
       }
@@ -69,12 +65,24 @@
       this.$nextTick(() => {
         this.initEchartsFun(this.seriesData, this.legendData)
       })
+      setTimeout(() => {
+        this.myChart.resize()
+      }, 1000)
     }
 
     initEchartsFun (series:Array<any>, legendData:Array<string>) {
       this.myChart = echarts.init(this.$refs.map as HTMLDivElement)
       this.myChart.clear()
       this.option = {
+        title: {
+          // x: 'center',
+          left: '30%', // 位置
+          text: 'yname',
+          textStyle: {
+            fontSize: '10',
+            color: '#16325c'
+          }
+        },
         tooltip: { // 鼠标悬浮时，提示tooltip位置
           trigger: 'item',
           formatter: '{a} <br/> {b} : {c} ({d}%)',
@@ -96,11 +104,11 @@
           data: legendData
         },
         series: {
-          name: this.title,
+          name: 'title标题',
           type: 'pie',
           radius: ['50%', '80%'],
           // roseType: 'radius', // 'area' 切换模式半径模式or面积模式
-          center: ['35%', '45%'],
+          center: ['35%', '55%'],
           avoidLabelOverlap: false,
           label: {
             normal: {
@@ -141,6 +149,9 @@
   .map {
     height: 100%;
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 </style>
