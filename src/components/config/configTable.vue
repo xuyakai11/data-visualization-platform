@@ -96,15 +96,15 @@
         } else {
           (this as any).$message.error('请求失败', 3); // 弹出错误message
         }
-       this.loading = false;
-       this.data = [];
-     });
+       this.loading = false
+       this.data = []
+     })
     }
     onChange (pagination:any):void {
       const pager:any = { ...this.pagination }
       pager.current = pagination.current
       this.pagination = pager
-      let obj = { nowpage: pagination.current, pageSize: pagination.pageSize }
+      let obj = { 'reportId': this.paramsData.selected_rows.report_id, 'searchParam': '', nowpage: pagination.current, pageSize: pagination.pageSize }
       this.initDataFun(obj)
     }
   }

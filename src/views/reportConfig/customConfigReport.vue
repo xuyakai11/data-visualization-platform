@@ -585,7 +585,7 @@
           } else {
             group_ids = this.group_name
           }
-          console.log(this.boardName)
+          // console.log(this.boardName)
           if (this.addOrEditTitle === '编辑组件') {
             this.paintingReport = {
               'x': this.editData.x,
@@ -608,7 +608,7 @@
               'editType': true // 是否是编辑判断字段
             }
           } else {
-            console.log(this.x, this.y)
+            // console.log(this.x, this.y)
             this.paintingReport = { // 新增添加的// 每次添加默认宽度为4高度为7
               'x': this.x,
               'y': this.y,
@@ -630,6 +630,8 @@
           }
           this.addOrEditVisible = false
           this.chartId = (Number(this.chartId) + 1).toString()
+        } else {
+          (this as any).$message.info('请填写必填项', 3) 
         }
       })
     }
@@ -717,8 +719,8 @@
       } */
       let group_ids:string = ''
       if (this.type === 'yBar') {
-        // group_ids = this.yBargroup_name.join(',')
-        group_ids = this.yBarfield_name
+        group_ids = this.yBargroup_name.join(',')
+        // group_ids = this.yBarfield_name
       } else if (this.type === 'xBar' || this.type === 'line') {
         group_ids = this.xBargroup_name.join(',')
       } else {
@@ -727,16 +729,15 @@
       this.params = {
         'config_details': {
           'group_ids': group_ids,
-          'field_ids': this.type === 'yBar' ? this.yBargroup_name.join(',') : this.field_name // this.type === 'yBar' ? this.yBarfield_name : this.field_name,
+          'field_ids': this.type === 'yBar' ? this.yBarfield_name : this.field_name // this.type === 'yBar' ? this.yBargroup_name.join(',') : this.field_name 
         },
         'type': this.type,
         'pre_unit': this.preUnit,
         'selected_rows': this.selectedRows
       }
-      console.log(this.params)
+      // console.log(this.params)
     }
     saveAllDatasFun ():void { // 点击完成方法
-      console.log(this.editAllData)
       if (this.viewType !== 'add') {
         let board_id:string = (this as any).$route.query.boardId
         this.editAllData.map((v:any, i:number) => {
