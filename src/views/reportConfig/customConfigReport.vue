@@ -149,7 +149,7 @@
                   <a-select
                     @change="XChange"
                     v-decorator="['group_name', {initialValue: yBarfield_name, rules: [{ required: true, message: '请选择纬度键名' }]}]"
-                  >
+                  > <!-- labelInValue -->
                     <a-select-option v-for="(item, index) in modalPreData.y" :value="item.field_id">{{ item.col_title }}</a-select-option>
                   </a-select>
                 </a-form-item>
@@ -492,17 +492,18 @@
           this.modalPreData = res.data
           console.log(this.modalPreData)
           // this.yBargroup_name.push({ key: `'${res.data.x[0].field_id}'`, label: res.data.x[0].col_title })
-          this.group_name = res.data.x[0].group_id // 单个的
-          this.xBargroup_name.push(res.data.x[0].group_id) // 多选的
-          this.yBargroup_name.push(res.data.x[0].group_id) // 多选的
-          if (res.data.y) { // 判断该字段是否存在
+          if (res.data.x.length) {
+            this.group_name = res.data.x[0].group_id // 单个的
+            this.xBargroup_name.push(res.data.x[0].group_id) // 多选的
+            this.yBargroup_name.push(res.data.x[0].group_id) // 多选的
+          }
+          if (res.data.y.length) { // 判断该字段是否存在
             this.yBarfield_name = res.data.y[0].field_id
             this.field_name = res.data.y[0].field_id
             // this.yBarfield_name = { key: `'${res.data.y[0].group_id}'`, label: res.data.y[0].group_title_name }
             // this.group_name = { key: `'${res.data.y[0].group_id}'`, label: res.data.y[0].group_title_name }
           }
-          // this.field_name.push({ key: `'${res.data.x[0].field_id}'`, label: res.data.x[0].col_title })
-          
+          // this.field_name.push({ key: `'${res.data.x[0].field_id}'`, label: res.data.x[0].col_title })  
           this.initGetChartsDataFun() // 每次改变都重新请求数据
         } else {
           this.addOrEditModalSpinning = false
@@ -571,7 +572,7 @@
     }
     addOrEditModalCancel ():void { // 添加or编辑组件弹窗关闭事件
       this.addOrEditVisible = false;
-      (this as any).reportModalForm.resetFields(); // 重置输入控件的值
+      (this as any).reportModalForm.resetFields() // 重置输入控件的值
     }
     addOrEditModalOk ():void { // 添加or编辑组件弹窗确认事件
       (this as any).reportModalForm.validateFields((err: any, values: any) => {
@@ -584,6 +585,7 @@
           } else {
             group_ids = this.group_name
           }
+          console.log(this.boardName)
           if (this.addOrEditTitle === '编辑组件') {
             this.paintingReport = {
               'x': this.editData.x,
@@ -639,6 +641,23 @@
       if (!item.active) {
         this.modalImgToggle(item.type, index)
         this.type = item.type // 赋值选中的类型
+        /* 每次切换都重置x、y选项 */
+        this.yBargroup_name = []
+        this.xBargroup_name = []
+        this.yBarfield_name = ''
+        this.group_name = ''
+        this.field_name = ''
+        if (this.modalPreData.x.length) {
+          this.group_name = this.modalPreData.x[0].group_id // 单个的
+          this.xBargroup_name.push(this.modalPreData.x[0].group_id) // 多选的
+          this.yBargroup_name.push(this.modalPreData.x[0].group_id) // 多选的
+        }
+        if (this.modalPreData.y.length) { // 判断该字段是否存在
+          this.yBarfield_name = this.modalPreData.y[0].field_id
+          this.field_name = this.modalPreData.y[0].field_id
+          // this.yBarfield_name = { key: `'${res.data.y[0].group_id}'`, label: res.data.y[0].group_title_name }
+          // this.group_name = { key: `'${res.data.y[0].group_id}'`, label: res.data.y[0].group_title_name }
+        }
         this.initGetChartsDataFun() // 每次改变都重新请求数据
       }
     }
@@ -653,22 +672,23 @@
       if (value.length <= 2) {
         if (this.type === 'yBar') {
           this.yBarfield_name = value
+        } else if (this.type === 'xBar' || this.type === 'line'){
+          this.xBargroup_name = value
         } else {
-          this.field_name = value
+          this.group_name = value
         }
         this.initGetChartsDataFun() // 每次改变都重新请求数据
       }
     }
     YChange (value:any):void { // 添加or编辑组件弹窗 Y轴change事件
       if (this.type === 'yBar') {
-        this.yBargroup_name = value 
+        this.yBargroup_name = value
       } else {
-        this.group_name = value
+        this.field_name = value
       }
       this.initGetChartsDataFun() // 每次改变都重新请求数据
     }
     unitChange (value:any):void { // // 添加or编辑组件弹窗 单位change事件
-      console.log(value)
       this.preUnit = value
       this.initGetChartsDataFun() // 每次改变都重新请求数据
     }
@@ -697,7 +717,8 @@
       } */
       let group_ids:string = ''
       if (this.type === 'yBar') {
-        group_ids = this.yBargroup_name.join(',')
+        // group_ids = this.yBargroup_name.join(',')
+        group_ids = this.yBarfield_name
       } else if (this.type === 'xBar' || this.type === 'line') {
         group_ids = this.xBargroup_name.join(',')
       } else {
@@ -706,7 +727,7 @@
       this.params = {
         'config_details': {
           'group_ids': group_ids,
-          'field_ids': this.type === 'yBar' ? this.yBarfield_name : this.field_name,
+          'field_ids': this.type === 'yBar' ? this.yBargroup_name.join(',') : this.field_name // this.type === 'yBar' ? this.yBarfield_name : this.field_name,
         },
         'type': this.type,
         'pre_unit': this.preUnit,
@@ -720,6 +741,7 @@
         let board_id:string = (this as any).$route.query.boardId
         this.editAllData.map((v:any, i:number) => {
           v.board_id = board_id
+          v.board_name = this.boardName
         })
       }
       /* let params = {"subunitData":[
@@ -785,6 +807,7 @@
     }
     saveEditBoardName ():void { // 保存修改
       this.boardNameEdit = false
+      console.log(this.boardName)
     }
     cancelEditBoardName ():void { // 取消还原修改
       this.boardNameEdit = false
@@ -837,7 +860,7 @@
       })
       this.reportTitle = item.main_board_title // 报表标题
       this.reportViceTitle = item.board_title // 报表副标题
-      this.reportFooterTitle = item.foot_page // 报表页脚
+      this.reportFooterTitle = item.foot_page; // 报表页脚
       (this as any).reportModalForm.resetFields() // 重置验证
       // console.log(this.type)
       setTimeout(() => {

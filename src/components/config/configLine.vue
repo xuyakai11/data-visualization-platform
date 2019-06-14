@@ -30,6 +30,8 @@
 
     seriesData:Array<any> = []
     legendData:Array<string> = []
+    preUnit:string = '' // 单位
+    dataZoom:Array<any> = []
     @Watch('styles') patintingWatch (newVal:any, oldVal:any) {
       if (newVal && JSON.stringify(newVal) !== '{}') {
         this.$nextTick(() => {
@@ -51,6 +53,7 @@
           'field_id': newVal.config_details.field_ids,
           'pre_unit': newVal.pre_unit.key
         }
+        console.log(params)
         // this.preUnit = newVal.pre_unit.label // 赋值单位文字
         this.initGetChartsDataFun(params)
       }
@@ -65,7 +68,7 @@
           'field_id': this.paramsData.config_details.field_ids,
           'pre_unit': this.paramsData.pre_unit.key
         }
-        // this.preUnit = this.paramsData.pre_unit.label // 赋值单位文字
+        this.preUnit = this.paramsData.pre_unit.label // 赋值单位文字
         this.initGetChartsDataFun(params)
       }
     }
@@ -88,16 +91,54 @@
       (this as any).$post('/custom/boardManage/generateBoardData', params).then((res: any) => {
         if (res.state === 2000) {
           this.chartData = res.data
-          if (res.data.length) {
-            this.chartData.map((v:any, i:number) => {
+          if (res.data.length || JSON.stringify(res.data) !== '{}') {
+            if (res.data.legendData && res.data.seriesData) {
+              this.legendData = res.data.legendData
+              this.seriesData = res.data.seriesData
+              this.seriesData.map((v:any, i:number) => {
+                v.type = 'line'
+                v.stack = '总量'
+              })
+              this.dataZoom = [
+                {
+                  show: true,
+                  start: 0,
+                  end: 20,
+                  height: 20
+                },
+                /* {
+                  type: 'inside',
+                  start: 94,
+                  end: 100
+                }, */
+                {
+                  show: true,
+                  yAxisIndex: 0,
+                  filterMode: 'empty',
+                  width: 10,
+                  height: '80%',
+                  showDataShadow: false,
+                  right: '0%'
+                }
+              ]
+            } else {
+              let danLineArr:Array<number> = []
+              this.chartData.map((v:any, i:number) => {
                 if (v.value > 0) {
-                  this.seriesData.push({ type: 'line', name: v.name, value: v.value })
+                  danLineArr.push(v.value)
+                  // this.seriesData.push({ type: 'line', stack: '总量', name: v.name, data: v.value })
                   this.legendData.push(v.name)
                 }
-              }) 
-            _this.$nextTick(() => {
-              _this.initEchartsFun(this.legendData, this.seriesData)
-            })
+              })
+              this.dataZoom = []
+              this.seriesData = [{ type: 'line', data: danLineArr }]
+            }
+            // _this.$nextTick(() => {
+              setTimeout(() => {
+                _this.initEchartsFun(this.legendData, this.seriesData)
+              }, 500);
+              
+            // })
           }
         } else {
           (this as any).$message.error(res.message, 3) // 弹出错误message
@@ -121,13 +162,17 @@
           trigger: 'axis',
           position: 'right'
         },
-        legend: {
+        /* legend: {
           data: legendData // ['语陪', '活动', '咨询', '定金', '订单', '垃圾', '无聊']
-        },
+        }, */
         grid: {
-          left: '3%',
+          /* left: '3%',
           right: '4%',
-          bottom: '3%',
+          bottom: '3%', */
+          top: 10,
+          bottom: 38,
+          left: 50,
+          right: 20,
           containLabel: true
         },
         toolbox: {
@@ -149,7 +194,8 @@
             show: false
           }
         },
-        series: seriesData
+        dataZoom: this.dataZoom,
+        series: seriesData // seriesData
       }
       this.myChart.setOption(this.option, true)
     }

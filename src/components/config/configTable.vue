@@ -1,7 +1,7 @@
 <template>
   <div class="config">
     <a-table
-        :scroll="{ x: 1500, y: y }"
+        :scroll="{ x: x, y: y }"
         :columns="columns"
         :dataSource="data"
         :pagination="pagination"
@@ -49,6 +49,7 @@
     loading:boolean = true
     data:Array<any> = []
     y:number = 140
+    x:number = 1500
     @Watch('styles') patintingWatch (newVal:any, oldVal:any) {
       if (newVal && JSON.stringify(newVal) !== '{}') {
         this.y = newVal.parentHeight - 180
@@ -75,6 +76,8 @@
        if (res.state === 2000) {
          this.loading = false
          this.columns = res.data.columns
+         this.x = this.columns.length * 250
+         // console.log(this.x)
          this.data = res.data.data
          this.data.map((v:any, i:number) => {
            v.keyFlagId = i

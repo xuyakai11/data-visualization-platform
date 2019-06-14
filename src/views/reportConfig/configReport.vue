@@ -7,17 +7,13 @@
             :layout.sync="allChartsData"
             :col-num="12"
             :row-height="30"
-            :is-draggable="true"
-            :is-resizable="true"
+            :is-draggable="draggableOrResize"
+            :is-resizable="draggableOrResize"
             :is-mirrored="false"
             :vertical-compact="true"
             :margin="[10, 10]"
             :use-css-transforms="true"
             @layout-updated="layoutUpdatedEvent"
-            @layout-created="layoutCreatedEvent"
-            @layout-before-mount="layoutBeforeMountEvent"
-            @layout-mounted="layoutMountedEvent"
-            @layout-ready="layoutReadyEvent"
             ><!--
               drag-allow-from=".vue-draggable-handle"
               drag-ignore-from=".no-drag" -->
@@ -30,15 +26,12 @@
               :minH="2"
               :minW="item.type !== 'number' ? 4 : 2"
               :dragIgnoreFrom="'canvas'"
-              @resize="resizeEvent"
-              @move="moveEvent"
               @resized="resizedEvent"
-              @moved="movedEvent"
             >
               <header class="lpc-charts-header">
                 <p class="lpc-title-p">{{ item.main_board_title }}<br/> <span>{{ item.board_title }}</span></p>
                 <span class="lpc-chart-icon" v-if="viewType !== 'look'"><a-icon type="edit" @click.stop="editChartFun(item, index)"/><a-icon type="close" @click.stop="delChartFun(item, index)"/></span>
-                <span class="lpc-chart-icon" v-else><a-icon type="fullscreen" /></span>
+                <span class="lpc-chart-icon" v-else><a-icon type="fullscreen" @click="fullScreenFun(item, index)"/></span>
               </header>
               <!-- <div ref="initStyle" > -->
                 <div class="lpc-contentReport">
@@ -61,6 +54,17 @@
         </a-row>
       </div>
     </a-spin>
+    <!-- 弹窗层 -->
+    <a-modal
+      :visible="fullModalVisible"
+      :title="fullModalTitle"
+      @cancel="fullHandleCancel"
+      width="80%"
+      :footer="null"
+      :bodyStyle="{ 'padding-bottom': 0 }"
+      > 
+      
+    </a-modal>
   </div>
 </template>
 
@@ -116,6 +120,9 @@
     parentStyleNumber:any = {}
     parentStyleScatter:any = {}
 
+    draggableOrResize:boolean = true // 配置是否可拖拽，放大缩小
+    fullModalVisible:boolean = false
+    fullModalTitle:string = ''
     @Emit('allChartsData') send (item:any) {}
     @Emit('howMany') howMany (item:any, chartid?:string) {}
     // 监听paintingReport 是因为如果其变化则显示验证公式按钮 deep: true, immediate: true
@@ -140,6 +147,7 @@
       if (this.viewType !== 'add') {
         this.editOrLookGetDataFun()
       }
+      this.viewType === 'look' ? this.draggableOrResize = false : ''
     }
     mounted () {
     }
@@ -162,25 +170,9 @@
     }
 
     /* 拖拽等事件start */
-    layoutCreatedEvent (newLayout:any) {
-      // console.log('Created layout: ', newLayout)
-    }
-    layoutBeforeMountEvent (newLayout:any) {
-      // console.log('beforeMount layout: ', newLayout)
-    }
-    layoutMountedEvent (newLayout:any) {
-      // console.log('Mounted layout: ', newLayout)
-    }
-    layoutReadyEvent (newLayout:any) {
-      // console.log('Ready layout: ', newLayout)
-    }
     layoutUpdatedEvent (newLayout:any) { // 拖拽后更新
       // console.log('Updated layout: ', newLayout)
        this.howMany(newLayout) // 传递当前剩下的所有数据
-    }
-
-    resizeEvent (i:number, newH:number, newW:number, newHPx:number, newWPx:number) { // 改变大小时
-      // console.log('RESIZE i=' + i + ', H=' + newH + ', W=' + newW + ', H(px)=' + newHPx + ', W(px)=' + newWPx);
     }
     resizedEvent (i:number, newH:number, newW:number, newHPx:number, newWPx:number) { // 改变大小结束
       // console.log('RESIZED i=' + i + ', H=' + newH + ', W=' + newW + ', H(px)=' + newHPx + ', W(px)=' + newWPx);
@@ -207,12 +199,6 @@
           }
         }
       })
-    }
-    moveEvent (i:number, newX:number, newY:number) { // 拖拽时
-      // console.log('MOVE i=' + i + ', X=' + newX + ', Y=' + newY);
-    }
-    movedEvent (i:number, newX:number, newY:number) { // 拖拽结束
-      // console.log('MOVED i=' + i + ', X=' + newX + ', Y=' + newY);
     }
     /* 拖拽等事件end */
 
@@ -242,6 +228,13 @@
         console.log('footerLook')
         window.open(window.location.origin + '/reportTable?reportId=' + reportId)
       }
+    }
+    fullScreenFun (item:any, index:number):void { // 扩大展示按钮方法
+      this.fullModalVisible = true
+      this.fullModalTitle = '扩大查看报表'
+    }
+    fullHandleCancel ():void {
+      this.fullModalVisible = false
     }
     /* 编辑等操作end */
   }

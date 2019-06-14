@@ -72,7 +72,7 @@
     }
 
     initEchartsFun (seriesData:Array<any>) {
-      console.log(seriesData) // [{value: 50, name: '完成率'}]
+      // console.log(seriesData) // [{value: 50, name: '完成率'}]
       this.myChart = echarts.init(this.$refs.map as HTMLDivElement)
       this.myChart.clear()
       this.option = {

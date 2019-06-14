@@ -81,7 +81,7 @@
       (this as any).$post('/custom/boardManage/generateBoardData', params).then((res: any) => {
         if (res.state === 2000) {
           this.chartData = res.data
-          if (res.data.length) {
+          if (res.data.length || JSON.stringify(res.data) !== '{}') {
             if (res.data.legendData && res.data.seriesData) {
               this.legendData = res.data.legendData
               this.seriesData = res.data.seriesData
