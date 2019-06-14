@@ -208,7 +208,7 @@
               fontSize: 10
             }
           },
-          name: '人均收入123',
+          // name: '人均收入123',
           nameGap: 25, // 距离坐标轴位置
           nameLocation: 'middle',
           nameTextStyle: {
@@ -219,7 +219,7 @@
         },
         yAxis: {
           type: 'value',
-          name: '人均收入',
+          // name: '人均收入',
           nameGap: 39,
           nameLocation: 'middle',
           nameTextStyle: {

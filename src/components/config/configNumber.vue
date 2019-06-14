@@ -51,10 +51,7 @@
       }
     } */
     @Watch('paramsData') paramsDataWatch (newVal:any, oldVal:any) {
-      console.log(newVal,oldVal)
-      console.log(1111)
       if (newVal && JSON.stringify(newVal) !== '{}') {
-        console.log(newVal)
         let params:any = {
           'report_id': newVal.selected_rows.report_id,
           'type': newVal.type,
@@ -69,20 +66,20 @@
     mounted () {
       console.log(this.paramsData)
       if (JSON.stringify(this.paramsData) !== '{}') {
-        /* let params:any = {
+        let params:any = {
           'report_id': this.paramsData.selected_rows.report_id,
           'type': this.paramsData.type,
           'group_id': this.paramsData.config_details.group_ids,
           'field_id': this.paramsData.config_details.field_ids,
           'pre_unit': this.paramsData.pre_unit.key
-        } */
-        let params:any = {
+        }
+       /*  let params:any = {
           'report_id': 130, //newVal.selected_rows.report_id,
           'type': this.paramsData.type,
           'group_id': 21, // newVal.config_details.group_ids,
           'field_id': 30, // newVal.config_details.field_ids,
           'pre_unit': this.paramsData.pre_unit.key
-        }
+        } */
         this.preUnit = this.paramsData.pre_unit.label // 赋值单位文字
         this.initGetChartsDataFun(params)
       }

@@ -19,13 +19,13 @@
     preUnit:string = '' // 单位
 
     chartData:Array<any> = [
-      { 'name': '语陪', 'value': 150 },
+      /* { 'name': '语陪', 'value': 150 },
       { 'name': '活动', 'value': 200 },
       { 'name': '咨询', 'value': 300 },
       { 'name': '定金', 'value': 400 },
       { 'name': '订单', 'value': 500 },
       { 'name': '垃圾', 'value': 600 },
-      { 'name': '无聊', 'value': 700 }
+      { 'name': '无聊', 'value': 700 } */
     ]
 
     seriesData:Array<any> = []
@@ -44,7 +44,6 @@
     }
     @Watch('paramsData') paramsDataWatch (newVal:any, oldVal:any) {
       if (newVal && JSON.stringify(newVal) !== '{}') {
-        console.log(newVal)
         let params:any = {
           'report_id': newVal.selected_rows.report_id,
           'type': newVal.type,

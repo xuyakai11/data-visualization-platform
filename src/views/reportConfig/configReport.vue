@@ -132,7 +132,6 @@
             this.allChartsData.push(newVal)
           })
         }
-        console.log(1)
         this.howMany(this.allChartsData)
       }
     }
@@ -261,7 +260,6 @@
     height: 100%;
     background: transparent;
     .lpc-editbox {
-      border: 1px solid red;
       margin-bottom: 5px;
     }
     .lpc-charts-header {
@@ -297,7 +295,6 @@
       height: calc(100% - 45px - 30px);
       // margin-top: 8px;
       overflow: hidden;
-      border: 1px solid red;
     }
     .lpc-charts-footer {
       width: 100%;

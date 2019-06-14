@@ -140,17 +140,17 @@
                   <a-select
                     @change="YChange"
                     mode="multiple"
-                    v-decorator="['group_name', { initialValue: yBargroup_name, rules: [{ required: true, message: '请选择字段键名' }]}]"
+                    v-decorator="['field_name', { initialValue: yBargroup_name, rules: [{ required: true, message: '请选择字段键名' }]}]"
                   >
-                    <a-select-option v-if="JSON.stringify(modalPreData) !== '{}'" v-for="(item, index) in modalPreData.x" :value="item.field_id">{{ item.col_title }}</a-select-option>
+                    <a-select-option v-if="JSON.stringify(modalPreData) !== '{}'" v-for="(item, index) in modalPreData.x" :value="item.group_id">{{ item.group_title_name }}</a-select-option>
                   </a-select>
                 </a-form-item>
                 <a-form-item label="X轴">
                   <a-select
                     @change="XChange"
-                    v-decorator="['field_name', {initialValue: yBarfield_name, rules: [{ required: true, message: '请选择纬度键名' }]}]"
+                    v-decorator="['group_name', {initialValue: yBarfield_name, rules: [{ required: true, message: '请选择纬度键名' }]}]"
                   >
-                    <a-select-option v-for="(item, index) in modalPreData.y" :value="item.group_id">{{ item.group_title_name }}</a-select-option>
+                    <a-select-option v-for="(item, index) in modalPreData.y" :value="item.field_id">{{ item.col_title }}</a-select-option>
                   </a-select>
                 </a-form-item>
               </div>
@@ -159,37 +159,37 @@
                   <a-select
                     @change="XChange"
                     mode="multiple"
-                    v-decorator="['field_name', { initialValue: field_name, rules: [{ required: true, message: '请选择纬度键名' }]}]"
+                    v-decorator="['group_name', { initialValue: xBargroup_name, rules: [{ required: true, message: '请选择纬度键名' }]}]"
                   >
                     <!-- <a-select-option value="create">创建人</a-select-option> -->
-                    <a-select-option v-for="(item, index) in modalPreData.x" :value="item.field_id">{{ item.col_title }}</a-select-option>
+                    <a-select-option v-if="JSON.stringify(modalPreData) !== '{}'" v-for="(item, index) in modalPreData.x" :value="item.group_id">{{ item.group_title_name }}</a-select-option>
                   </a-select>
                 </a-form-item>
                 <a-form-item label="Y轴">
                   <a-select
                     @change="YChange"
-                    v-decorator="['group_name', {initialValue: group_name, rules: [{ required: true, message: '请选择字段键名' }]}]"
+                    v-decorator="['field_name', {initialValue: field_name, rules: [{ required: true, message: '请选择字段键名' }]}]"
                   >
-                    <a-select-option v-for="(item, index) in modalPreData.y" :value="item.group_id">{{ item.group_title_name }}</a-select-option>
+                    <a-select-option v-if="JSON.stringify(modalPreData) !== '{}'" v-for="(item, index) in modalPreData.y" :value="item.field_id">{{ item.col_title }}</a-select-option>
                   </a-select>
                 </a-form-item>
               </div>
-              <div v-show="type === 'pie' || type === 'funnel'">
+              <div v-if="type === 'pie' || type === 'funnel'">
                 <a-form-item label="值">
                   <a-select
                     @change="YChange"
-                    v-decorator="['group_name', { initialValue: group_name, rules: [{ required: true, message: '请选择字段键名' }]}]"
+                    v-decorator="['field_name', { initialValue: field_name, rules: [{ required: true, message: '请选择字段键名' }]}]"
                   >
-                    <a-select-option v-for="(item, index) in modalPreData.y" :value="item.group_id">{{ item.group_title_name }}</a-select-option>
+                    <a-select-option v-if="JSON.stringify(modalPreData) !== '{}'" v-for="(item, index) in modalPreData.y" :value="item.field_id">{{ item.col_title }}</a-select-option>
                   </a-select>
                 </a-form-item>
                 <a-form-item label="切块标准">
                   <a-select
                     @change="XChange"
-                    v-decorator="['field_name', { initialValue: field_name, rules: [{ required: true, message: '请选择纬度键名' }]}]"
+                    v-decorator="['group_name', { initialValue: group_name, rules: [{ required: true, message: '请选择纬度键名' }]}]"
                   >
                     <!-- <a-select-option value="create">创建人</a-select-option> -->
-                    <a-select-option v-for="(item, index) in modalPreData.x" :value="item.field_id">{{ item.col_title }}</a-select-option>
+                    <a-select-option v-if="JSON.stringify(modalPreData) !== '{}'" v-for="(item, index) in modalPreData.x" :value="item.group_id">{{ item.group_title_name }}</a-select-option>
                   </a-select>
                 </a-form-item>
               </div>
@@ -203,13 +203,13 @@
                   </a-select>
                 </a-form-item>
               </div> -->
-              <div v-show="type === 'number' || type === 'gauge'">
+              <div v-if="type === 'number' || type === 'gauge'">
                 <a-form-item label="值">
                   <a-select
                     @change="XChange"
                     v-decorator="[ 'group_name', { initialValue: group_name, rules: [{ required: true, message: '请选择纬度键名' }]}]"
                   >
-                    <a-select-option v-for="(item, index) in modalPreData.x" :value="item.field_id">{{ item.col_title }}</a-select-option>
+                    <a-select-option v-if="JSON.stringify(modalPreData) !== '{}'" v-for="(item, index) in modalPreData.x" :value="item.group_id">{{ item.group_title_name }}</a-select-option>
                   </a-select>
                 </a-form-item>
               </div>
@@ -325,10 +325,13 @@
     selectedRows:any = {}
     isImgToggle:Array<string> = [] // 存放选中报表支持那些图
     modalPreData:any = {} // 存放选中报表的x轴y轴信息
+
     yBargroup_name:Array<any> = []
-    yBarfield_name:any = 0
-    group_name:any = 0
-    field_name:Array<any> = []
+    yBarfield_name:any = ''
+    group_name:any = ''
+    xBargroup_name:Array<any> = []
+    field_name:any = ''
+
     preUnit:any = { key: 'whole', label: '全数字' } // 单位
 
     addOrEditVisible:boolean = false
@@ -487,16 +490,19 @@
         if (res.state === 2000) {
           this.addOrEditModalSpinning = false
           this.modalPreData = res.data
+          console.log(this.modalPreData)
           // this.yBargroup_name.push({ key: `'${res.data.x[0].field_id}'`, label: res.data.x[0].col_title })
-          this.yBargroup_name.push(res.data.x[0].field_id)
+          this.group_name = res.data.x[0].group_id // 单个的
+          this.xBargroup_name.push(res.data.x[0].group_id) // 多选的
+          this.yBargroup_name.push(res.data.x[0].group_id) // 多选的
           if (res.data.y) { // 判断该字段是否存在
-            this.yBarfield_name = res.data.y[0].group_id
-            this.group_name = res.data.y[0].group_id
+            this.yBarfield_name = res.data.y[0].field_id
+            this.field_name = res.data.y[0].field_id
             // this.yBarfield_name = { key: `'${res.data.y[0].group_id}'`, label: res.data.y[0].group_title_name }
             // this.group_name = { key: `'${res.data.y[0].group_id}'`, label: res.data.y[0].group_title_name }
           }
           // this.field_name.push({ key: `'${res.data.x[0].field_id}'`, label: res.data.x[0].col_title })
-          this.field_name.push(res.data.x[0].field_id)
+          
           this.initGetChartsDataFun() // 每次改变都重新请求数据
         } else {
           this.addOrEditModalSpinning = false
@@ -507,7 +513,7 @@
         if (err.code === 'ECONNABORTED') {
           (this as any).$message.error('请求超时', 3) // 弹出错误message
         } else {
-          (this as any).$message.error('请求失败', 3) // 弹出错误message
+          (this as any).$message.error('失败', 3) // 弹出错误message
         }
         this.addOrEditModalSpinning = false
         this.resetColdsGroupsDataFun()
@@ -516,9 +522,10 @@
     resetColdsGroupsDataFun ():void { // 清空x、y轴信息
       this.modalPreData = {}
       this.yBargroup_name = []
-      this.yBarfield_name = 0
-      this.group_name = 0
-      this.field_name = []
+      this.xBargroup_name = []
+      this.yBarfield_name = ''
+      this.group_name = ''
+      this.field_name = ''
     }
     handleSearch (e: any):void { // 添加组件modal中搜索方法
       e.preventDefault()
@@ -569,6 +576,14 @@
     addOrEditModalOk ():void { // 添加or编辑组件弹窗确认事件
       (this as any).reportModalForm.validateFields((err: any, values: any) => {
         if (!err) {
+          let group_ids:string = ''
+          if (this.type === 'yBar') {
+            group_ids = this.yBargroup_name.join(',')
+          } else if (this.type === 'xBar' || this.type === 'line') {
+            group_ids = this.xBargroup_name.join(',')
+          } else {
+            group_ids = this.group_name
+          }
           if (this.addOrEditTitle === '编辑组件') {
             this.paintingReport = {
               'x': this.editData.x,
@@ -584,8 +599,8 @@
               'foot_page': this.reportFooterTitle,
               'pre_unit': this.preUnit,
               'config_details': {
-                'field_ids': values.field_name.join(),
-                'group_ids': values.group_name
+                'field_ids': this.type === 'yBar' ? this.yBarfield_name : this.field_name, // values.field_name.join(),
+                'group_ids': group_ids // values.group_name
               },
               'index': this.editData.index, // 当前编辑的数据的下标
               'editType': true // 是否是编辑判断字段
@@ -606,8 +621,8 @@
               'foot_page': this.reportFooterTitle, // 页脚
               'pre_unit': this.preUnit,
               'config_details': {
-                'field_ids': values.field_name.join(),
-                'group_ids': values.group_name
+                'field_ids': this.type === 'yBar' ? this.yBarfield_name : this.field_name, // values.field_name.join(),
+                'group_ids': group_ids // values.group_name
               }
             }
           }
@@ -621,9 +636,7 @@
       this.addOrEditVisible = false
     }
     modalImgClick (item:any, index:number) { // 点击显示方式切换方法
-      console.log(item.active)
       if (!item.active) {
-        console.log(2)
         this.modalImgToggle(item.type, index)
         this.type = item.type // 赋值选中的类型
         this.initGetChartsDataFun() // 每次改变都重新请求数据
@@ -637,7 +650,6 @@
       this.modalImg[index].active = true
     }
     XChange (value:any):void { // 添加or编辑组件弹窗 X轴change事件
-      console.log(value)
       if (value.length <= 2) {
         if (this.type === 'yBar') {
           this.yBarfield_name = value
@@ -648,7 +660,6 @@
       }
     }
     YChange (value:any):void { // 添加or编辑组件弹窗 Y轴change事件
-      console.log(value)
       if (this.type === 'yBar') {
         this.yBargroup_name = value 
       } else {
@@ -684,10 +695,18 @@
           })
         }
       } */
+      let group_ids:string = ''
+      if (this.type === 'yBar') {
+        group_ids = this.yBargroup_name.join(',')
+      } else if (this.type === 'xBar' || this.type === 'line') {
+        group_ids = this.xBargroup_name.join(',')
+      } else {
+        group_ids = this.group_name
+      }
       this.params = {
         'config_details': {
-          'group_ids': this.type === 'yBar' ? this.yBargroup_name.join(',') : this.group_name,
-          'field_ids': this.type === 'yBar' ? this.yBarfield_name : this.field_name.join(','),
+          'group_ids': group_ids,
+          'field_ids': this.type === 'yBar' ? this.yBarfield_name : this.field_name,
         },
         'type': this.type,
         'pre_unit': this.preUnit,
@@ -729,7 +748,6 @@
           }
       ]}; */
       (this as any).$post('/custom/BoardManage/boardAddSubUnit', { 'subunitData': this.editAllData }).then((res: any) => { // 请求表格数据
-        console.log(res)
         if (res.state === 2000) {
           (this as any).$message.success(res.message, 1) // 弹出错误message
           setTimeout(() => {
@@ -776,39 +794,37 @@
 
     /* 编辑操作start */
     manyIndex (item:any, id?:string):void {
-      // this.chartId = id
       if (id) {
         +id ? this.chartId = (+id + 1).toString() : this.chartId = id
       }
       this.editAllData = item
-      
       console.log(this.editAllData)
-      if (this.editAllData.length) {
-        this.boardName = this.editAllData[0].board_name
-        this.editAllData.map((v:any, i:number) => {
-          // this.x = this.x > v.x ? this.x : v.x
-          this.y += v.h
-          // this.y = this.y > v.h ? this.y : v.h // 与高度比较
-        })
-        this.x = this.editAllData[this.editAllData.length - 1].x // 获取上一个的x起点
-        let w = this.editAllData[this.editAllData.length - 1].w // 获取上一个的w宽度
-        // this.y = this.editAllData[this.editAllData.length - 1].y
-        if ((this.x + w) >= 0 && (this.x + w) <= 8) {
-          this.x = this.x + this.editAllData[this.editAllData.length - 1].w
-        } else if ((this.x + w) > 8) { // 如果大于8，则换一行
-          this.x = 0
+      setTimeout(() => {
+        console.log('length' + this.editAllData.length)
+        if (this.editAllData.length) {
+          this.boardName = this.editAllData[0].board_name
+          this.editAllData.map((v:any, i:number) => {
+            this.y += v.h
+          })
+          this.x = this.editAllData[this.editAllData.length - 1].x // 获取上一个的x起点
+          let w = this.editAllData[this.editAllData.length - 1].w // 获取上一个的w宽度
+          // this.y = this.editAllData[this.editAllData.length - 1].y
+          if ((this.x + w) >= 0 && (this.x + w) <= 8) {
+            this.x = this.x + this.editAllData[this.editAllData.length - 1].w
+          } else if ((this.x + w) > 8) { // 如果大于8，则换一行
+            this.x = 0
+          }
+          console.log('12312312312312312qweqwe')
+          console.log(this.x , this.y)
         }
-        console.log('12312312312312312qweqwe')
-        console.log(this.x , this.y)
-      }
+      }, 500);
+      
       this.$nextTick(() => {
-        console.log(document.getElementsByClassName('lpc-canvas')[0])
         let clientHeight:number = document.getElementsByClassName('lpc-canvas')[0].scrollHeight
         this.row = Math.ceil(clientHeight / 30) // 向上取整
       })
     }
     editChartData (item:any):void { // 点击图编辑按钮 子组件传递过来的当前编辑的项的数据及当前所编辑的第几个
-      console.log(item)
       this.chartEditFlag = true // 编辑判断字段
       this.addOrEditVisible = true
       this.addOrEditTitle = '编辑组件'
@@ -1013,7 +1029,6 @@
             width: 100%;
             height: 250px;
             margin-top: 8px;
-            border: 1px solid red;
           }
           .gridFooter {
             font-size: 12px;

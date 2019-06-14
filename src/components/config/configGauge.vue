@@ -34,7 +34,6 @@
     }
     @Watch('paramsData') paramsDataWatch (newVal:any, oldVal:any) {
       if (newVal && JSON.stringify(newVal) !== '{}') {
-        console.log(newVal)
         let params:any = {
           'report_id': newVal.selected_rows.report_id,
           'type': newVal.type,
@@ -73,7 +72,7 @@
     }
 
     initEchartsFun (seriesData:Array<any>) {
-      console.log(seriesData) //[{value: 50, name: '完成率'}]
+      console.log(seriesData) // [{value: 50, name: '完成率'}]
       this.myChart = echarts.init(this.$refs.map as HTMLDivElement)
       this.myChart.clear()
       this.option = {

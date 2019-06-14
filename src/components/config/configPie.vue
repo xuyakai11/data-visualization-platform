@@ -77,7 +77,7 @@
         title: {
           // x: 'center',
           left: '30%', // 位置
-          text: 'yname',
+          // text: 'yname',
           textStyle: {
             fontSize: '10',
             color: '#16325c'

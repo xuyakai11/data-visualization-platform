@@ -54,8 +54,6 @@
   
   columns: Array<object> = [ // 定义表格表头
     {title: '仪表盘名称', dataIndex: 'board_name'}, // fixed: 'left' 设置是否固定
-    {title: '数据源名称', dataIndex: 'resource_name'},
-    {title: '报表名称', dataIndex: 'report_name'},
     {title: '操作', dataIndex: '', width: '40%', scopedSlots: { customRender: 'action'}} // scopedSlots配置操作列
   ]
   data: Array<object> = [] // 定义表格内容

@@ -190,7 +190,7 @@
               fontSize: 10
             }
           },
-          name: 'mmp',
+          // name: 'mmp',
           nameGap: 25, // 距离坐标轴位置
           nameLocation: 'middle',
           nameTextStyle: {
@@ -212,7 +212,7 @@
               fontSize: 10
             }
           },
-          name: 'mmp',
+          // name: 'mmp',
           nameGap: 35, // 距离坐标轴位置
           nameLocation: 'middle',
           nameTextStyle: {
