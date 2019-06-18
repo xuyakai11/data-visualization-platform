@@ -42,7 +42,6 @@
       { 'name': '定金', 'value': 234 },
       { 'name': '订单', 'value': 566 }
     ] */
-
     seriesData:Array<any> = []
     legendData:Array<string> = []
     seriesLabel:any = {
@@ -57,6 +56,9 @@
     preUnit:string = '' // 单位
     chartData:Array<any> = []
     dataZoom:Array<any> = [] // 滚动轴
+    group_label:string = ''
+    field_label:string = ''
+
     // 监听styles 是因为如果其变化则显示验证公式按钮 deep: true, immediate: true
     @Watch('styles') patintingWatch (newVal:any, oldVal:any) {
       if (newVal && JSON.stringify(newVal) !== '{}') {
@@ -80,6 +82,8 @@
           'field_id': newVal.config_details.field_ids,
           'pre_unit': newVal.pre_unit.key
         }
+        this.group_label = this.paramsData.group_label
+        this.field_label = this.paramsData.field_label // 赋值x轴y轴标识
         this.preUnit = newVal.pre_unit.label // 赋值单位文字
         this.initGetChartsDataFun(params)
       }
@@ -93,6 +97,8 @@
           'field_id': this.paramsData.config_details.field_ids,
           'pre_unit': this.paramsData.pre_unit.key
         }
+        this.group_label = this.paramsData.group_label
+        this.field_label = this.paramsData.field_label // 赋值x轴y轴标识
         this.preUnit = this.paramsData.pre_unit.label // 赋值单位文字
         this.initGetChartsDataFun(params)
       }
@@ -103,6 +109,8 @@
         if (res.state === 2000) {
           this.chartData = res.data
           if (res.data.length || JSON.stringify(res.data) !== '{}') {
+            this.legendData = []
+            this.seriesData = []
             if (res.data.legendData && res.data.seriesData) {
               this.legendData = res.data.legendData
               this.seriesData = res.data.seriesData
@@ -136,7 +144,7 @@
                 return a.value - b.value
               })
               this.chartData.map((v:any, i:number) => {
-                if (v.value > 0) {
+                if (v.value >= 0) {
                   // this.seriesData.push({ name: v.name, value: v.value })
                   this.legendData.push(v.name)
                 }
@@ -181,9 +189,17 @@
         tooltip: { // 鼠标悬浮时，提示tooltip位置
           trigger: 'axis',
           // formatter: '{b} : {c}',
-          position: 'right', // ['50%', '50%']
+           // position: 'right', // ['50%', '50%']
           axisPointer: {
             type: 'shadow'
+          },
+          position: function (point:Array<any>, params:any, dom:HTMLElement, rect:any, size:any) {
+            // 鼠标在左侧时 tooltip 显示到右侧，鼠标在右侧时 tooltip 显示到左侧。
+            /* var obj:any = {top: 60};
+            obj[['left', 'right'][+(point[0] < size.viewSize[0] / 2)]] = 5;
+            return obj; */
+            // 固定在顶部
+            return [point[0], '1%'];
           }
         },
         calculable: true,
@@ -208,7 +224,7 @@
               fontSize: 10
             }
           },
-          // name: '人均收入123',
+          name: this.group_label,
           nameGap: 25, // 距离坐标轴位置
           nameLocation: 'middle',
           nameTextStyle: {
@@ -219,9 +235,9 @@
         },
         yAxis: {
           type: 'value',
-          // name: '人均收入',
+          name: this.field_label,
           nameGap: 39,
-          nameLocation: 'middle',
+          // nameLocation: 'middle',
           nameTextStyle: {
             fontSize: '10',
             color: '#16325c',

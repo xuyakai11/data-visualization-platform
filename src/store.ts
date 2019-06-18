@@ -18,7 +18,7 @@ export default new Vuex.Store({
     changeOpenKeys (state, data) {
       if (data) {
         sessionStorage.setItem('openKeys', data.openKeys)
-      } else { 
+      } else {
         state.openKeys = sessionStorage.getItem('openKeys') || '';
       }
     },

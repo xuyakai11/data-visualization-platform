@@ -1,7 +1,7 @@
 <template>
   <div class="config">
     <div class="map" ref="map">
-      <count-to ref="totalIncomeMoney" v-if="JSON.stringify(chartData) !== '{}'" :separator="''" :suffix="preUnit" :autoplay="true" :startVal="0" :endVal="chartData.value" :duration="500"></count-to>
+      <count-to ref="totalIncomeMoney" v-if="JSON.stringify(chartData) !== '{}'" :separator="','" :decimals="+chartData.value | decimalsFilter" :suffix="preUnit" :autoplay="true" :startVal="0" :endVal="+chartData.value" :duration="500"></count-to>
     </div>
   </div>
 </template>
@@ -9,9 +9,18 @@
 <script lang='ts'>
   import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
   import countTo from 'vue-count-to'
-  
+
   @Component({
-    components: { countTo }
+    components: { countTo },
+    filters: { // 注册过滤器
+      decimalsFilter (value:any):number { // 过滤保留几位小数
+        if (value.toString().indexOf('.') !== -1) {
+          return 1
+        } else {
+          return 0
+        }
+      }
+    }
   })
 
   export default class configNumber extends Vue {
@@ -34,7 +43,7 @@
       { key: 'whole', unit: ''},
       { key: 'hundres', unit: 'H'},
       { key: 'thousands', unit: 'K'},
-      { key: 'mmillions', unit: 'M'},
+      { key: 'millions', unit: 'M'},
       { key: 'billions', unit: 'B'}
     ]
     /* @Watch('styles') patintingWatch (newVal:any, oldVal:any) {
@@ -64,7 +73,6 @@
       }
     }
     mounted () {
-      console.log(this.paramsData)
       if (JSON.stringify(this.paramsData) !== '{}') {
         let params:any = {
           'report_id': this.paramsData.selected_rows.report_id,
@@ -73,18 +81,12 @@
           'field_id': this.paramsData.config_details.field_ids,
           'pre_unit': this.paramsData.pre_unit.key
         }
-       /*  let params:any = {
-          'report_id': 130, //newVal.selected_rows.report_id,
-          'type': this.paramsData.type,
-          'group_id': 21, // newVal.config_details.group_ids,
-          'field_id': 30, // newVal.config_details.field_ids,
-          'pre_unit': this.paramsData.pre_unit.key
-        } */
         this.preUnit = this.paramsData.pre_unit.label // 赋值单位文字
         this.initGetChartsDataFun(params)
       }
     }
     initGetChartsDataFun (params:any):void { // { 'report_id': 123, 'type': 'xBar', 'group_id': '9,12', 'field_id': '5', 'pre_unit': 'whole' }?report_id=130&type=xBar&group_id=21,22&field_id=30&pre_unit=whole
+      this.chartData = {}
       let _this = this;
       (this as any).$post('/custom/boardManage/generateBoardData', params).then((res: any) => {
         if (res.state === 2000) {

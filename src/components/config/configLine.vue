@@ -1,6 +1,5 @@
 <template>
   <div class="config"> <!-- 饼图 -->
-    <!-- <p>{{title}}</p> -->
     <div class="map" ref="map">暂无数据</div>
   </div>
 </template>
@@ -32,6 +31,8 @@
     legendData:Array<string> = []
     preUnit:string = '' // 单位
     dataZoom:Array<any> = []
+    group_label:string = ''
+    field_label:string = ''
     @Watch('styles') patintingWatch (newVal:any, oldVal:any) {
       if (newVal && JSON.stringify(newVal) !== '{}') {
         this.$nextTick(() => {
@@ -45,7 +46,6 @@
     }
     @Watch('paramsData') paramsDataWatch (newVal:any, oldVal:any) {
       if (newVal && JSON.stringify(newVal) !== '{}') {
-        console.log(newVal)
         let params:any = {
           'report_id': newVal.selected_rows.report_id,
           'type': newVal.type,
@@ -53,13 +53,13 @@
           'field_id': newVal.config_details.field_ids,
           'pre_unit': newVal.pre_unit.key
         }
-        console.log(params)
+        this.group_label = this.paramsData.group_label
+        this.field_label = this.paramsData.field_label // 赋值x轴y轴标识
         // this.preUnit = newVal.pre_unit.label // 赋值单位文字
         this.initGetChartsDataFun(params)
       }
     }
     mounted () {
-      console.log(this.paramsData)
       if (JSON.stringify(this.paramsData) !== '{}') {
         let params:any = {
           'report_id': this.paramsData.selected_rows.report_id,
@@ -68,30 +68,20 @@
           'field_id': this.paramsData.config_details.field_ids,
           'pre_unit': this.paramsData.pre_unit.key
         }
+        this.group_label = this.paramsData.group_label
+        this.field_label = this.paramsData.field_label // 赋值x轴y轴标识
         this.preUnit = this.paramsData.pre_unit.label // 赋值单位文字
         this.initGetChartsDataFun(params)
       }
     }
-    /* mounted () {
-      this.chartData.sort((a:any, b:any) => {
-        return a.value - b.value
-      })
-      this.chartData.map((v:any, i:number) => {
-        if (v.value > 0) {
-          this.seriesData.push({ name: v.name, value: v.value })
-          this.legendData.push(v.name)
-        }
-      })
-      this.$nextTick(() => {
-        this.initEchartsFun(this.seriesData, this.legendData)
-      })
-    } */
     initGetChartsDataFun (params:any):void { // { 'report_id': 123, 'type': 'xBar', 'group_id': '9,12', 'field_id': '5', 'pre_unit': 'whole' }?report_id=130&type=xBar&group_id=21,22&field_id=30&pre_unit=whole
       let _this = this;
       (this as any).$post('/custom/boardManage/generateBoardData', params).then((res: any) => {
         if (res.state === 2000) {
           this.chartData = res.data
           if (res.data.length || JSON.stringify(res.data) !== '{}') {
+            this.legendData = []
+            this.seriesData = []
             if (res.data.legendData && res.data.seriesData) {
               this.legendData = res.data.legendData
               this.seriesData = res.data.seriesData
@@ -133,12 +123,9 @@
               this.dataZoom = []
               this.seriesData = [{ type: 'line', data: danLineArr }]
             }
-            // _this.$nextTick(() => {
-              setTimeout(() => {
-                _this.initEchartsFun(this.legendData, this.seriesData)
-              }, 500);
-              
-            // })
+            setTimeout(() => {
+              _this.initEchartsFun(this.legendData, this.seriesData)
+            }, 500)
           }
         } else {
           (this as any).$message.error(res.message, 3) // 弹出错误message
@@ -160,7 +147,10 @@
         },
         tooltip: {
           trigger: 'axis',
-          position: 'right'
+          position: function (point:Array<any>, params:any, dom:HTMLElement, rect:any, size:any) {
+            // 固定在顶部
+            return [point[0]-20, '1%'];
+          }
         },
         /* legend: {
           data: legendData // ['语陪', '活动', '咨询', '定金', '订单', '垃圾', '无聊']
@@ -172,15 +162,16 @@
           top: 10,
           bottom: 38,
           left: 50,
-          right: 20,
-          containLabel: true
+          right: 20
         },
+        containLabel: true,
         toolbox: {
           // feature: { 配置下载按钮
           //   saveAsImage: {}
           // }
         },
         xAxis: {
+          name: this.group_label,
           type: 'category',
           boundaryGap: false, // 配置从间隔是否中间开始，坐标轴两边留白策略
           axisTick: { // 分隔x轴下方小刻度线
@@ -189,6 +180,8 @@
           data: legendData // ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
         },
         yAxis: {
+          name: this.field_label,
+          nameGap: 25,
           type: 'value',
           axisTick: { // 分隔x轴下方小刻度线
             show: false

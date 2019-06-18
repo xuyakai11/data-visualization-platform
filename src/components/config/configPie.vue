@@ -31,7 +31,8 @@
 
     seriesData:Array<any> = []
     legendData:Array<string> = []
-    
+    group_label:string = ''
+    field_label:string = ''
     @Watch('styles') patintingWatch (newVal:any, oldVal:any) {
       if (newVal && JSON.stringify(newVal) !== '{}') {
         this.$nextTick(() => {
@@ -52,6 +53,8 @@
           'field_id': newVal.config_details.field_ids,
           'pre_unit': newVal.pre_unit.key
         }
+        this.group_label = this.paramsData.group_label
+        this.field_label = this.paramsData.field_label // 赋值x轴y轴标识
         this.preUnit = newVal.pre_unit.label // 赋值单位文字
         this.initGetChartsDataFun(params)
       }
@@ -71,21 +74,19 @@
           'field_id': this.paramsData.config_details.field_ids,
           'pre_unit': this.paramsData.pre_unit.key
         }
+        this.group_label = this.paramsData.group_label
+        this.field_label = this.paramsData.field_label // 赋值x轴y轴标识
         this.preUnit = this.paramsData.pre_unit.label // 赋值单位文字
         this.initGetChartsDataFun(params)
       }
-      /* this.$nextTick(() => {
-        this.initEchartsFun(this.seriesData, this.legendData)
-      })
-      setTimeout(() => {
-        this.myChart.resize()
-      }, 1000) */
     }
     initGetChartsDataFun (params:any):void { // { 'report_id': 123, 'type': 'xBar', 'group_id': '9,12', 'field_id': '5', 'pre_unit': 'whole' }?report_id=130&type=xBar&group_id=21,22&field_id=30&pre_unit=whole
       let _this = this;
       (this as any).$post('/custom/boardManage/generateBoardData', params).then((res: any) => {
         if (res.state === 2000) {
           this.chartData = res.data
+          this.legendData = []
+          this.seriesData = []
           if (res.data.length) {
             this.chartData.map((v:any, i:number) => {
               if (v.value > 0) {

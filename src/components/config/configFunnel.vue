@@ -30,7 +30,8 @@
 
     seriesData:Array<any> = []
     legendData:Array<string> = []
-
+    group_label:string = ''
+    field_label:string = ''
     @Watch('styles') patintingWatch (newVal:any, oldVal:any) {
       if (newVal && JSON.stringify(newVal) !== '{}') {
         this.$nextTick(() => {
@@ -51,20 +52,13 @@
           'field_id': newVal.config_details.field_ids,
           'pre_unit': newVal.pre_unit.key
         }
+        this.group_label = this.paramsData.group_label
+        this.field_label = this.paramsData.field_label // 赋值x轴y轴标识
         this.preUnit = newVal.pre_unit.label // 赋值单位文字
         this.initGetChartsDataFun(params)
       }
     }
     mounted () {
-      /* this.chartData.sort((a:any, b:any) => {
-        return a.value - b.value
-      })
-      this.chartData.map((v:any, i:number) => {
-        if (v.value > 0) {
-          this.seriesData.push({ name: v.name, value: v.value })
-          this.legendData.push(v.name)
-        }
-      }) */
       if (JSON.stringify(this.paramsData) !== '{}') {
         let params:any = {
           'report_id': this.paramsData.selected_rows.report_id,
@@ -73,6 +67,8 @@
           'field_id': this.paramsData.config_details.field_ids,
           'pre_unit': this.paramsData.pre_unit.key
         }
+        this.group_label = this.paramsData.group_label
+        this.field_label = this.paramsData.field_label // 赋值x轴y轴标识
         this.preUnit = this.paramsData.pre_unit.label // 赋值单位文字
         this.initGetChartsDataFun(params)
       }
@@ -172,13 +168,15 @@
       (this as any).$post('/custom/boardManage/generateBoardData', params).then((res: any) => {
         if (res.state === 2000) {
           this.chartData = res.data
+          this.legendData = []
+          this.seriesData = []
           if (res.data.length) {
             this.chartData.map((v:any, i:number) => {
-                if (v.value > 0) {
-                  this.seriesData.push({ name: v.name, value: v.value })
-                  this.legendData.push(v.name)
-                }
-              }) 
+              if (v.value > 0) {
+                this.seriesData.push({ name: v.name, value: v.value })
+                this.legendData.push(v.name)
+              }
+            }) 
             _this.$nextTick(() => {
               _this.initEchartsFun(this.legendData, this.seriesData)
             })

@@ -37,6 +37,8 @@
     seriesData:Array<any> = []
     legendData:Array<string> = []
     dataZoom:Array<any> = [] // 滚动轴配置
+    group_label:string = ''
+    field_label:string = ''
     @Watch('styles') patintingWatch (newVal:any, oldVal:any) {
       if (newVal && JSON.stringify(newVal) !== '{}') {
         this.$nextTick(() => {
@@ -58,12 +60,13 @@
           'field_id': newVal.config_details.field_ids,
           'pre_unit': newVal.pre_unit.key
         }
+        this.group_label = this.paramsData.group_label
+        this.field_label = this.paramsData.field_label // 赋值x轴y轴标识
         this.preUnit = newVal.pre_unit.label // 赋值单位文字
         this.initGetChartsDataFun(params)
       }
     }
     mounted () {
-      console.log(this.paramsData)
       if (JSON.stringify(this.paramsData) !== '{}') {
         let params:any = {
           'report_id': this.paramsData.selected_rows.report_id,
@@ -72,6 +75,8 @@
           'field_id': this.paramsData.config_details.field_ids,
           'pre_unit': this.paramsData.pre_unit.key
         }
+        this.group_label = this.paramsData.group_label
+        this.field_label = this.paramsData.field_label // 赋值x轴y轴标识
         this.preUnit = this.paramsData.pre_unit.label // 赋值单位文字
         this.initGetChartsDataFun(params)
       }
@@ -82,6 +87,8 @@
         if (res.state === 2000) {
           this.chartData = res.data
           if (res.data.length || JSON.stringify(res.data) !== '{}') {
+            this.legendData = []
+            this.seriesData = []
             if (res.data.legendData && res.data.seriesData) {
               this.legendData = res.data.legendData
               this.seriesData = res.data.seriesData
@@ -162,7 +169,10 @@
           axisPointer: { // 配置鼠标悬浮阴影
             type: 'shadow'
           },
-          position: 'right' // ['50%', '50%']
+          position: function (point:Array<any>, params:any, dom:HTMLElement, rect:any, size:any) {
+            // 固定在顶部
+            return [point[0], '1%'];
+          }
         },
         calculable: true,
         grid: {
@@ -190,7 +200,7 @@
               fontSize: 10
             }
           },
-          // name: 'mmp',
+          name: this.group_label,
           nameGap: 25, // 距离坐标轴位置
           nameLocation: 'middle',
           nameTextStyle: {
@@ -212,9 +222,9 @@
               fontSize: 10
             }
           },
-          // name: 'mmp',
-          nameGap: 35, // 距离坐标轴位置
-          nameLocation: 'middle',
+          name: this.field_label,
+          nameGap: 40, // 距离坐标轴位置
+          // nameLocation: 'middle',
           nameTextStyle: {
             fontSize: '10',
             color: '#16325c'

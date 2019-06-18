@@ -5,7 +5,7 @@
         <div class="header-left">
           <a-input ref="boardName" v-if="boardNameEdit" :value="boardName" @change="e => boardNameEditFun(e.target.value)" style="width: 200px;"/>
           <template v-else>{{boardName}}</template>
-          <div v-if="!boardNameEdit" class="header-icon">
+          <div v-if="!boardNameEdit" v-show="viewType !== 'look'" class="header-icon">
             <a-icon type="edit" @click="editBoardName"></a-icon>
           </div>
           <div v-else class="header-icon">
@@ -140,15 +140,18 @@
                   <a-select
                     @change="YChange"
                     mode="multiple"
-                    v-decorator="['field_name', { initialValue: yBargroup_name, rules: [{ required: true, message: '请选择字段键名' }]}]"
+                    v-decorator="['field_name', { initialValue: yBargroup_name, rules: [{ required: true, min:1, max:2, type:'array', message: '请至少选择1项至多选择2项字段键名' }]}]"
                   >
+                    <a-select-option value="create">创建人</a-select-option>
+                    <a-select-option value="create2">创建人2</a-select-option>
+                    <a-select-option value="create3">创建人3</a-select-option>
                     <a-select-option v-if="JSON.stringify(modalPreData) !== '{}'" v-for="(item, index) in modalPreData.x" :value="item.group_id">{{ item.group_title_name }}</a-select-option>
                   </a-select>
                 </a-form-item>
                 <a-form-item label="X轴">
                   <a-select
                     @change="XChange"
-                    v-decorator="['group_name', {initialValue: yBarfield_name, rules: [{ required: true, message: '请选择纬度键名' }]}]"
+                    v-decorator="['group_name', { initialValue: yBarfield_name, rules: [{ required: true, message: '请选择纬度键名' }]}]"
                   > <!-- labelInValue -->
                     <a-select-option v-for="(item, index) in modalPreData.y" :value="item.field_id">{{ item.col_title }}</a-select-option>
                   </a-select>
@@ -159,17 +162,19 @@
                   <a-select
                     @change="XChange"
                     mode="multiple"
-                    v-decorator="['group_name', { initialValue: xBargroup_name, rules: [{ required: true, message: '请选择纬度键名' }]}]"
+                    v-decorator="['group_name', { initialValue: xBargroup_name, rules: [{ required: true, min:1, max: 2, message: '请至少选择1项至多选择2项纬度键名', type:'array' }]}]"
                   >
-                    <!-- <a-select-option value="create">创建人</a-select-option> -->
                     <a-select-option v-if="JSON.stringify(modalPreData) !== '{}'" v-for="(item, index) in modalPreData.x" :value="item.group_id">{{ item.group_title_name }}</a-select-option>
                   </a-select>
                 </a-form-item>
                 <a-form-item label="Y轴">
                   <a-select
                     @change="YChange"
-                    v-decorator="['field_name', {initialValue: field_name, rules: [{ required: true, message: '请选择字段键名' }]}]"
+                    v-decorator="['field_name', { initialValue: field_name, rules: [{ required: true, message: '请选择字段键名' }]}]"
                   >
+                  <a-select-option value="create">创建人</a-select-option>
+                    <a-select-option value="create2">创建人2</a-select-option>
+                    <a-select-option value="create3">创建人3</a-select-option>
                     <a-select-option v-if="JSON.stringify(modalPreData) !== '{}'" v-for="(item, index) in modalPreData.y" :value="item.field_id">{{ item.col_title }}</a-select-option>
                   </a-select>
                 </a-form-item>
@@ -231,11 +236,11 @@
                 <a-input placeholder="标题" @change="reportTitleChange($event, 'title')" v-decorator="[ 'reportTitle', { initialValue: reportTitle, rules: [{ required: true, message: '请填写标题' }]}]"/>
               </a-form-item>
               <a-form-item label="副标题">
-                <a-input placeholder="副标题" @change="reportTitleChange($event, 'vice')" v-decorator="[ 'reportViceTitle', { initialValue: reportViceTitle, rules: [{ required: true, message: '请填写副标题' }]}]"/>
+                <a-input placeholder="副标题" @change="reportTitleChange($event, 'vice')" v-decorator="[ 'reportViceTitle', { initialValue: reportViceTitle, rules: [{ required: false, message: '请填写副标题' }]}]"/>
               </a-form-item>
-              <a-form-item label="页脚">
+              <!-- <a-form-item label="页脚">
                 <a-input placeholder="页脚" @change="reportTitleChange($event, 'footer')" v-decorator="[ 'reportFooterTitle', { initialValue: reportFooterTitle, rules: [{ required: true, message: '请填写页脚名称' }]}]"/>
-              </a-form-item>
+              </a-form-item> -->
             </a-form>
           </a-spin>
         </aside>
@@ -262,7 +267,7 @@
               </div>
               <div class="gridFooter">
                 <div class="truncation">
-                  <span>查看报表({{ reportFooterTitle}})</span>
+                  <span>查看报表</span><!-- ({{ reportFooterTitle}}) -->
                 </div>
               </div>
             </article>
@@ -304,6 +309,7 @@
     cancelBoardNameFlag:string = '' // 用于取消还原修改
     visible:boolean = false // 抽屉
     row:number = 0
+    rowFlag:number = 0
     columns: Array<object> = [ // 定义表格表头
       { title: '报表名称', dataIndex: 'report_name' }, // fixed: 'left' 设置是否固定
       { title: '报表数据源名称', dataIndex: 'report_resource_name' },
@@ -331,6 +337,8 @@
     group_name:any = ''
     xBargroup_name:Array<any> = []
     field_name:any = ''
+    group_label:string = '' // 横坐标标示文字
+    field_label:string = '' // 纵坐标标示文字
 
     preUnit:any = { key: 'whole', label: '全数字' } // 单位
 
@@ -354,7 +362,7 @@
 
     paintingReport:any = {}
     chartId:string = '0' // 添加的每个内容的id
-    
+
     x:number = 0
     y:number = 0 // 新增时用到的起始坐标
     chartEditFlag:boolean = false // 编辑判断字段
@@ -383,6 +391,7 @@
     mounted () {
       let clientHeight:number = document.body.offsetHeight - 49
       this.row = Math.ceil(clientHeight / 38) // 向上取整
+      this.rowFlag = this.row // 固定标识
       // window.onresize = () => {
       //   let clientHeight:any = document.body.offsetHeight - 49
       //   console.log(clientHeight / 30);
@@ -440,6 +449,7 @@
       this.getColsAndGroupsFun() // 获取前置下拉框内容
     }
     getImgToggleFun ():void { // 第一步弹窗确认，根据报表id查询当前有哪些图支持该表
+      this.addOrEditModalSpinning = true;
       (this as any).$post('/custom/BoardManage/checkReportChart', { 'report_id': this.addReportId.join() }).then((res: any) => { // 请求表格数据
         if (res.state === 2000) {
           this.addOrEditModalSpinning = false
@@ -486,6 +496,7 @@
       })
     }
     getColsAndGroupsFun ():void { // 第一步弹窗确认，根据报表id查询x轴y轴下拉框数据方法
+      this.addOrEditModalSpinning = true;
       (this as any).$post('/custom/BoardManage/getColsAndGroups', { 'report_id': this.addReportId.join() }).then((res: any) => { // 请求表格数据
         if (res.state === 2000) {
           this.addOrEditModalSpinning = false
@@ -496,10 +507,12 @@
             this.group_name = res.data.x[0].group_id // 单个的
             this.xBargroup_name.push(res.data.x[0].group_id) // 多选的
             this.yBargroup_name.push(res.data.x[0].group_id) // 多选的
+            this.group_label = res.data.x[0].group_title_name // 默认第一个
           }
           if (res.data.y.length) { // 判断该字段是否存在
             this.yBarfield_name = res.data.y[0].field_id
             this.field_name = res.data.y[0].field_id
+            this.field_label = res.data.y[0].col_title // 默认第一个
             // this.yBarfield_name = { key: `'${res.data.y[0].group_id}'`, label: res.data.y[0].group_title_name }
             // this.group_name = { key: `'${res.data.y[0].group_id}'`, label: res.data.y[0].group_title_name }
           }
@@ -593,6 +606,8 @@
               'w': this.editData.w,
               'h': this.editData.h,
               'i': this.editData.i,
+              'group_label': this.group_label,
+              'field_label': this.field_label,
               'selected_rows': this.editData.selected_rows,
               'main_board_title': this.reportTitle,
               'board_name': this.boardName,
@@ -615,6 +630,8 @@
               'w': 4,
               'h': 8,
               'i': this.chartId,
+              'group_label': this.group_label,
+              'field_label': this.field_label,
               'selected_rows': this.selectedRows,
               'main_board_title': this.reportTitle, // 标题
               'board_name': this.boardName, // 仪表盘名称
@@ -649,18 +666,23 @@
         this.yBarfield_name = ''
         this.group_name = ''
         this.field_name = ''
-        if (this.modalPreData.x.length) {
-          this.group_name = this.modalPreData.x[0].group_id // 单个的
-          this.xBargroup_name.push(this.modalPreData.x[0].group_id) // 多选的
-          this.yBargroup_name.push(this.modalPreData.x[0].group_id) // 多选的
-        }
-        if (this.modalPreData.y.length) { // 判断该字段是否存在
-          this.yBarfield_name = this.modalPreData.y[0].field_id
-          this.field_name = this.modalPreData.y[0].field_id
-          // this.yBarfield_name = { key: `'${res.data.y[0].group_id}'`, label: res.data.y[0].group_title_name }
-          // this.group_name = { key: `'${res.data.y[0].group_id}'`, label: res.data.y[0].group_title_name }
-        }
-        this.initGetChartsDataFun() // 每次改变都重新请求数据
+        this.$nextTick(() => { // 等渲染完再赋值，
+          if (this.modalPreData.x.length) {
+            this.group_name = this.modalPreData.x[0].group_id // 单个的
+            this.xBargroup_name.push(this.modalPreData.x[0].group_id) // 多选的
+            this.yBargroup_name.push(this.modalPreData.x[0].group_id) // 多选的
+            this.group_label = this.modalPreData.x[0].group_title_name // 默认第一个
+          }
+          if (this.modalPreData.y.length) { // 判断该字段是否存在
+            this.yBarfield_name = this.modalPreData.y[0].field_id
+            this.field_name = this.modalPreData.y[0].field_id
+            this.field_label = this.modalPreData.y[0].col_title // 默认第一个
+            // this.yBarfield_name = { key: `'${res.data.y[0].group_id}'`, label: res.data.y[0].group_title_name }
+            // this.group_name = { key: `'${res.data.y[0].group_id}'`, label: res.data.y[0].group_title_name }
+          }
+          this.initGetChartsDataFun() // 每次改变都重新请求数据
+        })
+       
       }
     }
     modalImgToggle (type:string, index:number):void { // 添加or编辑组件弹窗 显示方式img切换事件
@@ -671,24 +693,67 @@
       this.modalImg[index].active = true
     }
     XChange (value:any):void { // 添加or编辑组件弹窗 X轴change事件
+      this.group_label = '' // 先将其重置为空
+      let arr:Array<number> = []
+      value instanceof Array ? arr = value : arr = Array.of(value) // 判断是否是数组，不是则转为数组
       if (value.length <= 2) {
         if (this.type === 'yBar') {
           this.yBarfield_name = value
+          this.modalPreData.y.map((v:any, i:number) => {
+            for (let index in arr) {
+              if (arr[index] === v.field_id) {
+                this.group_label += v.col_title + ' '
+              }
+            }
+          })
         } else if (this.type === 'xBar' || this.type === 'line'){
           this.xBargroup_name = value
+          this.modalPreData.x.map((v:any, i:number) => {
+            for (let index in arr) {
+              if (arr[index] === v.group_id) {
+                this.group_label += v.group_title_name + ' '
+              }
+            }
+          })
         } else {
           this.group_name = value
+          this.modalPreData.x.map((v:any, i:number) => {
+            for (let index in arr) {
+              if (arr[index] === v.group_id) {
+                this.group_label += v.group_title_name + ' '
+              }
+            }
+          })
         }
         this.initGetChartsDataFun() // 每次改变都重新请求数据
       }
     }
     YChange (value:any):void { // 添加or编辑组件弹窗 Y轴change事件
-      if (this.type === 'yBar') {
-        this.yBargroup_name = value
-      } else {
-        this.field_name = value
+      this.field_label = ''
+      let arr:Array<number> = []
+      value instanceof Array ? arr = value : arr= Array.of(value) // 判断是否是数组，不是则转为数组
+      if (value.length <= 2) {
+        if (this.type === 'yBar') {
+          this.yBargroup_name = value
+          this.modalPreData.x.map((v:any, i:number) => {
+            for (let index in arr) {
+              if (arr[index] === v.group_id) {
+                this.field_label += v.group_title_name + ' '
+              }
+            }
+          })
+        } else {
+          this.field_name = value
+          this.modalPreData.y.map((v:any, i:number) => {
+            for (let index in arr) {
+              if (arr[index] === v.field_id) {
+                this.field_label += v.col_title + ' '
+              }
+            }
+          })
+        }
+        this.initGetChartsDataFun() // 每次改变都重新请求数据
       }
-      this.initGetChartsDataFun() // 每次改变都重新请求数据
     }
     unitChange (value:any):void { // // 添加or编辑组件弹窗 单位change事件
       this.preUnit = value
@@ -704,19 +769,6 @@
       }
     }
     initGetChartsDataFun ():void { // 获取图表数据方法
-      /* let group_names:string = ''
-      let field_names:string = ''
-      if (this.type === 'yBar') {
-        this.modalPreData.x.map((v:any, i:number) => {
-          
-        })
-      } else {
-        if (this.modalPreData.y) {
-          this.modalPreData.y.map((v:any, i:number) => {
-          
-          })
-        }
-      } */
       let group_ids:string = ''
       if (this.type === 'yBar') {
         group_ids = this.yBargroup_name.join(',')
@@ -733,7 +785,9 @@
         },
         'type': this.type,
         'pre_unit': this.preUnit,
-        'selected_rows': this.selectedRows
+        'selected_rows': this.selectedRows,
+        'field_label': this.field_label,
+        'group_label': this.group_label
       }
       // console.log(this.params)
     }
@@ -744,32 +798,7 @@
           v.board_id = board_id
           v.board_name = this.boardName
         })
-      }
-      /* let params = {"subunitData":[
-          {
-              "x":1,
-              "y":2,
-              "selected_rows":{
-                  "report_id":125,
-                  "report_name":"报表明",
-                  "report_resource_name":"数据源",
-                  "main_table_name":"学员表"
-              },
-              "board_name":"仪表盘盘名",
-              "board_title":2,
-              "type":"xBar",
-              "foot_page":3,
-              "pre_unit":{
-                  "key":"whole",
-                  "label":"全数字"
-              },
-              "config_details":{
-                  "field_ids":"23",
-                  "group_ids":"7,1"
-              },
-              "moved":"12"
-          }
-      ]}; */
+      };
       (this as any).$post('/custom/BoardManage/boardAddSubUnit', { 'subunitData': this.editAllData }).then((res: any) => { // 请求表格数据
         if (res.state === 2000) {
           (this as any).$message.success(res.message, 1) // 弹出错误message
@@ -808,7 +837,6 @@
     }
     saveEditBoardName ():void { // 保存修改
       this.boardNameEdit = false
-      console.log(this.boardName)
     }
     cancelEditBoardName ():void { // 取消还原修改
       this.boardNameEdit = false
@@ -824,11 +852,12 @@
       this.editAllData = item
       console.log(this.editAllData)
       setTimeout(() => {
-        console.log('length' + this.editAllData.length)
+        this.y = 0
         if (this.editAllData.length) {
           this.boardName = this.editAllData[0].board_name
           this.editAllData.map((v:any, i:number) => {
             this.y += v.h
+            this.chartId = (Number(this.chartId) + 1).toString()
           })
           this.x = this.editAllData[this.editAllData.length - 1].x // 获取上一个的x起点
           let w = this.editAllData[this.editAllData.length - 1].w // 获取上一个的w宽度
@@ -838,20 +867,20 @@
           } else if ((this.x + w) > 8) { // 如果大于8，则换一行
             this.x = 0
           }
-          console.log('12312312312312312qweqwe')
-          console.log(this.x , this.y)
         }
-      }, 500);
-      
-      this.$nextTick(() => {
-        let clientHeight:number = document.getElementsByClassName('lpc-canvas')[0].scrollHeight
-        this.row = Math.ceil(clientHeight / 30) // 向上取整
-      })
+        const rowHeight:number = this.editAllData[this.editAllData.length - 1].y + this.editAllData[this.editAllData.length - 1].h // row的数量
+        this.$nextTick(() => {
+          // let clientHeight:number = document.getElementsByClassName('lpc-canvas')[0].scrollHeight
+          rowHeight + 1 > this.rowFlag ? this.row = rowHeight + 1 : '' // 如果大于当前body的计算所得row则替代，小于则不变
+          // this.row = rowHeight + 1 // Math.ceil(clientHeight / 30) // 向上取整
+        })
+      }, 500)
     }
     editChartData (item:any):void { // 点击图编辑按钮 子组件传递过来的当前编辑的项的数据及当前所编辑的第几个
       this.chartEditFlag = true // 编辑判断字段
       this.addOrEditVisible = true
       this.addOrEditTitle = '编辑组件'
+      this.addOrEditModalSpinning = true
       this.editData = item // 保存当前编辑的数据
       // this.type = 'xBar' // 选中的图表类型 默认为xBar
       this.modalImg.map((v:any, i:number) => {
@@ -859,14 +888,46 @@
           this.modalImgToggle(item.type, i) // 选中回显
         }
       })
+      this.group_label = item.group_label
+      this.field_label = item.field_label // label回显
+      this.selectedRows = item.selected_rows
       this.reportTitle = item.main_board_title // 报表标题
       this.reportViceTitle = item.board_title // 报表副标题
       this.reportFooterTitle = item.foot_page; // 报表页脚
-      (this as any).reportModalForm.resetFields() // 重置验证
+      (this as any).reportModalForm.resetFields(); // 重置验证
       // console.log(this.type)
-      setTimeout(() => {
+      (this as any).$post('/custom/BoardManage/getColsAndGroups', { 'report_id': item.selected_rows.report_id }).then((res: any) => { // 请求表格数据
+        if (res.state === 2000) {
+          this.addOrEditModalSpinning = false
+          this.modalPreData = res.data
+          console.log(this.modalPreData)
+          // this.yBargroup_name.push({ key: `'${res.data.x[0].field_id}'`, label: res.data.x[0].col_title })
+          if (res.data.x.length) {
+            this.group_name =  item.config_details.group_ids // 单个的
+            this.xBargroup_name = item.config_details.group_ids.split(',').map(Number); // 多选的
+            this.yBargroup_name = item.config_details.group_ids.split(',').map(Number) // 多选的
+          }
+          if (res.data.y.length) { // 判断该字段是否存在
+            this.yBarfield_name = item.config_details.field_ids
+            this.field_name = item.config_details.field_ids
+          }
+          this.initGetChartsDataFun() // 每次改变都重新请求数据
+        } else {
+          this.addOrEditModalSpinning = false;
+          (this as any).$message.error(res.message, 3) // 弹出错误message
+        }
+      }).catch((err: any) => {
+        if (err.code === 'ECONNABORTED') {
+          (this as any).$message.error('请求超时', 3) // 弹出错误message
+        } else {
+          (this as any).$message.error('失败', 3) // 弹出错误message
+        }
         this.addOrEditModalSpinning = false
-      }, 600)
+      })
+    
+      /* setTimeout(() => {
+        this.addOrEditModalSpinning = false
+      }, 600) */
       // let val:number = item
       // this.chartId = (Number(val) + 1).toString()
     }

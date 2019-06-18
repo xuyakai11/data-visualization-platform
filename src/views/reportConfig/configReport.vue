@@ -47,7 +47,7 @@
                 </div>
               <!-- </div> -->
               <footer class="lpc-charts-footer">
-                <p class="lpc-footer-p" @click="footerLookFun(item)">查看报表({{ item.foot_page }})</p>
+                <p class="lpc-footer-p" @click="footerLookFun(item)">查看报表</p><!-- ({{ item.foot_page }}) -->
               </footer>
             </grid-item>
           </grid-layout>
@@ -58,12 +58,23 @@
     <a-modal
       :visible="fullModalVisible"
       :title="fullModalTitle"
+      ref="fullModalTitle"
       @cancel="fullHandleCancel"
       width="80%"
       :footer="null"
       :bodyStyle="{ 'padding-bottom': 0 }"
-      > 
-      
+      >
+      <div class="lpc-modalFull">
+        <configx-bar :paramsData="fullParams" v-if="fullType === 'xBar'"></configx-bar>
+        <configy-bar :paramsData="fullParams" v-if="fullType === 'yBar'"></configy-bar>
+        <config-pie :paramsData="fullParams" v-if="fullType === 'pie'"></config-pie>
+        <config-line :paramsData="fullParams" v-if="fullType === 'line'"></config-line>
+        <config-gauge :paramsData="fullParams" v-if="fullType === 'gauge'"></config-gauge>
+        <config-funnel :paramsData="fullParams" v-if="fullType === 'funnel'"></config-funnel>
+        <config-table :paramsData="fullParams" v-if="fullType === 'table'" :modalStype="modalStype"></config-table>
+        <config-number :paramsData="fullParams" v-if="fullType === 'number'"></config-number>
+        <config-scatter :paramsData="fullParams" v-if="fullType === 'scatter'"></config-scatter>
+      </div>
     </a-modal>
   </div>
 </template>
@@ -123,6 +134,9 @@
     draggableOrResize:boolean = true // 配置是否可拖拽，放大缩小
     fullModalVisible:boolean = false
     fullModalTitle:string = ''
+    fullType:string = '' // 扩大弹窗中的图表类型
+    fullParams:any = {}
+    modalStype:any = { 'height': 500 }
     @Emit('allChartsData') send (item:any) {}
     @Emit('howMany') howMany (item:any, chartid?:string) {}
     // 监听paintingReport 是因为如果其变化则显示验证公式按钮 deep: true, immediate: true
@@ -204,7 +218,6 @@
 
     /* 编辑等操作start */
     editChartFun (item:any, index:number):void {
-      console.log(item)
       item.index = index // 把当前编辑的数据的下标传进去，然后修改完之后传递回来
       this.send(item) // 传递当前选中的给父组件
     }
@@ -217,19 +230,20 @@
         max = +(max.i) > +(v.i) ? max : v
       })
       max ? chartId = max.i : ''
-      console.log(chartId)
       this.howMany(this.allChartsData, chartId) // 传递当前剩下的所有数据及最大的i值 chart的id
       // this.send(this.allChartsData)
     }
     footerLookFun (item:any):void { // 查看报表
-      console.log(item.selected_rows.report_id)
       let reportId:number = item.selected_rows.report_id
       if (this.viewType === 'look') { // 判断，只有当为查看时才能操作
-        console.log('footerLook')
         window.open(window.location.origin + '/reportTable?reportId=' + reportId)
       }
     }
     fullScreenFun (item:any, index:number):void { // 扩大展示按钮方法
+      console.log(item)
+      this.fullParams = item // Object.assign({}, item)
+      this.fullType = item.type
+      this.modalStype = { 'height': 500 }
       this.fullModalVisible = true
       this.fullModalTitle = '扩大查看报表'
     }
@@ -302,5 +316,8 @@
         cursor: pointer;
       }
     }
+  }
+  .lpc-modalFull {
+    height: 500px;
   }
 </style>

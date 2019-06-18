@@ -1,15 +1,15 @@
 <template>
   <div class="config">
     <a-table
-        :scroll="{ x: x, y: y }"
-        :columns="columns"
-        :dataSource="data"
-        :pagination="pagination"
-        @change="onChange"
-        maskClosable="false"
-        :loading="loading"
-        :rowKey="record => record.keyFlagId"
-        size="small" />
+      :scroll="{ x: x, y: y }"
+      :columns="columns"
+      :dataSource="data"
+      :pagination="pagination"
+      @change="onChange"
+      maskClosable="false"
+      :loading="loading"
+      :rowKey="record => record.keyFlagId"
+      size="small" />
   </div>
 </template>
 
@@ -27,6 +27,7 @@
   export default class configTable extends Vue {
     @Prop({}) paramsData!:any
     @Prop({}) styles!:any
+    @Prop({}) modalStype!:any
 
     columns: Array<object> = [ // 定义表格表头
       /* { title: '账号', dataIndex: 'login_name', key: '', width: '120px' }, // fixed: 'left' 设置是否固定
@@ -57,7 +58,6 @@
     }
     @Watch('paramsData') paramsDataWatch (newVal:any, oldVal:any) {
       if (newVal && JSON.stringify(newVal) !== '{}') {
-        console.log(newVal)
         let params:any = {
           'reportId': newVal.selected_rows.report_id,
           'pageSize': 10,
@@ -67,13 +67,24 @@
         this.initDataFun(params)
       }
     }
+    @Watch('modalStype') modalStypeWatch (newVal:any, oldVal:any) {
+      console.log(newVal)
+      if (newVal && JSON.stringify(newVal) !== '{}') {
+        this.y = newVal.height - 100
+      }
+    }
     mounted () {
+      if (this.modalStype) {
+        this.y = this.modalStype.height - 100
+      }
+
       let params:any = { 'reportId': this.paramsData.selected_rows.report_id, 'searchParam': '', pageSize: 10, nowpage: 1 }
       this.initDataFun(params) // 请求表格数据
     }
     initDataFun (params:any):void {
       (this as any).$post('custom/Report/getReportDetail', params).then((res: any) => { // 请求表格数据
        if (res.state === 2000) {
+         this.data = [];
          this.loading = false
          this.columns = res.data.columns
          this.x = this.columns.length * 250

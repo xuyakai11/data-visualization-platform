@@ -46,15 +46,6 @@
       }
     }
     mounted () {
-      /* this.chartData.sort((a:any, b:any) => {
-        return a.value - b.value
-      })
-      this.chartData.map((v:any, i:number) => {
-        if (v.value > 0) {
-          this.seriesData.push({ name: v.name, value: v.value })
-          this.legendData.push(v.name)
-        }
-      }) */
       if (JSON.stringify(this.paramsData) !== '{}') {
         let params:any = {
           'report_id': this.paramsData.selected_rows.report_id,
@@ -66,9 +57,6 @@
         this.preUnit = this.paramsData.pre_unit.label // 赋值单位文字
         this.initGetChartsDataFun(params)
       }
-      // this.$nextTick(() => {
-      //   this.initEchartsFun(this.seriesData, this.legendData)
-      // })
     }
 
     initEchartsFun (seriesData:Array<any>) {
@@ -121,6 +109,7 @@
       this.myChart.setOption(this.option, true)
     }
     initGetChartsDataFun (params:any):void { // { 'report_id': 123, 'type': 'xBar', 'group_id': '9,12', 'field_id': '5', 'pre_unit': 'whole' }?report_id=130&type=xBar&group_id=21,22&field_id=30&pre_unit=whole
+      this.seriesData = []
       let _this = this;
       (this as any).$post('/custom/boardManage/generateBoardData', params).then((res: any) => {
         if (res.state === 2000) {
