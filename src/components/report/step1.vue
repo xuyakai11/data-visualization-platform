@@ -99,7 +99,7 @@
             v-decorator="['mainTableId', { rules: [{ required: true, message: '请选择字段' }]}]"
             placeholder="请选择数据主表">
             <a-select-option value="">请选择数据主表</a-select-option>
-            <a-select-option v-for="(item, i) in mainTableIdModel" :value="item.id" :key="i">{{item.title}}</a-select-option>
+            <a-select-option v-for="(item, i) in mainTableIdModel" :value="item.id" :key="i">{{ item.title }}</a-select-option>
           </a-select>
         </a-form-item>
         <a-form-item label="主表字段" :labelCol="modelCol.label" :wrapperCol="modelCol.wrapper">
@@ -172,9 +172,12 @@
             this.reportResourceId = res.data.reportResourceId */
             this.dataSourceSelectChange(res.data.reportResourceId)
             this.madinTabId = res.data.mainTableId; // 替换存放数据主表id 用于modal框中的数据主表回显
+            res.data.joinArr.map((v:any, i:number) => { // 关联表的数据也得带入到弹窗的数据主表
+              // this.mainTableIdModel
+            });
             (this as any).form.setFieldsValue({ 'reportName': res.data.reportName, 'reportResourceId': res.data.reportResourceId })
             this.aTagDatas = res.data.joinArr // 赋值关联表回显
-            this.joinArr = Object.assign(this.joinArr, res.data.joinArr) // 深度拷贝
+            this.joinArr = Object.assign(this.joinArr, res.data.joinArr) // 拷贝
             this.spinning = false // 关闭加载动画
           } else {
             this.spinning = false; // 关闭加载动画
@@ -233,6 +236,7 @@
       }
     }
     mainTableIdChange (val:number):void { // 数据主表下拉框改变事件
+      console.log(val)
       if (val) {
         this.joinBtnDis = false
         this.madinTabId = val // 替换存放数据主表id
@@ -315,10 +319,13 @@
     }
     showModel ():void { // 模态框
       this.visible = true
-      this.dataTab.forEach((v, i) => { // 处理附带数据主表 数据
+      console.log(this.madinTabId)
+      console.log(this.dataTab)
+      this.dataTab.forEach((v:any, i:number) => { // 处理附带数据主表 数据
         if (v.id === this.madinTabId) { // 相同给的则不带过去
           if (JSON.stringify(this.mainTableIdModel).indexOf(JSON.stringify(v)) === -1) {
             this.mainTableIdModel.push(v)
+            console.log(this.mainTableIdModel)
           }
         }
       })
@@ -333,6 +340,7 @@
       e.preventDefault();
       (this as any).modelForm.validateFields((err: any, values: any) => {
         if (!err) {
+          console.log(values)
           this.joinArr.push(values); // 存放进要提交的
           let tableId:number = values.joinTableId // 关联表id
           this.dataTab.forEach((item, ind) => {

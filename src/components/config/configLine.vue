@@ -1,5 +1,5 @@
 <template>
-  <div class="config"> <!-- 饼图 -->
+  <div class="config"> <!-- 折线图 -->
     <div class="map" ref="map">暂无数据</div>
   </div>
 </template>
@@ -173,6 +173,12 @@
         xAxis: {
           name: this.group_label,
           type: 'category',
+          nameGap: 25, // 距离坐标轴位置
+          nameLocation: 'middle',
+          nameTextStyle: {
+            fontSize: '10',
+            color: '#16325c'
+          },
           boundaryGap: false, // 配置从间隔是否中间开始，坐标轴两边留白策略
           axisTick: { // 分隔x轴下方小刻度线
             show: false

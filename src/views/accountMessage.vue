@@ -1,4 +1,3 @@
-
 <template>
   <div>
     <a-card :title="title" :bordered="false"></a-card>
@@ -110,7 +109,6 @@
              </a-form-item>
             </a-col>
           </a-row> -->
-
           <a-form-item v-bind="formItemLayout" label="系统角色">
             <a-checkbox-group
               :disabled="allDisabled"
@@ -181,7 +179,6 @@
               </a-row>
             </a-checkbox-group>
           </a-form-item> -->
-
           <!-- <a-form-item v-bind="formItemLayout" label="工作性质">
             <a-radio-group :disabled="allDisabled" v-decorator="['stuffType', { initialValue: data.userInfo.stuff_type }]">
               <a-radio value="0">
@@ -278,11 +275,11 @@
     wrapperCol:any
   }
   interface data {
-    areaInfo: Array<any>,
+    // areaInfo: Array<any>,
     areaList:Array<any>,
-    businessLineCodes:Array<string>,
+    // businessLineCodes:Array<string>,
     idCardType:Array<string>,
-    positionRoleCode:any,
+    // positionRoleCode:any,
     roleInfo:Array<any>,
     roleList:Array<any>,
     state:Array<string>,
@@ -298,12 +295,12 @@
     commonDisabled:boolean = true // 编辑or查看页共同都是禁用
     allDisabled:boolean = false // 全部禁用
     data:data = {
-      areaInfo: [],
+      // areaInfo: [],
       areaList: [], // 校区权限
-      businessLineCodes: [], // 条线
+      // businessLineCodes: [], // 条线
       department: [], // 所属部门
       idCardType: [], // 证件类型
-      positionRoleCode: {},
+      // positionRoleCode: {},
       roleInfo: [], // 回显选中系统角色
       roleList: [], // 系统角色
       state: [],
@@ -347,15 +344,15 @@
           this.data = res.data
           this.roleInfoDealWith = res.data.roleInfo.length ? res.data.roleInfo.map((v:any, i:number) => { // 处理要回显的数据
             return v.id
-          }) : []
+          }) : [] // 回显系统角色
           /* this.data.userInfo.business_line_codes ? this.data.userInfo.business_line_codes.split(',') : this.data.userInfo.business_line_codes = []
           this.data.userInfo.position_role_codes ? this.data.userInfo.position_role_codes.split(',') : this.data.userInfo.position_role_codes = [] */
-          this.data.userInfo.hire_date = this.data.userInfo.hire_date ? this.data.userInfo.hire_date = null : (this as any).moment(this.data.userInfo.hire_date, 'YYYY-MM-DD')
-          this.data.userInfo.gender = this.data.userInfo.gender.toString() // 将返回过来的性别字段转为字符串格式
+          // this.data.userInfo.hire_date = this.data.userInfo.hire_date ? this.data.userInfo.hire_date = null : (this as any).moment(this.data.userInfo.hire_date, 'YYYY-MM-DD')
           /* this.checkedList = this.data.areaInfo // 赋值默认选中的校区权限
           this.areaList = this.data.areaList.length ? this.data.areaList.map((v:any, i:number) => {
             return v.Code
           }) : [] */ // 设置获取全选时的选中
+          this.data.userInfo.gender = this.data.userInfo.gender.toString() // 将返回过来的性别字段转为字符串格式
           this.spinning = false;
         } else {
           this.spinning = false;
@@ -369,12 +366,12 @@
         }
         this.spinning = false
         this.data = {
-          areaInfo: [],
+          // areaInfo: [],
           areaList: [],
-          businessLineCodes: [],
+          // businessLineCodes: [],
           department: [],
           idCardType: [],
-          positionRoleCode: {},
+          // positionRoleCode: {},
           roleInfo: [],
           roleList: [],
           state: [],
@@ -398,17 +395,18 @@
       e.preventDefault();
       (this as any).form.validateFieldsAndScroll((err: any, values: any) => {
         if (!err) {
-          values.businessLineCodes = values.businessLineCodes.join(',')
-          values.positionRoleCode = values.positionRoleCode.join(',')
+          // values.businessLineCodes = values.businessLineCodes.join(',')
+          // values.positionRoleCode = values.positionRoleCode.join(',')
           values.roleId = values.roleId.join(',')
-          values.phone = values.phone_qu + values.phone_hao + values.phone_fen
-          delete values.EHR_code
-          delete values.phone_fen
-          delete values.phone_qu
-          delete values.phone_hao
+          // values.phone = values.phone_qu + values.phone_hao + values.phone_fen
+          // delete values.EHR_code
+          // delete values.phone_fen
+          // delete values.phone_qu
+          // delete values.phone_hao
+          console.log(values)
           let params:any = {
             ...values,
-            'hireDate': values['hireDate'].format('YYYY-MM-DD'),
+            // 'hireDate': values['hireDate'].format('YYYY-MM-DD'),
             'userId': this.userId
           };
           (this as any).$post('/custom/UserManage/updateUserInfo', params).then((res: any) => { // 请求页面数据
@@ -417,7 +415,7 @@
               setTimeout(() => {
                 (this as any).$router.push({ path: '/accountManagement' }) 
                 // window.location.href = window.location.origin + '/roleManagement' // 
-              }, 1000)
+              }, 800)
             } else {
               (this as any).$message.error(res.message, 3) // 弹出错误message
             }

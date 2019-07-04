@@ -199,7 +199,7 @@
             obj[['left', 'right'][+(point[0] < size.viewSize[0] / 2)]] = 5;
             return obj; */
             // 固定在顶部
-            return [point[0], '1%'];
+            return [point[0], '1%']
           }
         },
         calculable: true,
@@ -229,7 +229,7 @@
           nameLocation: 'middle',
           nameTextStyle: {
             fontSize: '10',
-            color: '#16325c',
+            color: '#16325c'
           },
           data: legendData // ['北京', '浙江', '湖南', '江西', '湖北', '江苏', '海南']
         },
@@ -240,7 +240,7 @@
           // nameLocation: 'middle',
           nameTextStyle: {
             fontSize: '10',
-            color: '#16325c',
+            color: '#16325c'
           }
         },
         dataZoom: this.dataZoom,

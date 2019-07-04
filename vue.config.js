@@ -4,7 +4,7 @@ module.exports = {
     ? '/static/custom/'
     : './',
   devServer: { // 设置端口
-    port: 8080
+    port: 8081
   },
   // pages: { // 配置多页面入口
   //   index: 'src/project/index/main.ts',
