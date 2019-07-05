@@ -47,7 +47,7 @@
                 </div>
               <!-- </div> -->
               <footer class="lpc-charts-footer">
-                <p class="lpc-footer-p" @click="footerLookFun(item)">查看报表</p><!-- ({{ item.foot_page }}) -->
+                <p class="lpc-footer-p" v-show="viewType === 'look'" @click="footerLookFun(item)">查看报表</p><!-- ({{ item.foot_page }}) -->
               </footer>
             </grid-item>
           </grid-layout>

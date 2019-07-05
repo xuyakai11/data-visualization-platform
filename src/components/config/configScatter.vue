@@ -32,7 +32,6 @@
     seriesData:Array<any> = []
     legendData:Array<string> = []
     @Watch('styles') patintingWatch (newVal:any, oldVal:any) {
-      console.log(newVal)
       if (newVal && JSON.stringify(newVal) !== '{}') {
         console.log(1)
         this.$nextTick(() => {
@@ -41,7 +40,6 @@
         })
       } else {
         this.myChart = echarts.init(this.$refs.map as HTMLDivElement)
-        console.log(this.myChart)
         this.myChart.clear()
         this.myChart.setOption(this.option, true)
       }
@@ -60,14 +58,14 @@
       }
     } */
     mounted () {
-      this.chartData.sort((a:any, b:any) => {
+      /* this.chartData.sort((a:any, b:any) => {
         return a.value - b.value
-      })
+      }) */
       this.chartData.map((v:any, i:number) => {
-        if (v.value > 0) {
+        // if (v.value > 0) {
           this.seriesData.push({ name: v.name, value: v.value })
           this.legendData.push(v.name)
-        }
+        // }
       })
       this.$nextTick(() => {
         this.initEchartsFun(this.seriesData, this.legendData)

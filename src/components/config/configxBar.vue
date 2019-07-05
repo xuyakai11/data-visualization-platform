@@ -73,7 +73,8 @@
         })
       }
     }
-    @Watch('paramsData') paramsDataWatch (newVal:any, oldVal:any) {
+    @Watch('paramsData', { deep: true, immediate: true }) paramsDataWatch (newVal:any, oldVal:any) {
+      console.log(this.paramsData)
       if (newVal && JSON.stringify(newVal) !== '{}') {
         let params:any = {
           'report_id': newVal.selected_rows.report_id,
@@ -140,26 +141,26 @@
                 }
               ]
             } else {
-              this.chartData.sort((a:any, b:any) => {
-                return a.value - b.value
-              })
+              // this.chartData.sort((a:any, b:any) => {
+              //   return a.value - b.value
+              // })
               this.chartData.map((v:any, i:number) => {
-                if (v.value >= 0) {
+                // if (v.value >= 0) {
                   // this.seriesData.push({ name: v.name, value: v.value })
                   this.legendData.push(v.name)
-                }
+                // }
               }) 
               this.seriesData = [{
                 type: 'bar',
                 barWidth: '60%',
                 barCategoryGap: 5,
                 itemStyle: {
-                  normal: {
+                  /* normal: {
                     color: function (params:any) { // 每个柱子的颜色即为colorList数组里的每一项，如果柱子数目多于colorList的长度，则柱子颜色循环使用该数组
                       var colorList = ['#64B9FC', '#81C784', '#E57373', '#369FF1', '#f1963b', '#ff4715', '#5072b8']
                       return colorList[params.dataIndex]
                     }
-                  }
+                  } */
                 },
                 data: this.chartData
               }]

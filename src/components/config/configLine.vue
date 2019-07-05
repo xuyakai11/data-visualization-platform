@@ -44,7 +44,7 @@
         this.myChart.setOption(this.option, true)
       }
     }
-    @Watch('paramsData') paramsDataWatch (newVal:any, oldVal:any) {
+    @Watch('paramsData', { deep: true, immediate: true }) paramsDataWatch (newVal:any, oldVal:any) {
       if (newVal && JSON.stringify(newVal) !== '{}') {
         let params:any = {
           'report_id': newVal.selected_rows.report_id,
@@ -114,11 +114,11 @@
             } else {
               let danLineArr:Array<number> = []
               this.chartData.map((v:any, i:number) => {
-                if (v.value > 0) {
+                // if (v.value > 0) {
                   danLineArr.push(v.value)
                   // this.seriesData.push({ type: 'line', stack: '总量', name: v.name, data: v.value })
                   this.legendData.push(v.name)
-                }
+                // }
               })
               this.dataZoom = []
               this.seriesData = [{ type: 'line', data: danLineArr }]

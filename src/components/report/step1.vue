@@ -172,9 +172,22 @@
             this.reportResourceId = res.data.reportResourceId */
             this.dataSourceSelectChange(res.data.reportResourceId)
             this.madinTabId = res.data.mainTableId; // 替换存放数据主表id 用于modal框中的数据主表回显
-            res.data.joinArr.map((v:any, i:number) => { // 关联表的数据也得带入到弹窗的数据主表
+            console.log(this.dataTab);
+            // 编辑回显未做弹窗中的数据主表回显
+            /* res.data.joinArr.map((v:any, i:number) => { // 关联表的数据也得带入到弹窗的数据主表
               // this.mainTableIdModel
-            });
+              console.log(v)
+              this.dataTab.forEach((item, ind) => {
+                if (tableId === item.id) {
+                  // _thisValues.title = item.title
+                let _thisValues = Object.assign({ joinTableName: item.title }, values)
+                this.aTagDatas.push(_thisValues) // 存放进要回显的
+                if (JSON.stringify(this.mainTableIdModel).indexOf(JSON.stringify(item)) === -1) {
+                    this.mainTableIdModel.push(item) // 将关联表放到数据主表
+                  }
+                }
+              })
+            }); */
             (this as any).form.setFieldsValue({ 'reportName': res.data.reportName, 'reportResourceId': res.data.reportResourceId })
             this.aTagDatas = res.data.joinArr // 赋值关联表回显
             this.joinArr = Object.assign(this.joinArr, res.data.joinArr) // 拷贝
@@ -236,7 +249,6 @@
       }
     }
     mainTableIdChange (val:number):void { // 数据主表下拉框改变事件
-      console.log(val)
       if (val) {
         this.joinBtnDis = false
         this.madinTabId = val // 替换存放数据主表id
@@ -313,19 +325,16 @@
             } else {
               (this as any).$message.error('请求失败', 3) // 弹出错误message
             }
-          });
+          })
         }
       })
     }
     showModel ():void { // 模态框
       this.visible = true
-      console.log(this.madinTabId)
-      console.log(this.dataTab)
       this.dataTab.forEach((v:any, i:number) => { // 处理附带数据主表 数据
         if (v.id === this.madinTabId) { // 相同给的则不带过去
           if (JSON.stringify(this.mainTableIdModel).indexOf(JSON.stringify(v)) === -1) {
             this.mainTableIdModel.push(v)
-            console.log(this.mainTableIdModel)
           }
         }
       })
@@ -340,7 +349,6 @@
       e.preventDefault();
       (this as any).modelForm.validateFields((err: any, values: any) => {
         if (!err) {
-          console.log(values)
           this.joinArr.push(values); // 存放进要提交的
           let tableId:number = values.joinTableId // 关联表id
           this.dataTab.forEach((item, ind) => {
@@ -348,6 +356,9 @@
               // _thisValues.title = item.title
              let _thisValues = Object.assign({ joinTableName: item.title }, values)
              this.aTagDatas.push(_thisValues) // 存放进要回显的
+             if (JSON.stringify(this.mainTableIdModel).indexOf(JSON.stringify(item)) === -1) {
+                this.mainTableIdModel.push(item) // 将关联表放到数据主表
+              }
             }
           })
           this.joinTabFiledSelectDis = true // 将关联字段选择重置为不可选

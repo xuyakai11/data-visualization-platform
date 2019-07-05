@@ -15,7 +15,7 @@
         </div>
         <div class="header-right">
           <a-tag color="#108ee9" @click="addReportModal" v-if="viewType !== 'look'"><a-icon type="plus" />添加组件</a-tag>
-          <a-tag @click="showDrawer"><a-icon type="setting"/></a-tag>
+          <!-- <a-tag @click="showDrawer"><a-icon type="setting"/></a-tag> -->
           <a-tag color="#87d068" v-if="viewType !== 'look'" @click="saveAllDatasFun">完成</a-tag>
         </div>
       </header>
@@ -142,9 +142,9 @@
                     mode="multiple"
                     v-decorator="['field_name', { initialValue: yBargroup_name, rules: [{ required: true, min:1, max:2, type:'array', message: '请至少选择1项至多选择2项字段键名' }]}]"
                   >
-                    <a-select-option value="create">创建人</a-select-option>
+                    <!-- <a-select-option value="create">创建人</a-select-option>
                     <a-select-option value="create2">创建人2</a-select-option>
-                    <a-select-option value="create3">创建人3</a-select-option>
+                    <a-select-option value="create3">创建人3</a-select-option> -->
                     <a-select-option v-if="JSON.stringify(modalPreData) !== '{}'" v-for="(item, index) in modalPreData.x" :value="item.group_id">{{ item.group_title_name }}</a-select-option>
                   </a-select>
                 </a-form-item>
@@ -172,9 +172,9 @@
                     @change="YChange"
                     v-decorator="['field_name', { initialValue: field_name, rules: [{ required: true, message: '请选择字段键名' }]}]"
                   >
-                  <a-select-option value="create">创建人</a-select-option>
+                  <!-- <a-select-option value="create">创建人</a-select-option>
                     <a-select-option value="create2">创建人2</a-select-option>
-                    <a-select-option value="create3">创建人3</a-select-option>
+                    <a-select-option value="create3">创建人3</a-select-option> -->
                     <a-select-option v-if="JSON.stringify(modalPreData) !== '{}'" v-for="(item, index) in modalPreData.y" :value="item.field_id">{{ item.col_title }}</a-select-option>
                   </a-select>
                 </a-form-item>
@@ -212,9 +212,9 @@
                 <a-form-item label="值">
                   <a-select
                     @change="XChange"
-                    v-decorator="[ 'group_name', { initialValue: group_name, rules: [{ required: true, message: '请选择纬度键名' }]}]"
-                  >
-                    <a-select-option v-if="JSON.stringify(modalPreData) !== '{}'" v-for="(item, index) in modalPreData.x" :value="item.group_id">{{ item.group_title_name }}</a-select-option>
+                    v-decorator="['field_name', { initialValue: field_name, rules: [{ required: true, message: '请选择纬度键名' }]}]"
+                  ><!-- v-decorator="[ 'group_name', { initialValue: group_name, rules: [{ required: true, message: '请选择纬度键名' }]}]" -->
+                    <a-select-option v-if="JSON.stringify(modalPreData) !== '{}'" v-for="(item, index) in modalPreData.y" :value="item.field_id">{{ item.col_title }}</a-select-option>
                   </a-select>
                 </a-form-item>
               </div>
@@ -596,7 +596,10 @@
           } else if (this.type === 'xBar' || this.type === 'line') {
             group_ids = this.xBargroup_name.join(',')
           } else {
+            console.log(this.group_name)
+            console.log(this.field_name)
             group_ids = this.group_name
+            // group_ids = this.field_name
           }
           // console.log(this.boardName)
           if (this.addOrEditTitle === '编辑组件') {
@@ -769,6 +772,7 @@
       }
     }
     initGetChartsDataFun ():void { // 获取图表数据方法
+      console.log(11)
       let group_ids:string = ''
       if (this.type === 'yBar') {
         group_ids = this.yBargroup_name.join(',')

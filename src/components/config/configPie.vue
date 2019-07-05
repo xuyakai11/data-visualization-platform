@@ -44,7 +44,7 @@
         this.initEchartsFun(this.seriesData, this.legendData)
       }
     }
-    @Watch('paramsData') paramsDataWatch (newVal:any, oldVal:any) {
+    @Watch('paramsData', { deep: true, immediate: true }) paramsDataWatch (newVal:any, oldVal:any) {
       if (newVal && JSON.stringify(newVal) !== '{}') {
         let params:any = {
           'report_id': newVal.selected_rows.report_id,
@@ -89,10 +89,10 @@
           this.seriesData = []
           if (res.data.length) {
             this.chartData.map((v:any, i:number) => {
-              if (v.value > 0) {
+              // if (v.value > 0) {
                 this.seriesData.push({ name: v.name, value: v.value })
                 this.legendData.push(v.name)
-              }
+              // }
             })
             _this.$nextTick(() => {
               _this.initEchartsFun(this.legendData, this.seriesData)
