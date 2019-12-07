@@ -73,7 +73,7 @@
         })
       }
     }
-    @Watch('paramsData', { deep: true, immediate: true }) paramsDataWatch (newVal:any, oldVal:any) {
+    @Watch('paramsData') paramsDataWatch (newVal:any, oldVal:any) {
       console.log(this.paramsData)
       if (newVal && JSON.stringify(newVal) !== '{}') {
         let params:any = {

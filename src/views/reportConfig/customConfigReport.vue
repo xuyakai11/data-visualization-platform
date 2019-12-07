@@ -851,17 +851,18 @@
     /* 编辑操作start */
     manyIndex (item:any, id?:string):void {
       if (id) {
-        +id ? this.chartId = (+id + 1).toString() : this.chartId = id
+        console.log('cunzai')
+        this.chartId = (+id + 1).toString()
+        // +id ? this.chartId = (+id + 1).toString() : this.chartId = id
       }
       this.editAllData = item
-      console.log(this.editAllData)
       setTimeout(() => {
         this.y = 0
         if (this.editAllData.length) {
           this.boardName = this.editAllData[0].board_name
           this.editAllData.map((v:any, i:number) => {
             this.y += v.h
-            this.chartId = (Number(this.chartId) + 1).toString()
+            // this.chartId = (Number(this.chartId) + 1).toString()
           })
           this.x = this.editAllData[this.editAllData.length - 1].x // 获取上一个的x起点
           let w = this.editAllData[this.editAllData.length - 1].w // 获取上一个的w宽度
@@ -1007,11 +1008,11 @@
     .dashboardView {
       height: 100%;
       width: 100%;
-      overflow: visible;
+      // overflow: visible;
       .layout-container {
         padding: 15px 10px;
-        overflow-x: hidden;
-        overflow-y: auto;
+        // overflow-x: hidden;
+        // overflow-y: auto;
         position: relative;
         .gutter-example {
           // background: url('../../assets/img/repeat.png') 0 0 repeat;

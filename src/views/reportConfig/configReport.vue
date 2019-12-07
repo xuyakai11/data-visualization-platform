@@ -170,7 +170,15 @@
       (this as any).$post('/custom/BoardManage/getBoardData', { board_id } ).then((res: any) => {
         if (res.state === 2000) {
           this.allChartsData = res.data.subunitData
-          this.howMany(this.allChartsData)
+          let chartId:string = '0'
+          let max:any = this.allChartsData[0]
+          this.allChartsData.map((v:any,i:number) => {
+            max = +(max.i) > +(v.i) ? max : v
+          })
+          max ? chartId = max.i : ''
+          console.log(max)
+          console.log(typeof(chartId))
+          this.howMany(this.allChartsData, chartId) // 编辑进入第一次请求全部数据时，将最大的i传递
         } else {
           (this as any).$message.error(res.message, 3) // 弹出错误message
         }
@@ -229,9 +237,9 @@
       this.allChartsData.map((v:any,i:number) => {
         max = +(max.i) > +(v.i) ? max : v
       })
-      max ? chartId = max.i : ''
-      this.howMany(this.allChartsData, chartId) // 传递当前剩下的所有数据及最大的i值 chart的id
-      // this.send(this.allChartsData)
+      max ? chartId = max.i : '' // 获取最大的i
+      // this.howMany(this.allChartsData, chartId) // 传递当前剩下的所有数据及最大的i值 chart的id
+      this.howMany(this.allChartsData)
     }
     footerLookFun (item:any):void { // 查看报表
       let reportId:number = item.selected_rows.report_id

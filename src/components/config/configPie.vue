@@ -44,7 +44,7 @@
         this.initEchartsFun(this.seriesData, this.legendData)
       }
     }
-    @Watch('paramsData', { deep: true, immediate: true }) paramsDataWatch (newVal:any, oldVal:any) {
+    @Watch('paramsData') paramsDataWatch (newVal:any, oldVal:any) {
       if (newVal && JSON.stringify(newVal) !== '{}') {
         let params:any = {
           'report_id': newVal.selected_rows.report_id,

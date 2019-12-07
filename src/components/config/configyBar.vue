@@ -49,8 +49,8 @@
         this.myChart.clear()
         this.myChart.setOption(this.option, true)
       }
-    }
-    @Watch('paramsData', { deep: true, immediate: true }) paramsDataWatch (newVal:any, oldVal:any) {
+    } /* { deep: true, immediate: true } */
+    @Watch('paramsData') paramsDataWatch (newVal:any, oldVal:any) {
       if (newVal && JSON.stringify(newVal) !== '{}') {
         console.log(newVal)
         let params:any = {
